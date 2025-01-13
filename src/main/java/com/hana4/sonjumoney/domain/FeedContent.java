@@ -26,7 +26,7 @@ public class FeedContent {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "feed_id")
+	@JoinColumn(name = "feed_id", nullable = false)
 	private Feed feed;
 
 	@Column(name = "content_url", nullable = false)
