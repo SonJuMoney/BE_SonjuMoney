@@ -51,13 +51,6 @@ public class Feed extends BaseEntity {
 	private FeedType feedType;
 
 	@Builder
-	public Feed(Member member, boolean contentExist, String feedMessage) {
-		this.member = member;
-		this.contentExist = contentExist;
-		this.feedMessage = feedMessage;
-		this.feedType = FeedType.NORMAL;
-	}
-	@Builder
 	public Feed(Member member, Allowance allowance, Long receiverId, boolean contentExist, String feedMessage,
 		FeedType feedType) {
 		this.member = member;
