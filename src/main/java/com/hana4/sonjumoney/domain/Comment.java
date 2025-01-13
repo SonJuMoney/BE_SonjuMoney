@@ -1,11 +1,7 @@
 package com.hana4.sonjumoney.domain;
 
-import com.hana4.sonjumoney.domain.enums.MemberRole;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,32 +15,31 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "Comment")
 @Getter
-@Table(name = "Member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class Comment extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "member_id", nullable = false)
+	@Column(name = "comment_id", nullable = false)
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "family_id", nullable = false)
-	private Family family;
+	@JoinColumn(name = "feed_id", nullable = false)
+	private Feed feed;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = false)
-	private User user;
+	@JoinColumn(name = "member_id", nullable = false)
+	private Member member;
 
-	@Column(name = "member_role", nullable = false)
-	@Enumerated(EnumType.STRING)
-	private MemberRole memberRole;
+	@Column(name = "message", length = 300, nullable = false)
+	private String message;
 
 	@Builder
-	public Member(Family family, User user, MemberRole memberRole) {
-		this.family = family;
-		this.user = user;
-		this.memberRole = memberRole;
+	public Comment(Feed feed, Member member, String message) {
+		this.feed = feed;
+		this.member = member;
+		this.message = message;
 	}
 }

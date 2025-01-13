@@ -1,6 +1,6 @@
 package com.hana4.sonjumoney.domain;
 
-import com.hana4.sonjumoney.domain.enums.MemberRole;
+import com.hana4.sonjumoney.domain.enums.TransactionType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,31 +20,34 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "Member")
+@Table(name = "Transaction_History")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
-
+public class TransactionHistory extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "member_id", nullable = false)
+	@Column(name = "transaction_id", nullable = false)
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "family_id", nullable = false)
-	private Family family;
+	@JoinColumn(name = "account_id", nullable = false)
+	private Account account;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = false)
-	private User user;
+	@Column(nullable = false)
+	private Integer amount;
 
-	@Column(name = "member_role", nullable = false)
+	@Column(length = 20, nullable = false)
+	private String message;
+
+	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
-	private MemberRole memberRole;
+	private TransactionType transactionType;
 
 	@Builder
-	public Member(Family family, User user, MemberRole memberRole) {
-		this.family = family;
-		this.user = user;
-		this.memberRole = memberRole;
+	public TransactionHistory(Account account, Integer amount, String message, TransactionType transactionType) {
+		this.account = account;
+		this.amount = amount;
+		this.message = message;
+		this.transactionType = transactionType;
 	}
+
 }
