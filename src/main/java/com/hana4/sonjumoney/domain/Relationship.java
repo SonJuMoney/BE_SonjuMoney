@@ -19,7 +19,7 @@ public class Relationship {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "relationship_id")
-	private Long relationshipId;
+	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_id", nullable = false)
