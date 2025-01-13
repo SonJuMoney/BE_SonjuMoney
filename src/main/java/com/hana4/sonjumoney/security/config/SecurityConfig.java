@@ -10,8 +10,10 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.hana4.sonjumoney.security.filter.JwtAuthenticationFilter;
 import com.hana4.sonjumoney.security.filter.LoginFilter;
 import com.hana4.sonjumoney.security.util.JwtUtil;
+import com.hana4.sonjumoney.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
 	private final JwtUtil jwtUtil;
+	private final AuthService authService;
 	private final AuthenticationConfiguration authenticationConfiguration;
 
 	@Bean
@@ -40,7 +43,9 @@ public class SecurityConfig {
 				.anyRequest()
 				.authenticated()
 			)
-			.addFilter(new LoginFilter(authenticationManager(), jwtUtil));
+			.addFilter(new LoginFilter(authenticationManager(), jwtUtil))
+			.addFilter(new JwtAuthenticationFilter(jwtUtil, authService))
+		;
 
 		return http.build();
 	}
