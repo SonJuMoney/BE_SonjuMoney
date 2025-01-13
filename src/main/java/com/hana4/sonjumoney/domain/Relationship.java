@@ -1,5 +1,6 @@
 package com.hana4.sonjumoney.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -17,6 +18,7 @@ public class Relationship {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "relationship_id")
 	private Long relationshipId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
