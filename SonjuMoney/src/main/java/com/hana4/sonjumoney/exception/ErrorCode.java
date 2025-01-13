@@ -10,7 +10,7 @@ import lombok.Getter;
 public enum ErrorCode {
 
 	// 404
-	NOT_FOUND_USER(40000,HttpStatus.NOT_FOUND,"존재하지 않는 유저입니다."),
+	NOT_FOUND_USER(40400,HttpStatus.NOT_FOUND,"존재하지 않는 유저입니다."),
 
 	// 500
 	INTERNAL_SERVER_ERROR(50000, HttpStatus.INTERNAL_SERVER_ERROR,"서버내부 오류입니다."),

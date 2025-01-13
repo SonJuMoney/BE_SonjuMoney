@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import com.hana4.sonjumoney.domain.User;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<User, Long> {
 }
