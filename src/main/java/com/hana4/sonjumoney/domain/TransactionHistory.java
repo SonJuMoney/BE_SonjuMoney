@@ -38,7 +38,7 @@ public class TransactionHistory extends BaseEntity {
 	@Column(length = 20, nullable = false)
 	private String message;
 
-	@Column(nullable = false)
+	@Column(name = "transaction_type", nullable = false)
 	@Enumerated(EnumType.STRING)
 	private TransactionType transactionType;
 

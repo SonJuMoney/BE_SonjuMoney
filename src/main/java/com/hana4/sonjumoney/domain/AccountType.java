@@ -29,7 +29,7 @@ public class AccountType {
 	@Enumerated(EnumType.STRING)
 	private Bank bank;
 
-	@Column(nullable = false)
+	@Column(name = "account_type", nullable = false)
 	@Enumerated(EnumType.STRING)
 	private com.hana4.sonjumoney.domain.enums.AccountType accountType;
 
