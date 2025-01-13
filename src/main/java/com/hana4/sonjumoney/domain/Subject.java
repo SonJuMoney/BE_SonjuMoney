@@ -1,14 +1,10 @@
 package com.hana4.sonjumoney.domain;
 
-import java.util.List;
-
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -17,20 +13,28 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "Family")
+@Table(name = "Subject")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Family extends BaseEntity {
-
+public class Subject {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "family_id", nullable = false)
+	@Column(name = "subject_id", nullable = false)
 	private Long id;
 
-	@Column(name = "family_name", length = 20, nullable = false)
-	private String familyName;
+	@Column(length = 100, nullable = false)
+	private String subject;
+
+	@Column(name = "age_range1", nullable = false)
+	private Integer ageRange1;
+
+	@Column(name = "age_range2", nullable = false)
+	private Integer ageRange2;
 
 	@Builder
-	public Family(String familyName) {
-		this.familyName = familyName;
+	public Subject(String subject, Integer ageRange1, Integer ageRange2) {
+		this.subject = subject;
+		this.ageRange1 = ageRange1;
+		this.ageRange2 = ageRange2;
 	}
+
 }

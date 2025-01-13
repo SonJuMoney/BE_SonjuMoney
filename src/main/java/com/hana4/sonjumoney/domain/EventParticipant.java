@@ -1,11 +1,7 @@
 package com.hana4.sonjumoney.domain;
 
-import com.hana4.sonjumoney.domain.enums.MemberRole;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,31 +16,26 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "Member")
+@Table(name = "Event_Participant")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class EventParticipant {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "member_id", nullable = false)
+	@Column(name = "participant_id", nullable = false)
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "family_id", nullable = false)
-	private Family family;
+	@JoinColumn(name = "event_id", nullable = false)
+	private Event event;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = false)
-	private User user;
-
-	@Column(name = "member_role", nullable = false)
-	@Enumerated(EnumType.STRING)
-	private MemberRole memberRole;
+	@JoinColumn(name = "member_id", nullable = false)
+	private Member member;
 
 	@Builder
-	public Member(Family family, User user, MemberRole memberRole) {
-		this.family = family;
-		this.user = user;
-		this.memberRole = memberRole;
+	public EventParticipant(Event event, Member member) {
+		this.event = event;
+		this.member = member;
 	}
 }

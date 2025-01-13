@@ -1,14 +1,13 @@
 package com.hana4.sonjumoney.domain;
 
-import java.util.List;
-
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -16,21 +15,26 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "Feed_Content")
 @Getter
-@Table(name = "Family")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Family extends BaseEntity {
+public class FeedContent {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "family_id", nullable = false)
+	@Column(name = "feed_content_id", nullable = false)
 	private Long id;
 
-	@Column(name = "family_name", length = 20, nullable = false)
-	private String familyName;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "feed_id", nullable = false)
+	private Feed feed;
+
+	@Column(name = "content_url", nullable = false)
+	private String contentUrl;
 
 	@Builder
-	public Family(String familyName) {
-		this.familyName = familyName;
+	public FeedContent(Feed feed, String contentUrl) {
+		this.feed = feed;
+		this.contentUrl = contentUrl;
 	}
 }
