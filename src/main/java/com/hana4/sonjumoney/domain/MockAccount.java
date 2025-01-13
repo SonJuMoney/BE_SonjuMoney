@@ -24,35 +24,35 @@ import lombok.NoArgsConstructor;
 public class MockAccount {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "mockacc_id", nullable = false)
+	@Column(name = "mockacc_id", columnDefinition = "INT UNSIGNED", nullable = false)
 	private Long id;
 
-	//계좌유형
 	@ManyToOne
-	@JoinColumn(name = "account_type_id");
+	@JoinColumn(name = "account_type_id", nullable = false)
 	private AccountType accountType;
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private Bank bank;
 
-	@Column(name = "account_num", nullable = false)
+	@Column(name = "account_num", columnDefinition = "VARCHAR(20)", nullable = false)
 	private String accountNum;
 
-	@Column(name = "holder_resident_num", nullable = false)
+	@Column(name = "holder_resident_num", columnDefinition = "VARCHAR(14)", nullable = false)
 	private String holderResidentNum;
 
-	@Column(name = "deputy_resident_num", nullable = false)
+	@Column(name = "deputy_resident_num", columnDefinition = "VARCHAR(14)", nullable = false)
 	private String DeputyResidentNum;
 
 	@Column(nullable = false)
 	private Long balance;
 
-	@Column(name = "account_password", nullable = false)
+	@Column(name = "account_password", columnDefinition = "VARCHAR(4)", nullable = false)
 	private String accountPassword;
 
 	@Builder
-	public MockAccount(AccountType accountType,Bank bank, String accountNum, String holderResidentNum, String deputyResidentNum, Long balance,
+	public MockAccount(AccountType accountType, Bank bank, String accountNum, String holderResidentNum,
+		String deputyResidentNum, Long balance,
 		String accountPassword) {
 		this.accountType = accountType;
 		this.bank = bank;
@@ -61,7 +61,6 @@ public class MockAccount {
 		this.DeputyResidentNum = deputyResidentNum;
 		this.balance = balance;
 		this.accountPassword = accountPassword;
-
 	}
 
 }
