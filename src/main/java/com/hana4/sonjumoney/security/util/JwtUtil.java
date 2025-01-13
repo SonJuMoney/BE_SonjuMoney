@@ -7,6 +7,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Jwts;
@@ -27,16 +28,9 @@ public class JwtUtil {
 			Jwts.SIG.HS256.key().build().getAlgorithm());
 	}
 
-	public boolean validateToken(String token) {
-		try {
-			Jwts.parser()
-				.verifyWith(secretKey)
-				.build()
-				.parseSignedClaims(token);
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
+	public boolean validateToken(String token, UserDetails userDetails) {
+		String authId = getAuthId(token);
+		return authId.equals(userDetails.getUsername()) && !isTokenExpired(token);
 	}
 
 	public String getAuthId(String token) {
