@@ -20,10 +20,10 @@ public class Relationship {
 	private Long relationshipId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = false)
-	private User parentId;
+	@JoinColumn(name = "parent_id", nullable = false)
+	private User parent;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = false)
-	private User childId;
+	@JoinColumn(name = "child_id", nullable = false)
+	private User child;
 }
