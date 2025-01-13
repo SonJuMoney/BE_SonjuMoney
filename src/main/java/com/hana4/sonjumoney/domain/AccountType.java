@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 public class AccountType {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "account_type_id", columnDefinition = "INT UNSIGNED", nullable = false)
+	@Column(name = "account_type_id", nullable = false)
 	private Long id;
 
 	@Column(nullable = false)
