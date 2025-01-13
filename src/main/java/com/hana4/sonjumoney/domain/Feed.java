@@ -43,6 +43,9 @@ public class Feed extends BaseEntity {
 	@Column(name = "content_exist", nullable = false)
 	private boolean contentExist;
 
+	@Column(nullable = false)
+	private Integer like;
+
 	@Column(name = "feed_message", length = 300, nullable = false)
 	private String feedMessage;
 
@@ -52,11 +55,12 @@ public class Feed extends BaseEntity {
 
 	@Builder
 	public Feed(Member member, Allowance allowance, Long receiverId, boolean contentExist, String feedMessage,
-		FeedType feedType) {
+		Integer like, FeedType feedType) {
 		this.member = member;
 		this.allowance = allowance;
 		this.receiverId = receiverId;
 		this.contentExist = contentExist;
+		this.like = like;
 		this.feedMessage = feedMessage;
 		this.feedType = feedType;
 	}
