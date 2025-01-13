@@ -26,29 +26,29 @@ public class User {
 	@Column(name = "user_id", nullable = false)
 	private Long id;
 
-	@Column(name = "user_name", nullable = false)
+	@Column(name = "user_name", length = 20, nullable = false)
 	private String username;
 
-	@Column(name = "auth_id", nullable = false)
+	@Column(name = "auth_id", length = 100, nullable = false)
 	private String authId;
 
-	@Column(nullable = false)
+	@Column(length = 100, nullable = false)
 	private String password;
 
-	@Column(nullable = false)
+	@Column(length = 11, nullable = false)
 	private String phone;
 
-	@Column(name = "resident_num", nullable = false)
+	@Column(name = "resident_num", length = 14, nullable = false)
 	private String residentNum;
 
-	@Column(nullable = false)
+	@Column(length = 6, nullable = false)
 	private String pin;
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private Gender gender;
 
-	@Column(nullable = false)
+	@Column(length = 500, nullable = false)
 	private String profileLink;
 
 	@Builder
