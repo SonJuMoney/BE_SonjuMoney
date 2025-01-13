@@ -1,6 +1,8 @@
 package com.hana4.sonjumoney.security.filter;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -60,11 +62,16 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 		String accessToken = jwtUtil.generateAccessToken(authId, userId);
 		String refreshToken = jwtUtil.generateRefreshToken(authId, userId);
 
-		response.addHeader("Authorization", "Bearer " + accessToken);
-		response.setHeader("Refresh-Token", refreshToken);
+		Map<String, String> tokens = new HashMap<>();
+		tokens.put("accessToken", accessToken);
+		tokens.put("refreshToken", refreshToken);
 
+		// 4️⃣ JSON 응답 설정
 		response.setStatus(HttpServletResponse.SC_OK);
-		response.getWriter().write("login successful");
+		response.setContentType("application/json;charset=UTF-8");
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		response.getWriter().write(objectMapper.writeValueAsString(tokens));
 	}
 
 	@Override

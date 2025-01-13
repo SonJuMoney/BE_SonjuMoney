@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.hana4.sonjumoney.security.filter.JwtAuthenticationFilter;
 import com.hana4.sonjumoney.security.filter.LoginFilter;
@@ -44,7 +45,8 @@ public class SecurityConfig {
 				.authenticated()
 			)
 			.addFilter(new LoginFilter(authenticationManager(), jwtUtil))
-			.addFilter(new JwtAuthenticationFilter(jwtUtil, authService))
+			.addFilterBefore(new JwtAuthenticationFilter(jwtUtil, authService),
+				UsernamePasswordAuthenticationFilter.class)
 		;
 
 		return http.build();
