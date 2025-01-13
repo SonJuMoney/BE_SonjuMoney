@@ -6,7 +6,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum AccountType {
-	DEPOSIT("자유입출금"),
-	SAVINGS("적금");
-	private String value;
+	FREE_DEPOSIT("자유입출금"),
+	FREE_SAVINGS("자유적금"),
+	DREAM_HANA_SAVINGS("꿈하나적금"),
+	MY_SAVINGS("내맘적금"),
+	;
+	private final String name;
 }
