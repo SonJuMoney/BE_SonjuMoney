@@ -26,11 +26,11 @@ public class EventParticipant {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "event_id")
+	@JoinColumn(name = "event_id", nullable = false)
 	private Event event;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "member_id")
+	@JoinColumn(name = "member_id", nullable = false)
 	private Member member;
 
 	@Builder

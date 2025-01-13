@@ -30,11 +30,11 @@ public class Member {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "family_id")
+	@JoinColumn(name = "family_id", nullable = false)
 	private Family family;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
+	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
 	@Column(nullable = false)

@@ -1,5 +1,6 @@
 package com.hana4.sonjumoney.domain;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import com.hana4.sonjumoney.domain.enums.EventCategory;
@@ -33,17 +34,17 @@ public class Event extends BaseEntity {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "family_id")
+	@JoinColumn(name = "family_id", nullable = false)
 	private Family family;
 
 	@Column(name = "event_name", length = 30, nullable = false)
 	private String eventName;
 
 	@Column(name = "start_date", nullable = false, columnDefinition = "DATE")
-	private Date startDate;
+	private LocalDate startDate;
 
 	@Column(name = "end_date", nullable = false, columnDefinition = "DATE")
-	private Date endDate;
+	private LocalDate endDate;
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
@@ -54,7 +55,7 @@ public class Event extends BaseEntity {
 	private NotifyStatus notifyStatus;
 
 	@Builder
-	public Event(Family family, String eventName, Date startDate, Date endDate, EventCategory eventCategory, NotifyStatus status) {
+	public Event(Family family, String eventName, LocalDate startDate, LocalDate endDate, EventCategory eventCategory, NotifyStatus status) {
 		this.family = family;
 		this.eventName = eventName;
 		this.startDate = startDate;
