@@ -21,19 +21,22 @@ public class Alarm {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "alarm_id")
 	private Long alarmId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	@Column(nullable = false)
+	@Column(name = "alarm_status", nullable = false)
+	@Enumerated(EnumType.STRING)
 	private AlarmStatus alarmStatus;
 
-	@Column(nullable = false)
+	@Column(name = "alarm_type", nullable = false)
+	@Enumerated(EnumType.STRING)
 	private AlarmType alarmType;
 
-	@Column(nullable = false)
+	@Column(name = "link_id", nullable = false)
 	private Long linkId;
 
 	@Column(length = 300, nullable = false)

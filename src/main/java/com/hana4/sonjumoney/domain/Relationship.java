@@ -17,6 +17,7 @@ public class Relationship {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "relationship_id")
 	private Long relationshipId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
