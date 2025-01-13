@@ -46,11 +46,11 @@ public class Event extends BaseEntity {
 	@Column(name = "end_date", nullable = false, columnDefinition = "DATE")
 	private LocalDate endDate;
 
-	@Column(nullable = false)
+	@Column(name = "event_category", nullable = false)
 	@Enumerated(EnumType.STRING)
 	private EventCategory eventCategory;
 
-	@Column(nullable = false)
+	@Column(name = "notify_status", nullable = false)
 	@Enumerated(EnumType.STRING)
 	private NotifyStatus notifyStatus;
 
