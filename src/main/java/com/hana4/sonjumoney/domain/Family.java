@@ -1,5 +1,8 @@
 package com.hana4.sonjumoney.domain;
 
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,6 +28,12 @@ public class Family extends BaseEntity {
 
 	@Column(name = "family_name", length = 20, nullable = false)
 	private String familyName;
+
+	@OneToMany(mappedBy = "family", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Member> members;
+
+	@OneToMany(mappedBy = "family", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Event> events;
 
 	@Builder
 	public Family(String familyName) {
