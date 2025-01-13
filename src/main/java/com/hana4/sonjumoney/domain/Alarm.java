@@ -25,7 +25,7 @@ public class Alarm {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
-	private User userId;
+	private User user;
 
 	@Column(nullable = false)
 	private AlarmStatus alarmStatus;
