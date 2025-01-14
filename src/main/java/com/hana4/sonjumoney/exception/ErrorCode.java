@@ -16,7 +16,7 @@ public enum ErrorCode {
 	INVALID_PASSWORD(40101, HttpStatus.UNAUTHORIZED, "비밀번호가 올바르지 않습니다."),
 	INVALID_REFRESH_TOKEN(40102, HttpStatus.UNAUTHORIZED, "유효하지 않은 Refresh Token입니다."),
 	INVALID_PIN(40103, HttpStatus.UNAUTHORIZED, "PIN 번호가 올바르지 않습니다."),
-	INVALID_AUTH_FORMA(40104, HttpStatus.UNAUTHORIZED, "유효하지 않은 인증 요청 형식입니다."),
+	INVALID_AUTH_FORMAT(40104, HttpStatus.UNAUTHORIZED, "유효하지 않은 인증 요청 형식입니다."),
 
 	//403
 	FORBIDDEN(40300, HttpStatus.FORBIDDEN, "요청 권한이 없습니다."),

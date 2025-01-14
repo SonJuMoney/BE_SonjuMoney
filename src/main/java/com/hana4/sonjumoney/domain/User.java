@@ -48,7 +48,7 @@ public class User {
 	@Enumerated(EnumType.STRING)
 	private Gender gender;
 
-	@Column(length = 500, nullable = false)
+	@Column(name = "profile_link", length = 500, nullable = false)
 	private String profileLink;
 
 	@Builder
