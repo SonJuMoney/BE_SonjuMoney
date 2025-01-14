@@ -5,7 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.hana4.sonjumoney.domain.Allowance;
 import com.hana4.sonjumoney.domain.Member;
-import com.hana4.sonjumoney.dto.TransactionDto;
+import com.hana4.sonjumoney.dto.AllowanceDto;
 import com.hana4.sonjumoney.dto.request.SendAllowanceRequest;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
@@ -37,7 +37,7 @@ public class AllowanceService {
 		Member receiver = memberRepository.findById(sendAllowanceRequest.recieverId())
 			.orElseThrow(() -> new CommonException(
 				ErrorCode.NOT_FOUND_MEMBER));
-		accountService.makeTransferByUserId(new TransactionDto(sender.getUser().getId(), receiver.getUser().getId(),
+		accountService.makeTransferByUserId(new AllowanceDto(sender.getUser().getId(), receiver.getUser().getId(),
 			sendAllowanceRequest.amount()));
 		s3Service.upload(image);
 		allowanceRepository.save(Allowance.builder()
