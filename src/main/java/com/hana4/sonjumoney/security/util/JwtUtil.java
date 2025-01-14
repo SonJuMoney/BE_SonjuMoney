@@ -55,13 +55,13 @@ public class JwtUtil {
 	}
 
 	public Long getUserId(String token) {
-		return Long.getLong(
-			Jwts.parser()
-				.verifyWith(secretKey)
-				.build()
-				.parseSignedClaims(token)
-				.getPayload()
-				.get("userId", String.class));
+		String userId = Jwts.parser()
+			.verifyWith(secretKey)
+			.build()
+			.parseSignedClaims(token)
+			.getPayload()
+			.get("userId", String.class);
+		return Long.parseLong(userId);
 	}
 
 	public Boolean isTokenExpired(String token) {
@@ -80,7 +80,7 @@ public class JwtUtil {
 
 		return Jwts.builder()
 			.claim("authId", authId)
-			.claim("userId", userId)
+			.claim("userId", String.valueOf(userId))
 			.issuedAt(now)
 			.expiration(expiration)
 			.signWith(secretKey)
