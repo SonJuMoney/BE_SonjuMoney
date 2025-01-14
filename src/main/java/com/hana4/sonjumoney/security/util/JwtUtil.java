@@ -33,6 +33,18 @@ public class JwtUtil {
 		return authId.equals(userDetails.getUsername()) && !isTokenExpired(token);
 	}
 
+	public boolean validateRefreshToken(String refreshToken) {
+		try {
+			Jwts.parser()
+				.verifyWith(secretKey)
+				.build()
+				.parseSignedClaims(refreshToken);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
 	public String getAuthId(String token) {
 		return Jwts.parser()
 			.verifyWith(secretKey)
@@ -42,13 +54,14 @@ public class JwtUtil {
 			.get("authId", String.class);
 	}
 
-	public String getUserId(String token) {
-		return Jwts.parser()
-			.verifyWith(secretKey)
-			.build()
-			.parseSignedClaims(token)
-			.getPayload()
-			.get("userId", String.class);
+	public Long getUserId(String token) {
+		return Long.getLong(
+			Jwts.parser()
+				.verifyWith(secretKey)
+				.build()
+				.parseSignedClaims(token)
+				.getPayload()
+				.get("userId", String.class));
 	}
 
 	public Boolean isTokenExpired(String token) {
@@ -80,5 +93,11 @@ public class JwtUtil {
 
 	public String generateRefreshToken(String authId, Long userId) {
 		return generateToken(authId, userId, refreshTokenExpiration);
+	}
+
+	public String refreshAccessToken(String refreshToken) {
+		String authId = getAuthId(refreshToken);
+		Long userId = getUserId(refreshToken);
+		return generateAccessToken(authId, userId);
 	}
 }
