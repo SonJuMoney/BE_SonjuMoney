@@ -63,8 +63,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 		String refreshToken = jwtUtil.generateRefreshToken(authId, userId);
 
 		Map<String, String> tokens = new HashMap<>();
-		tokens.put("accessToken", accessToken);
-		tokens.put("refreshToken", refreshToken);
+		tokens.put("access_Token", accessToken);
+		tokens.put("refresh_Token", refreshToken);
 
 		// 4️⃣ JSON 응답 설정
 		response.setStatus(HttpServletResponse.SC_OK);
