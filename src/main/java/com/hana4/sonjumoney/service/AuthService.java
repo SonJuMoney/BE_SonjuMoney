@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.hana4.sonjumoney.domain.User;
 import com.hana4.sonjumoney.dto.response.ReissueResponse;
+import com.hana4.sonjumoney.exception.CommonException;
+import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.UserRepository;
 import com.hana4.sonjumoney.security.model.CustomUserDetails;
 import com.hana4.sonjumoney.security.util.JwtUtil;
@@ -25,12 +27,19 @@ public class AuthService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String authId) throws UsernameNotFoundException {
 		User user = userRepository.findByAuthId(authId)
-			.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
 		return new CustomUserDetails(user.getId(), user.getAuthId(), user.getPassword(), Collections.emptyList());
 	}
 
-	public ReissueResponse reissue(String refreshToken){
-		if (!jwtUtil.validateRefreshToken(refreshToken)) {throw new}
+	public ReissueResponse reissue(String refreshToken) {
+		if (!jwtUtil.validateRefreshToken(refreshToken)) {
+			throw new
+				CommonException(ErrorCode.INVALID_REFRESH_TOKEN);
+		}
+
+		String newAccessToken = jwtUtil.refreshAccessToken(refreshToken);
+
+		return new ReissueResponse(newAccessToken);
 	}
 }
