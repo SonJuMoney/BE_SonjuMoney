@@ -50,7 +50,7 @@ public class Account {
 	@Column(name = "account_password", length = 4, nullable = false)
 	private String accountPassword;
 
-	@Column(nullable = false)
+	@Column(nullable = false,columnDefinition = "BIGINT UNSIGNED")
 	private Long balance;
 
 	@Builder
