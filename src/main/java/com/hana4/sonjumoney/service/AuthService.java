@@ -8,8 +8,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.hana4.sonjumoney.domain.User;
+import com.hana4.sonjumoney.dto.response.ReissueResponse;
 import com.hana4.sonjumoney.repository.UserRepository;
 import com.hana4.sonjumoney.security.model.CustomUserDetails;
+import com.hana4.sonjumoney.security.util.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthService implements UserDetailsService {
 
 	private final UserRepository userRepository;
+	private final JwtUtil jwtUtil;
 
 	@Override
 	public UserDetails loadUserByUsername(String authId) throws UsernameNotFoundException {
@@ -25,5 +28,9 @@ public class AuthService implements UserDetailsService {
 			.orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
 		return new CustomUserDetails(user.getId(), user.getAuthId(), user.getPassword(), Collections.emptyList());
+	}
+
+	public ReissueResponse reissue(String refreshToken){
+		if (!jwtUtil.validateRefreshToken(refreshToken)) {throw new}
 	}
 }
