@@ -1,5 +1,6 @@
 package com.hana4.sonjumoney.domain;
 
+import com.hana4.sonjumoney.domain.enums.AccountProduct;
 import com.hana4.sonjumoney.domain.enums.Bank;
 
 import jakarta.persistence.Column;
@@ -29,14 +30,14 @@ public class AccountType {
 	@Enumerated(EnumType.STRING)
 	private Bank bank;
 
-	@Column(name = "account_type", nullable = false)
+	@Column(name = "account_product", nullable = false)
 	@Enumerated(EnumType.STRING)
-	private com.hana4.sonjumoney.domain.enums.AccountType accountType;
+	private AccountProduct accountProduct;
 
 	@Builder
-	public AccountType(Bank bank, com.hana4.sonjumoney.domain.enums.AccountType accountType) {
+	public AccountType(Bank bank, AccountProduct accountProduct) {
 		this.bank = bank;
-		this.accountType = accountType;
+		this.accountProduct = accountProduct;
 	}
 
 }
