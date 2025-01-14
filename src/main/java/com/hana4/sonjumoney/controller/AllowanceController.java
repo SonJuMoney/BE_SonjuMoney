@@ -28,4 +28,11 @@ public class AllowanceController {
 		return ResponseEntity.ok().body(allowanceService.sendAllowance(image, sendAllowanceRequest));
 	}
 
+	@PostMapping("/test")
+	public ResponseEntity<?> testUpload(
+		@RequestPart("image") MultipartFile image,
+		@RequestPart(value = "data") SendAllowanceRequest sendAllowanceRequest
+	) {
+		return ResponseEntity.ok().body(allowanceService.uploadTest(image, sendAllowanceRequest));
+	}
 }
