@@ -24,7 +24,8 @@ public enum ErrorCode {
 
 	// 404
 	NOT_FOUND_USER(40400, HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."),
-	NOT_FOUND_DATA(40401, HttpStatus.NOT_FOUND, "해당 데이터를 찾을 수 없습니다."),
+	NOT_FOUND_MEMBER(40401, HttpStatus.NOT_FOUND, "존재하지 않는 멤버입니다."),
+	NOT_FOUND_DATA(40402, HttpStatus.NOT_FOUND, "해당 데이터를 찾을 수 없습니다."),
 
 	// 500
 	INTERNAL_SERVER_ERROR(50000, HttpStatus.INTERNAL_SERVER_ERROR, "서버내부 오류입니다."),
