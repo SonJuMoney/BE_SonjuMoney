@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -13,6 +14,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hana4.sonjumoney.dto.request.SignInRequest;
+import com.hana4.sonjumoney.exception.ErrorCode;
+import com.hana4.sonjumoney.exception.UserNotFoundException;
 import com.hana4.sonjumoney.security.model.CustomUserDetails;
 import com.hana4.sonjumoney.security.util.JwtUtil;
 
@@ -46,7 +49,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
 			return authenticationManager.authenticate(authenticationToken);
 		} catch (Exception e) {
-			throw new AuthenticationServiceException(e.getMessage());
+			throw new AuthenticationServiceException(ErrorCode.INTERNAL_SERVER_ERROR.getMessage());
 		}
 	}
 
@@ -66,7 +69,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 		tokens.put("access_Token", accessToken);
 		tokens.put("refresh_Token", refreshToken);
 
-		// 4️⃣ JSON 응답 설정
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("application/json;charset=UTF-8");
 
@@ -77,7 +79,16 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 	@Override
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
 		AuthenticationException failed) throws IOException, ServletException {
-		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-		response.getWriter().write("login unsuccessful");
+		response.setContentType("application/json;charset=UTF-8");
+		if (failed.getCause() instanceof UserNotFoundException) {
+			response.setStatus(ErrorCode.NOT_FOUND_USER.getHttpStatus().value());
+			response.getWriter().write(ErrorCode.NOT_FOUND_USER.getMessage());
+		} else if (failed instanceof BadCredentialsException) {
+			response.setStatus(ErrorCode.INVALID_PASSWORD.getHttpStatus().value());
+			response.getWriter().write(ErrorCode.INVALID_PASSWORD.getMessage());
+		} else {
+			response.setStatus(ErrorCode.INTERNAL_SERVER_ERROR.getHttpStatus().value());
+			response.getWriter().write(ErrorCode.INTERNAL_SERVER_ERROR.getMessage());
+		}
 	}
 }
