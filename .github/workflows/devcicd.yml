@@ -1,7 +1,7 @@
-name: Main CI/CD 
+name: Develop CI/CD 
 on:
   push:
-    branches: [ main ]
+    branches: [ develop ]
 
 jobs:
   build:
@@ -17,13 +17,13 @@ jobs:
 
       - name: Set YML
         run: |
-            # 현위치
-            ls -al
-            
-            mkdir -p src/main/resources
-            echo "${{secrets.APPLICATION_SECRET_PROPERTIES}}" | base64 --decode > src/main/resources/application-secrets.properties
-            # secret.yml 잘 생성되었는지 확인
-            cat src/main/resources/application-secrets.properties
+          # 현위치
+          ls -al
+          
+          mkdir -p src/main/resources
+          echo "${{secrets.APPLICATION_SECRET_PROPERTIES}}" | base64 --decode > src/main/resources/application-secrets.properties
+          # secret.yml 잘 생성되었는지 확인
+          cat src/main/resources/application-secrets.properties
 
       - name: grant exe
         run: chmod +x gradlew
@@ -34,18 +34,18 @@ jobs:
       - name: setup ssh
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.DEV_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 400 ~/.ssh/id_rsa
-          ssh-keyscan ${{ secrets.WAS }} >> ~/.ssh/known_hosts
+          ssh-keyscan ${{ secrets.DEV_WAS }} >> ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
 
       - name: scp jar to was
         run: |
-          scp build/libs/*.jar ec2-user@${{ secrets.WAS }}:/home/ec2-user/workspace/
+          scp build/libs/*.jar ec2-user@${{ secrets.DEV_WAS }}:/home/ec2-user/workspace/
 
       - name: restart spring
         run: |
-          ssh ec2-user@${{ secrets.WAS }} '
+          ssh ec2-user@${{ secrets.DEV_WAS }} '
             cd /home/ec2-user/workspace &&
             sudo systemctl restart springboot
           '
