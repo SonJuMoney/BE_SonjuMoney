@@ -9,6 +9,8 @@ import com.hana4.sonjumoney.domain.EventParticipant;
 import com.hana4.sonjumoney.domain.Family;
 import com.hana4.sonjumoney.domain.Member;
 import com.hana4.sonjumoney.dto.request.EventAddRequest;
+import com.hana4.sonjumoney.exception.CommonException;
+import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.EventParticipantRepository;
 import com.hana4.sonjumoney.repository.EventRepository;
 import com.hana4.sonjumoney.repository.FamilyRepository;
@@ -26,7 +28,7 @@ public class EventService {
 
 	public void addEvent(Long familyId, EventAddRequest eventAddRequest) {
 		Family family = familyRepository.findById(familyId)
-			.orElseThrow(() -> new IllegalArgumentException("Family not found"));
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		Event event = eventAddRequest.toEntity(family);
 		eventRepository.save(event);
 

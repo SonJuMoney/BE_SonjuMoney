@@ -7,6 +7,9 @@ import com.hana4.sonjumoney.domain.Event;
 import com.hana4.sonjumoney.domain.Family;
 import com.hana4.sonjumoney.domain.enums.EventCategory;
 
+import lombok.Builder;
+
+@Builder
 public record EventAddRequest(EventCategory eventCategory,
 							  String eventName, LocalDate startDate, LocalDate endDate,
 							  List<Long> eventParticipantsId) {
