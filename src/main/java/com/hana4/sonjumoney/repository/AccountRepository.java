@@ -6,10 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.hana4.sonjumoney.domain.Account;
-import com.hana4.sonjumoney.domain.enums.AccountType;
+import com.hana4.sonjumoney.domain.enums.AccountProduct;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
-	Optional<Account> findByUser_IdAndAccountType_AccountType(Long userId, AccountType accountType);
+	Optional<Account> findByUser_IdAndAccountType_AccountProduct(Long userId, AccountProduct accountProduct);
 }

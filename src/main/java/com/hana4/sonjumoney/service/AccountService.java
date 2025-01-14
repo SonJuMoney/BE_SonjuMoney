@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hana4.sonjumoney.domain.Account;
-import com.hana4.sonjumoney.domain.enums.AccountType;
+import com.hana4.sonjumoney.domain.enums.AccountProduct;
 import com.hana4.sonjumoney.dto.TransactionDto;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
@@ -19,10 +19,10 @@ public class AccountService {
 
 	@Transactional
 	public void makeTransferByUserId(TransactionDto transactionDto) {
-		Account sender = accountRepository.findByUser_IdAndAccountType_AccountType(transactionDto.senderId(),
-			AccountType.FREE_DEPOSIT).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
-		Account receiver = accountRepository.findByUser_IdAndAccountType_AccountType(transactionDto.receiverId(),
-			AccountType.FREE_DEPOSIT).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		Account sender = accountRepository.findByUser_IdAndAccountType_AccountProduct(transactionDto.senderId(),
+			AccountProduct.FREE_DEPOSIT).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		Account receiver = accountRepository.findByUser_IdAndAccountType_AccountProduct(transactionDto.receiverId(),
+			AccountProduct.FREE_DEPOSIT).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		Long amount = transactionDto.amount();
 		transfer(sender, receiver, amount);
 	}
