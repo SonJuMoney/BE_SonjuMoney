@@ -48,8 +48,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 			);
 
 			return authenticationManager.authenticate(authenticationToken);
-		} catch (Exception e) {
-			throw new AuthenticationServiceException(ErrorCode.INTERNAL_SERVER_ERROR.getMessage());
+		} catch (IOException e) {
+			throw new AuthenticationServiceException(ErrorCode.BAD_REQUEST.getMessage());
 		}
 	}
 
@@ -80,12 +80,20 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
 		AuthenticationException failed) throws IOException, ServletException {
 		response.setContentType("application/json;charset=UTF-8");
-		if (failed.getCause() instanceof UserNotFoundException) {
+		Throwable cause = failed.getCause();
+		if (cause instanceof UserNotFoundException) {
 			response.setStatus(ErrorCode.NOT_FOUND_USER.getHttpStatus().value());
 			response.getWriter().write(ErrorCode.NOT_FOUND_USER.getMessage());
+
 		} else if (failed instanceof BadCredentialsException) {
 			response.setStatus(ErrorCode.INVALID_PASSWORD.getHttpStatus().value());
 			response.getWriter().write(ErrorCode.INVALID_PASSWORD.getMessage());
+
+		} else if (failed instanceof AuthenticationServiceException &&
+			failed.getMessage().equals(ErrorCode.BAD_REQUEST.getMessage())) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().write(ErrorCode.BAD_REQUEST.getMessage());
+
 		} else {
 			response.setStatus(ErrorCode.INTERNAL_SERVER_ERROR.getHttpStatus().value());
 			response.getWriter().write(ErrorCode.INTERNAL_SERVER_ERROR.getMessage());
