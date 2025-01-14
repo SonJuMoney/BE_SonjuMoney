@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum AccountType {
+public enum AccountProduct {
 	FREE_DEPOSIT("자유입출금"),
 	FREE_SAVINGS("자유적금"),
 	DREAM_HANA_SAVINGS("꿈하나적금"),
