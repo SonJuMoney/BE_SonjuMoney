@@ -3,6 +3,7 @@ package com.hana4.sonjumoney.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hana4.sonjumoney.domain.Event;
 import com.hana4.sonjumoney.domain.EventParticipant;
@@ -26,6 +27,7 @@ public class EventService {
 	private final MemberRepository memberRepository;
 	private final EventParticipantRepository eventParticipantRepository;
 
+	@Transactional
 	public void addEvent(Long familyId, EventAddRequest eventAddRequest) {
 		Family family = familyRepository.findById(familyId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));

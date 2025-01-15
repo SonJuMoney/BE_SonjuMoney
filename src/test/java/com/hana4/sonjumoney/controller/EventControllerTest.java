@@ -50,22 +50,33 @@ public class EventControllerTest {
 
 	@BeforeAll
 	public void beforeAll() throws Exception {
+
 		Family family = Family.builder()
 			.familyName("준용이네")
 			.build();
 		familyRepository.save(family);
 
-		User user1 = userRepository.findById(1L).get();
+		User user1 = User.builder()
+			.username("유저1")
+			.pin("123456")
+			.phone("01012345678")
+			.authId("user1")
+			.gender(Gender.MALE)
+			.password("123456")
+			.profileLink("profile")
+			.residentNum("990101-1000000")
+			.build();
+		userRepository.save(user1);
 
 		User user2 = User.builder()
 			.username("유저2")
 			.pin("123457")
-			.phone("01012345678")
+			.phone("01023456789")
 			.authId("user2")
 			.gender(Gender.FEMALE)
 			.password("123456")
 			.profileLink("profile")
-			.residentNum("990101-0000000")
+			.residentNum("990101-2000000")
 			.build();
 		userRepository.save(user2);
 
@@ -88,7 +99,7 @@ public class EventControllerTest {
 		EventAddRequest eventAddRequest = EventAddRequest.builder()
 			.eventCategory(EventCategory.MEMORIAL)
 			.eventName("결혼")
-			.eventParticipantsId(List.of(1L, 2L))
+			.memberId(List.of(1L, 2L))
 			.startDate(LocalDate.of(2025, 01, 06))
 			.endDate(LocalDate.of(2025, 01, 06))
 			.build();
