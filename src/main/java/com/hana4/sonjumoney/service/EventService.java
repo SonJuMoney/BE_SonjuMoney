@@ -1,6 +1,7 @@
 package com.hana4.sonjumoney.service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,8 +34,13 @@ public class EventService {
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		Event event = eventAddRequest.toEntity(family);
 		eventRepository.save(event);
+		List<Member> members;
+		try {
+			members = memberRepository.findAllWithUserByIds(eventAddRequest.memberId());
+		} catch (NoSuchElementException e) {
+			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
+		}
 
-		List<Member> members = memberRepository.findAllWithUserByIds(eventAddRequest.memberId());
 		List<EventParticipant> eventParticipants = members.stream()
 			.map(member -> EventParticipant.builder()
 				.event(event)
