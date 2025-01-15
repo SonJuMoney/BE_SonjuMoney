@@ -21,7 +21,6 @@ import com.hana4.sonjumoney.domain.Family;
 import com.hana4.sonjumoney.domain.Member;
 import com.hana4.sonjumoney.domain.User;
 import com.hana4.sonjumoney.domain.enums.EventCategory;
-import com.hana4.sonjumoney.domain.enums.Gender;
 import com.hana4.sonjumoney.domain.enums.MemberRole;
 import com.hana4.sonjumoney.domain.enums.NotifyStatus;
 import com.hana4.sonjumoney.dto.request.EventAddRequest;
@@ -59,32 +58,8 @@ public class EventControllerTest {
 			.build();
 		familyRepository.save(family);
 
-		/*
-		User user1 = User.builder()
-			.username("유저1")
-			.pin("123456")
-			.phone("01012345678")
-			.authId("user1")
-			.gender(Gender.MALE)
-			.password("123456")
-			.profileLink("profile")
-			.residentNum("990101-1000000")
-			.build();
-		userRepository.save(user1);*/
-
 		User user1 = userRepository.findById(1L).get();
-
-		User user2 = User.builder()
-			.username("유저2")
-			.pin("123457")
-			.phone("01023456789")
-			.authId("user2")
-			.gender(Gender.FEMALE)
-			.password("123456")
-			.profileLink("profile")
-			.residentNum("990101-2000000")
-			.build();
-		userRepository.save(user2);
+		User user2 = userRepository.findById(2L).get();
 
 		Member member1 = Member.builder()
 			.family(family)
