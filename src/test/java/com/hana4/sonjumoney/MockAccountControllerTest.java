@@ -6,9 +6,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Map;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +26,7 @@ import com.hana4.sonjumoney.service.MockAccountService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MockAccountControllerTest {
 
 	@Autowired
@@ -35,11 +38,11 @@ public class MockAccountControllerTest {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	private String accessToken;
+	private static String accessToken;
 
-	@BeforeEach
+	@BeforeAll
 	void setUp() throws Exception {
-		SignInRequest signInRequest = new SignInRequest("user1", "1234");
+		SignInRequest signInRequest = new SignInRequest("test1", "1234");
 		MvcResult mvcResult = mockMvc.perform(post("/api/auth/sign-in")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(signInRequest)))
@@ -49,8 +52,6 @@ public class MockAccountControllerTest {
 		Map<String, String> responseMap = objectMapper.readValue(responseBody, Map.class);
 		accessToken = responseMap.get("access_token");
 	}
-
-
 
 	@Test
 	@DisplayName("유저의 MockAccounts 목록 조회 테스트")
