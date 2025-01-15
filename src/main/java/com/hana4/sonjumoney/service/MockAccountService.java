@@ -25,23 +25,29 @@ public class MockAccountService {
 	private final MockAccountRepository mockAccountRepository;
 	private final UserRepository userRepository;
 
-	public List<MockAccountResponse> findMyMockAccounts(Long userId){
+	public List<MockAccountResponse> findMyMockAccounts(Long userId) {
 		Optional<User> oUser = userRepository.findById(userId);
 		User user = oUser.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 		String residentNum = user.getResidentNum();
 
-		List<MockAccount> mockAccounts = mockAccountRepository.findUserMockAccounts(residentNum);
+		List<MockAccount> mockAccounts;
+		try {
+			mockAccounts = mockAccountRepository.findUserMockAccounts(residentNum);
+		} catch (CommonException e) {
+			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
+		}
 
 		List<MockAccountResponse> response = new ArrayList<>();
-		for(MockAccount mockAccount : mockAccounts){
-			response.add(MockAccountResponse.of(mockAccount.getId(), Bank.HANA, mockAccount.getBalance(), AccountProduct.FREE_DEPOSIT,
+		for (MockAccount mockAccount : mockAccounts) {
+			response.add(MockAccountResponse.of(mockAccount.getId(), Bank.HANA, mockAccount.getBalance(),
+				AccountProduct.FREE_DEPOSIT,
 				mockAccount.getAccountNum()));
 		}
 
 		return response;
 	}
 
-	public List<MockAccountResponse> findChildMockAccounts(Long userId, Long childId){
+	public List<MockAccountResponse> findChildMockAccounts(Long userId, Long childId) {
 		Optional<User> oParent = userRepository.findById(userId);
 		User parent = oParent.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 		String parentResidentNum = parent.getResidentNum();
@@ -50,11 +56,18 @@ public class MockAccountService {
 		User child = oChild.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 		String childResidentNum = child.getResidentNum();
 
-		List<MockAccount> mockAccounts = mockAccountRepository.findChildMockAccounts(parentResidentNum, childResidentNum);
+		List<MockAccount> mockAccounts;
+		try {
+			mockAccounts = mockAccountRepository.findChildMockAccounts(parentResidentNum,
+				childResidentNum);
+		} catch (CommonException e) {
+			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
+		}
 
 		List<MockAccountResponse> response = new ArrayList<>();
-		for(MockAccount mockAccount : mockAccounts){
-			response.add(MockAccountResponse.of(mockAccount.getId(), Bank.HANA, mockAccount.getBalance(), AccountProduct.FREE_DEPOSIT,
+		for (MockAccount mockAccount : mockAccounts) {
+			response.add(MockAccountResponse.of(mockAccount.getId(), Bank.HANA, mockAccount.getBalance(),
+				AccountProduct.FREE_DEPOSIT,
 				mockAccount.getAccountNum()));
 		}
 
