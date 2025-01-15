@@ -22,8 +22,10 @@ jobs:
           
           mkdir -p src/main/resources
           echo "${{secrets.APPLICATION_SECRET_PROPERTIES}}" | base64 --decode > src/main/resources/application-secrets.properties
+          echo "${{secrets.APPLICATION_TEST_SECRET_PROPERTIES}}" | base64 --decode > src/test/resources/application-test-secrets.properties
           # secret.yml 잘 생성되었는지 확인
           cat src/main/resources/application-secrets.properties
+          cat src/test/resources/application-test-secrets.properties
 
       - name: grant exe
         run: chmod +x gradlew
