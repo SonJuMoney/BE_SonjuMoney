@@ -26,7 +26,7 @@ public class MockAccountService {
 	private final UserRepository userRepository;
 
 	public List<MockAccountResponse> findMyMockAccounts(Long userId){
-		Optional<User> oUser = userRepository.findByUserId(userId);
+		Optional<User> oUser = userRepository.findById(userId);
 		User user = oUser.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 		String residentNum = user.getResidentNum();
 
@@ -42,11 +42,11 @@ public class MockAccountService {
 	}
 
 	public List<MockAccountResponse> findChildMockAccounts(Long userId, Long childId){
-		Optional<User> oParent = userRepository.findByUserId(userId);
+		Optional<User> oParent = userRepository.findById(userId);
 		User parent = oParent.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 		String parentResidentNum = parent.getResidentNum();
 
-		Optional<User> oChild = userRepository.findByUserId(childId);
+		Optional<User> oChild = userRepository.findById(childId);
 		User child = oChild.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 		String childResidentNum = child.getResidentNum();
 
