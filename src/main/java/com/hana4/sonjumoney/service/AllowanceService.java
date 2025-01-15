@@ -1,14 +1,11 @@
 package com.hana4.sonjumoney.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.hana4.sonjumoney.domain.Allowance;
 import com.hana4.sonjumoney.domain.Member;
 import com.hana4.sonjumoney.dto.AllowanceDto;
-import com.hana4.sonjumoney.dto.CreateAllowanceDto;
-import com.hana4.sonjumoney.dto.global.CreatedDto;
 import com.hana4.sonjumoney.dto.request.SendAllowanceRequest;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
@@ -25,10 +22,13 @@ public class AllowanceService {
 	private final AllowanceRepository allowanceRepository;
 	private final MemberRepository memberRepository;
 	private final AccountService accountService;
-	private final FeedService feedService;
+	private final S3Service s3Service;
 
-	@Transactional
-	public CreatedDto sendAllowance(MultipartFile image, Long userId, SendAllowanceRequest sendAllowanceRequest) {
+	public String uploadTest( MultipartFile image) {
+		log.info("이미지 업로드 테스트 서비스 진입");
+		return s3Service.upload(image);
+	}
+	public String sendAllowance(MultipartFile image, Long userId, SendAllowanceRequest sendAllowanceRequest) {
 		Member receiver = memberRepository.findById(sendAllowanceRequest.receiverId())
 			.orElseThrow(() -> new CommonException(
 				ErrorCode.NOT_FOUND_MEMBER));
@@ -38,12 +38,13 @@ public class AllowanceService {
 		accountService.makeTransferByUserId(AllowanceDto.of(sender.getUser().getId(), receiver.getUser().getId(),
 			sendAllowanceRequest.amount()));
 
-		Allowance allowance = allowanceRepository.save(
-			new Allowance(sender,receiver,sendAllowanceRequest.amount())
-		);
-		Long feedId = feedService.saveAllowanceFeed(
-			CreateAllowanceDto.of(allowance, image, sendAllowanceRequest.message()));
+		String url = s3Service.upload(image);
+		allowanceRepository.save(Allowance.builder()
+			.receiver(receiver)
+			.sender(sender)
+			.amount(sendAllowanceRequest.amount())
+			.build());
 
-		return CreatedDto.of("송금을 완료했습니다.");
+		return url;
 	}
 }
