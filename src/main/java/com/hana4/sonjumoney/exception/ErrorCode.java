@@ -11,6 +11,7 @@ public enum ErrorCode {
 
 	//400
 	BAD_REQUEST(40000, HttpStatus.BAD_REQUEST, "잘못된 요청 형식입니다."),
+	INSUFFICIENT_BALANCE(40001, HttpStatus.BAD_REQUEST, "잔액이 부족합니다."),
 
 	//401
 	UNAUTHORIZED(40100, HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),
@@ -24,11 +25,14 @@ public enum ErrorCode {
 
 	// 404
 	NOT_FOUND_USER(40400, HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."),
-	NOT_FOUND_DATA(40401, HttpStatus.NOT_FOUND, "해당 데이터를 찾을 수 없습니다."),
+	NOT_FOUND_MEMBER(40401, HttpStatus.NOT_FOUND, "존재하지 않는 멤버입니다."),
+	NOT_FOUND_DATA(40402, HttpStatus.NOT_FOUND, "해당 데이터를 찾을 수 없습니다."),
 
 	// 500
 	INTERNAL_SERVER_ERROR(50000, HttpStatus.INTERNAL_SERVER_ERROR, "서버내부 오류입니다."),
-	IMAGE_UPLOAD_ERROR(50001, HttpStatus.INTERNAL_SERVER_ERROR, "이미지 업로드에 실패했습니다.");
+	IMAGE_UPLOAD_ERROR(50001, HttpStatus.INTERNAL_SERVER_ERROR, "이미지 업로드에 실패했습니다."),
+	TRANSACTION_FAILED(50002, HttpStatus.INTERNAL_SERVER_ERROR, "거래가 실패했습니다."),
+	;
 	private final Integer code;
 	private final HttpStatus httpStatus;
 	private final String message;

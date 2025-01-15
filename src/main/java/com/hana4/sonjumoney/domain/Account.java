@@ -1,6 +1,8 @@
 package com.hana4.sonjumoney.domain;
 
 import com.hana4.sonjumoney.domain.enums.Bank;
+import com.hana4.sonjumoney.exception.CommonException;
+import com.hana4.sonjumoney.exception.ErrorCode;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -63,6 +65,17 @@ public class Account {
 		this.accountNum = accountNum;
 		this.accountPassword = accountPassword;
 		this.balance = balance;
+	}
+
+	public void withdraw(Long amount) {
+		if (balance.compareTo(amount) < 0) {
+			throw new CommonException(ErrorCode.INSUFFICIENT_BALANCE);
+		}
+		this.balance -= amount;
+	}
+
+	public void deposit(Long amount) {
+		this.balance += amount;
 	}
 
 }

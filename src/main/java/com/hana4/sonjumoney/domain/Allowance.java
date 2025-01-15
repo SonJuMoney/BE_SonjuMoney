@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,4 +34,11 @@ public class Allowance {
 
 	@Column(nullable = false)
 	private Long amount;
+
+	@Builder
+	public Allowance(Member sender, Member receiver, Long amount) {
+		this.sender = sender;
+		this.receiver = receiver;
+		this.amount = amount;
+	}
 }
