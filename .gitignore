@@ -38,3 +38,4 @@ out/
 
 ### Properties ###
 application-secrets.properties
+application-test-secrets.properties
