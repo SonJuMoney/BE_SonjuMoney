@@ -11,6 +11,8 @@ import com.hana4.sonjumoney.domain.EventParticipant;
 import com.hana4.sonjumoney.domain.Family;
 import com.hana4.sonjumoney.domain.Member;
 import com.hana4.sonjumoney.dto.request.EventAddRequest;
+import com.hana4.sonjumoney.dto.response.EventParticipantResponse;
+import com.hana4.sonjumoney.dto.response.EventResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.EventParticipantRepository;
@@ -29,7 +31,7 @@ public class EventService {
 	private final EventParticipantRepository eventParticipantRepository;
 
 	@Transactional
-	public void addEvent(Long familyId, EventAddRequest eventAddRequest) {
+	public EventResponse addEvent(Long familyId, EventAddRequest eventAddRequest) {
 		Family family = familyRepository.findById(familyId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		Event event = eventAddRequest.toEntity(family);
@@ -48,5 +50,19 @@ public class EventService {
 				.build())
 			.toList();
 		eventParticipantRepository.saveAll(eventParticipants);
+
+		List<EventParticipantResponse> participantResponses = eventParticipants.stream()
+			.map(EventParticipantResponse::of)
+			.toList();
+
+		return EventResponse.of(
+			event.getId(),
+			event.getEventCategory(),
+			event.getEventName(),
+			event.getStartDate(),
+			event.getEndDate(),
+			participantResponses
+		);
+
 	}
 }

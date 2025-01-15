@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hana4.sonjumoney.dto.request.EventAddRequest;
+import com.hana4.sonjumoney.dto.response.EventResponse;
 import com.hana4.sonjumoney.service.EventService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,8 +23,9 @@ public class EventController {
 	private final EventService eventService;
 
 	@PostMapping()
-	public ResponseEntity<?> addEvent(@RequestParam Long familyId, @RequestBody EventAddRequest eventAddRequest) {
-		eventService.addEvent(familyId, eventAddRequest);
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+	public ResponseEntity<EventResponse> addEvent(@RequestParam Long familyId,
+		@RequestBody EventAddRequest eventAddRequest) {
+		EventResponse eventResponse = eventService.addEvent(familyId, eventAddRequest);
+		return ResponseEntity.status(HttpStatus.CREATED).body(eventResponse);
 	}
 }

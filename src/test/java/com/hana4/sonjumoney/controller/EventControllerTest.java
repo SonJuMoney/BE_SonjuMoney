@@ -1,6 +1,7 @@
 package com.hana4.sonjumoney.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDate;
@@ -15,7 +16,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hana4.sonjumoney.ControllerTest;
@@ -33,7 +33,6 @@ import com.hana4.sonjumoney.repository.UserRepository;
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Transactional
 public class EventControllerTest extends ControllerTest {
 	@Autowired
 	MockMvc mockMvc;
@@ -73,15 +72,20 @@ public class EventControllerTest extends ControllerTest {
 			.user(user2)
 			.build();
 		memberRepository.save(member2);
+
 	}
 
 	@Test
 	@DisplayName("일정 등록 테스트")
 	void addEventTest() throws Exception {
+		List<Long> memberIds = memberRepository.findAll().stream()
+			.map(Member::getId)
+			.toList();
+
 		EventAddRequest eventAddRequest = EventAddRequest.builder()
 			.eventCategory(EventCategory.MEMORIAL)
 			.eventName("결혼")
-			.memberId(List.of(1L, 2L))
+			.memberId(memberIds)
 			.startDate(LocalDate.of(2025, 1, 6))
 			.endDate(LocalDate.of(2025, 1, 6))
 			.notifyStatus(NotifyStatus.REGISTERED)
@@ -91,7 +95,16 @@ public class EventControllerTest extends ControllerTest {
 				.header("Authorization", "Bearer " + accessToken)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(eventAddRequest)))
-			.andExpect(status().isCreated());
+			.andDo(print())
+			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$.event_id").isNotEmpty())
+			.andExpect(jsonPath("$.event_category").value("MEMORIAL"))
+			.andExpect(jsonPath("$.event_name").value("결혼"))
+			.andExpect(jsonPath("$.start_date").value("2025-01-06"))
+			.andExpect(jsonPath("$.end_date").value("2025-01-06"))
+			.andExpect(jsonPath("$.event_participants.length()").value(2));
 	}
 
 }
+
+
