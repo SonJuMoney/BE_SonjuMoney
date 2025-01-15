@@ -31,6 +31,9 @@ public class S3Service {
 	@Value("${spring.cloud.aws.s3.bucket-name}")
 	private String bucketName;
 
+	@Value("${spring.cloud.aws.s3.cloudfront.baseurl}")
+	private String baseUrl;
+
 	// public PresignedUrlDto getPresignedUrlforAllowance(ContentExtension contentExtension) {
 	// 	String extension = contentExtension.getUploadExtension();
 	// 	String
@@ -68,7 +71,7 @@ public class S3Service {
 		byte[] bytes = IoUtils.toByteArray(is);
 		RequestBody requestBody = RequestBody.fromBytes(bytes);
 		s3Client.putObject(putObjectRequest, requestBody);
-		return s3FileName;
+		return "https://" + baseUrl + s3FileName;
 	}
 
 	private String createFileName(String filename) {

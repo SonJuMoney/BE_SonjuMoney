@@ -24,10 +24,13 @@ public class AllowanceController {
 
 	@PostMapping
 	public ResponseEntity<?> sendAllowance(
+		Authentication authentication,
 		@RequestPart(value = "image", required = false) MultipartFile image,
 		@RequestPart(value = "data") SendAllowanceRequest sendAllowanceRequest
 	) {
-		return ResponseEntity.ok().body(allowanceService.sendAllowance(image, sendAllowanceRequest));
+		return ResponseEntity.ok()
+			.body(allowanceService.sendAllowance(image, AuthenticationUtil.getUserId(authentication),
+				sendAllowanceRequest));
 	}
 
 	@PostMapping("/test")
