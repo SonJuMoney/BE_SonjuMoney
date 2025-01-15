@@ -43,6 +43,7 @@ public class ControllerTest {
 		String responseBody = mvcResult.getResponse().getContentAsString();
 		Map<String, String> responseMap = objectMapper.readValue(responseBody, Map.class);
 		accessToken = responseMap.get("access_token");
+		System.out.println("accessToken:" + accessToken);
 	}
 }
 

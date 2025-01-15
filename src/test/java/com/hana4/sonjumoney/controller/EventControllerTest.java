@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hana4.sonjumoney.ControllerTest;
 import com.hana4.sonjumoney.domain.Family;
 import com.hana4.sonjumoney.domain.Member;
 import com.hana4.sonjumoney.domain.User;
@@ -32,7 +34,7 @@ import com.hana4.sonjumoney.repository.UserRepository;
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Transactional
-public class EventControllerTest {
+public class EventControllerTest extends ControllerTest {
 	@Autowired
 	MockMvc mockMvc;
 
@@ -48,10 +50,8 @@ public class EventControllerTest {
 	@Autowired
 	ObjectMapper objectMapper;
 
-	private String accessToken;
-
 	@BeforeAll
-	public void beforeAll() throws Exception {
+	public void setUp() throws Exception {
 
 		Family family = Family.builder()
 			.familyName("준용이네")
@@ -76,6 +76,7 @@ public class EventControllerTest {
 	}
 
 	@Test
+	@DisplayName("가족 일정 등록 테스트")
 	void addEventTest() throws Exception {
 		EventAddRequest eventAddRequest = EventAddRequest.builder()
 			.eventCategory(EventCategory.MEMORIAL)
