@@ -29,7 +29,7 @@ jobs:
 
       - name: Set Test DB
         run: |
-          docker-compose up -d
+          docker compose up -d
           docker ps
 
       - name: grant exe
@@ -40,7 +40,7 @@ jobs:
 
       - name: Set Test DB
         run: |
-          docker-compose down
+          docker compose down
           docker ps
         
       - name: setup ssh
