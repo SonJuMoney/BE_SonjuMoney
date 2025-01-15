@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hana4.sonjumoney.domain.Event;
 import com.hana4.sonjumoney.domain.Family;
 import com.hana4.sonjumoney.domain.enums.EventCategory;
+import com.hana4.sonjumoney.domain.enums.NotifyStatus;
 
 import lombok.Builder;
 
@@ -24,6 +25,9 @@ public record EventAddRequest(
 	@JsonProperty("end_date")
 	LocalDate endDate,
 
+	@JsonProperty("notify_status")
+	NotifyStatus notifyStatus,
+
 	@JsonProperty("event_participants")
 	List<Long> memberId) {
 	public Event toEntity(Family family) {
@@ -33,6 +37,7 @@ public record EventAddRequest(
 			.eventName(this.eventName)
 			.startDate(this.startDate)
 			.endDate(this.endDate)
+			.status(this.notifyStatus)
 			.build();
 	}
 

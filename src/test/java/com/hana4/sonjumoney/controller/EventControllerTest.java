@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +25,9 @@ import com.hana4.sonjumoney.domain.User;
 import com.hana4.sonjumoney.domain.enums.EventCategory;
 import com.hana4.sonjumoney.domain.enums.Gender;
 import com.hana4.sonjumoney.domain.enums.MemberRole;
+import com.hana4.sonjumoney.domain.enums.NotifyStatus;
 import com.hana4.sonjumoney.dto.request.EventAddRequest;
+import com.hana4.sonjumoney.dto.request.SignInRequest;
 import com.hana4.sonjumoney.repository.FamilyRepository;
 import com.hana4.sonjumoney.repository.MemberRepository;
 import com.hana4.sonjumoney.repository.UserRepository;
@@ -48,14 +52,27 @@ public class EventControllerTest {
 	@Autowired
 	ObjectMapper objectMapper;
 
+	private String accessToken;
+
 	@BeforeAll
 	public void beforeAll() throws Exception {
+
+		SignInRequest signInRequest = new SignInRequest("user1", "1234");
+		MvcResult mvcResult = mockMvc.perform(post("/api/auth/sign-in")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(signInRequest)))
+			.andExpect(status().isOk()).andReturn();
+
+		String responseBody = mvcResult.getResponse().getContentAsString();
+		Map<String, String> responseMap = objectMapper.readValue(responseBody, Map.class);
+		accessToken = responseMap.get("access_token");
 
 		Family family = Family.builder()
 			.familyName("준용이네")
 			.build();
 		familyRepository.save(family);
 
+		/*
 		User user1 = User.builder()
 			.username("유저1")
 			.pin("123456")
@@ -66,7 +83,9 @@ public class EventControllerTest {
 			.profileLink("profile")
 			.residentNum("990101-1000000")
 			.build();
-		userRepository.save(user1);
+		userRepository.save(user1);*/
+
+		User user1 = userRepository.findById(1L).get();
 
 		User user2 = User.builder()
 			.username("유저2")
@@ -100,11 +119,13 @@ public class EventControllerTest {
 			.eventCategory(EventCategory.MEMORIAL)
 			.eventName("결혼")
 			.memberId(List.of(1L, 2L))
-			.startDate(LocalDate.of(2025, 01, 06))
-			.endDate(LocalDate.of(2025, 01, 06))
+			.startDate(LocalDate.of(2025, 1, 6))
+			.endDate(LocalDate.of(2025, 1, 6))
+			.notifyStatus(NotifyStatus.REGISTERED)
 			.build();
-		mockMvc.perform(post("/events")
+		mockMvc.perform(post("/api/events")
 				.param("familyId", "1")
+				.header("Authorization", "Bearer " + accessToken)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(eventAddRequest)))
 			.andExpect(status().isCreated());
