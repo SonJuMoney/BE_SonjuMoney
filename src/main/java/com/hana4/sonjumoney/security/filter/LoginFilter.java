@@ -1,8 +1,6 @@
 package com.hana4.sonjumoney.security.filter;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -14,6 +12,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hana4.sonjumoney.dto.request.SignInRequest;
+import com.hana4.sonjumoney.dto.response.LoginResponse;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.exception.UserNotFoundException;
 import com.hana4.sonjumoney.security.model.CustomUserDetails;
@@ -65,9 +64,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 		String accessToken = jwtUtil.generateAccessToken(authId, userId);
 		String refreshToken = jwtUtil.generateRefreshToken(authId, userId);
 
-		Map<String, String> tokens = new HashMap<>();
-		tokens.put("access_Token", accessToken);
-		tokens.put("refresh_Token", refreshToken);
+		// Map<String, String> tokens = new HashMap<>();
+		// tokens.put("access_Token", accessToken);
+		// tokens.put("refresh_Token", refreshToken);
+		LoginResponse tokens = LoginResponse.of(accessToken, refreshToken);
 
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("application/json;charset=UTF-8");
