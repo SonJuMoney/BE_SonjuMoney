@@ -32,18 +32,4 @@ public class AllowanceController {
 			.body(allowanceService.sendAllowance(image, AuthenticationUtil.getUserId(authentication),
 				sendAllowanceRequest));
 	}
-
-	@PostMapping("/test")
-	public ResponseEntity<?> testUpload(
-		Authentication authentication,
-		@RequestPart(value = "image", required = false) MultipartFile image,
-		@RequestPart(value = "data") SendAllowanceRequest data
-	) {
-		Long userId = AuthenticationUtil.getUserId(authentication);
-		System.out.println(userId);
-		if (image.isEmpty()) {
-			throw new IllegalArgumentException();
-		}
-		return ResponseEntity.ok().body(allowanceService.uploadTest(image));
-	}
 }
