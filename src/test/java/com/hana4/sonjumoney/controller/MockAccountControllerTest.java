@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -76,6 +77,15 @@ public class MockAccountControllerTest {
 	@Test
 	@DisplayName("Mock계좌 비밀번호 일치 확인 테스트")
 	void checkMockAccountPin() throws Exception{
-		
+		String api = "/api/mock/accounts/pin";
+		String pin = "1234";
+		String mockAccId = "1";
+		ResultActions result = mockMvc.perform(post(api)
+				.param("pin", pin)
+				.param("mockacc_id", mockAccId)
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(content().string("Mock계좌 비밀번호 일치"))
+			.andDo(print());
 	}
 }
