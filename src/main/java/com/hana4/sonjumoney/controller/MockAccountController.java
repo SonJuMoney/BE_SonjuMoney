@@ -44,8 +44,8 @@ public class MockAccountController {
 	public ResponseEntity<?> validateMockAccountPin(@RequestParam("pin") String pin, @RequestParam("mockacc_id") Long mockAccId){
 		Boolean response = mockAccountService.checkMockAccountPin(pin, mockAccId);
 		if(response){
-			return ResponseEntity.ok().body("Mock 비밀번호 일치");
+			return ResponseEntity.ok().body("Mock계좌 비밀번호 일치");
 		}
-		return ResponseEntity.status(401).body("Mock 비밀번호 불일치");
+		return ResponseEntity.status(401).body("Mock계좌 비밀번호 불일치");
 	}
 }
