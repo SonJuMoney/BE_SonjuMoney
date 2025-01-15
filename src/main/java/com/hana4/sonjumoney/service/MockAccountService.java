@@ -26,8 +26,7 @@ public class MockAccountService {
 	private final UserRepository userRepository;
 
 	public List<MockAccountResponse> findMyMockAccounts(Long userId) {
-		Optional<User> oUser = userRepository.findById(userId);
-		User user = oUser.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+		User user = userRepository.findById(userId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		String residentNum = user.getResidentNum();
 
 		List<MockAccount> mockAccounts;
@@ -37,23 +36,14 @@ public class MockAccountService {
 			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
 		}
 
-		List<MockAccountResponse> response = new ArrayList<>();
-		for (MockAccount mockAccount : mockAccounts) {
-			response.add(MockAccountResponse.of(mockAccount.getId(), Bank.HANA, mockAccount.getBalance(),
-				AccountProduct.FREE_DEPOSIT,
-				mockAccount.getAccountNum()));
-		}
-
-		return response;
+		return makeMockAccountResponse(mockAccounts);
 	}
 
 	public List<MockAccountResponse> findChildMockAccounts(Long userId, Long childId) {
-		Optional<User> oParent = userRepository.findById(userId);
-		User parent = oParent.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+		User parent = userRepository.findById(userId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		String parentResidentNum = parent.getResidentNum();
 
-		Optional<User> oChild = userRepository.findById(childId);
-		User child = oChild.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+		User child = userRepository.findById(childId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 		String childResidentNum = child.getResidentNum();
 
 		List<MockAccount> mockAccounts;
@@ -64,6 +54,10 @@ public class MockAccountService {
 			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
 		}
 
+		return makeMockAccountResponse(mockAccounts);
+	}
+
+	private List<MockAccountResponse> makeMockAccountResponse(List<MockAccount> mockAccounts){
 		List<MockAccountResponse> response = new ArrayList<>();
 		for (MockAccount mockAccount : mockAccounts) {
 			response.add(MockAccountResponse.of(mockAccount.getId(), Bank.HANA, mockAccount.getBalance(),
@@ -73,5 +67,4 @@ public class MockAccountService {
 
 		return response;
 	}
-
 }
