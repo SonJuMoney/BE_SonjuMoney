@@ -24,7 +24,7 @@ public class AuthController {
 	@PostMapping("/reissue")
 	public ResponseEntity<ReissueResponse> reissue(@CookieValue(name = "refresh_token") String refreshToken) {
 		ReissueResponse reissueResponse = authService.reissue(refreshToken);
-		return ResponseEntity.ok(reissueResponse);
+		return ResponseEntity.ok().body(reissueResponse);
 	}
 
 	@GetMapping("/id-duplication")
