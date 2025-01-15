@@ -43,7 +43,7 @@ public class MockAccount {
 	private String holderResidentNum;
 
 	@Column(name = "deputy_resident_num", length = 14, nullable = false)
-	private String DeputyResidentNum;
+	private String deputyResidentNum;
 
 	@Column(nullable = false)
 	private Long balance;
@@ -59,7 +59,7 @@ public class MockAccount {
 		this.bank = bank;
 		this.accountNum = accountNum;
 		this.holderResidentNum = holderResidentNum;
-		this.DeputyResidentNum = deputyResidentNum;
+		this.deputyResidentNum = deputyResidentNum;
 		this.balance = balance;
 		this.accountPassword = accountPassword;
 	}
