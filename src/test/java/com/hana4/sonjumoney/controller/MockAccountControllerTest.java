@@ -1,4 +1,4 @@
-package com.hana4.sonjumoney;
+package com.hana4.sonjumoney.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -71,5 +71,11 @@ public class MockAccountControllerTest {
 			.header("Authorization", "Bearer " + accessToken))
 			.andExpect(status().isOk())
 			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("Mock계좌 비밀번호 일치 확인 테스트")
+	void checkMockAccountPin() throws Exception{
+		
 	}
 }

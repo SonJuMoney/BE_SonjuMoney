@@ -57,6 +57,15 @@ public class MockAccountService {
 		return makeMockAccountResponse(mockAccounts);
 	}
 
+	public Boolean checkMockAccountPin(String pin, Long mockAccId){
+		MockAccount mockAccount = mockAccountRepository.findById(mockAccId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		if(!mockAccount.getAccountPassword().equals(pin)){
+			throw new CommonException(ErrorCode.INVALID_PIN);
+		}
+
+		return true;
+	}
+
 	private List<MockAccountResponse> makeMockAccountResponse(List<MockAccount> mockAccounts){
 		List<MockAccountResponse> response = new ArrayList<>();
 		for (MockAccount mockAccount : mockAccounts) {
