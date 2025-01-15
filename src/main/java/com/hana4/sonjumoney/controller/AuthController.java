@@ -4,12 +4,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hana4.sonjumoney.dto.request.SignUpRequest;
 import com.hana4.sonjumoney.dto.response.DuplicationResponse;
 import com.hana4.sonjumoney.dto.response.ReissueResponse;
+import com.hana4.sonjumoney.dto.response.SignUpResponse;
 import com.hana4.sonjumoney.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
@@ -30,6 +33,12 @@ public class AuthController {
 	@GetMapping("/id-duplication")
 	public ResponseEntity<DuplicationResponse> getDuplication(@RequestParam(name = "id") String id) {
 		DuplicationResponse duplicationResponse = authService.getDuplication(id);
-		return ResponseEntity.ok(duplicationResponse);
+		return ResponseEntity.ok().body(duplicationResponse);
+	}
+
+	@PostMapping("/sign-up")
+	public ResponseEntity<SignUpResponse> signUp(@RequestBody SignUpRequest signUpRequest) {
+		SignUpResponse signUpResponse = authService.signUp(signUpRequest);
+		return ResponseEntity.ok().body(signUpResponse);
 	}
 }

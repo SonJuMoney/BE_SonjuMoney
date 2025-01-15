@@ -5,17 +5,22 @@ import java.util.Collections;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.hana4.sonjumoney.domain.User;
+import com.hana4.sonjumoney.domain.enums.Gender;
+import com.hana4.sonjumoney.dto.request.SignUpRequest;
 import com.hana4.sonjumoney.dto.response.DuplicationResponse;
 import com.hana4.sonjumoney.dto.response.ReissueResponse;
+import com.hana4.sonjumoney.dto.response.SignUpResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.exception.UserNotFoundException;
 import com.hana4.sonjumoney.repository.UserRepository;
 import com.hana4.sonjumoney.security.model.CustomUserDetails;
 import com.hana4.sonjumoney.security.util.JwtUtil;
+import com.hana4.sonjumoney.util.CommonUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +30,7 @@ public class AuthService implements UserDetailsService {
 
 	private final UserRepository userRepository;
 	private final JwtUtil jwtUtil;
+	private final PasswordEncoder passwordEncoder;
 
 	@Override
 	public UserDetails loadUserByUsername(String authId) throws AuthenticationException {
@@ -53,5 +59,52 @@ public class AuthService implements UserDetailsService {
 			return DuplicationResponse.of(false);
 		}
 		return DuplicationResponse.of(true);
+	}
+
+	public SignUpResponse signUp(SignUpRequest signUpRequest) {
+		//----------예외처리 시작----------//
+
+		Boolean isDuplication = getDuplication(signUpRequest.authId()).duplication();
+		if (isDuplication) {
+			throw new CommonException(ErrorCode.CONFLICT_USER);
+		}
+		if (signUpRequest.phone().length() != 11) {
+			throw new CommonException(ErrorCode.BAD_REQUEST);
+		}
+		if (signUpRequest.pin().length() != 6) {
+			throw new CommonException(ErrorCode.BAD_REQUEST);
+		}
+		if (signUpRequest.residentNum().length() != 14) {
+			throw new CommonException(ErrorCode.BAD_REQUEST);
+		}
+		
+		//----------예외처리 완료----------//
+
+		try {
+			String password = passwordEncoder.encode(signUpRequest.password());
+			Gender gender = CommonUtil.getGender(signUpRequest.residentNum());
+
+			User user = User.builder()
+				.username(signUpRequest.name())
+				.authId(signUpRequest.authId())
+				.password(password)
+				.phone(signUpRequest.phone())
+				.residentNum(signUpRequest.residentNum())
+				.pin(signUpRequest.pin())
+				.gender(gender)
+				.build();
+
+			userRepository.save(user);
+
+		} catch (CommonException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+
+		return SignUpResponse.builder()
+			.code(201)
+			.message("회원가입에 성공했습니다.")
+			.build();
 	}
 }
