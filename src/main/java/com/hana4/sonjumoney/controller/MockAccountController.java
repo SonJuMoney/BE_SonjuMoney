@@ -24,7 +24,7 @@ public class MockAccountController {
 	private final MockAccountService mockAccountService;
 
 	@GetMapping("/mock/accounts")
-	public ResponseEntity<?> mockAccountList(@RequestParam(value = "user_id", required = false) Long childId, Authentication authentication){
+	public ResponseEntity<List<MockAccountResponse>> mockAccountList(@RequestParam(value = "user_id", required = false) Long childId, Authentication authentication){
 		Long userId = AuthenticationUtil.getUserId(authentication);
 
 		List<MockAccountResponse> response;
@@ -34,6 +34,6 @@ public class MockAccountController {
 			response = mockAccountService.findChildMockAccounts(userId, childId);
 		}
 
-		return ResponseEntity.ok(response);
+		return ResponseEntity.ok().body(response);
 	}
 }
