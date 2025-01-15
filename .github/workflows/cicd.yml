@@ -27,6 +27,9 @@ jobs:
             cat src/main/resources/application-secrets.properties
             cat src/test/resources/application-test-secrets.properties
 
+      - name: Set Test DB
+        run: docker-compose up -d
+
       - name: grant exe
         run: chmod +x gradlew
 
