@@ -24,13 +24,12 @@ public class AllowanceService {
 	private final AccountService accountService;
 	private final S3Service s3Service;
 
-	public String uploadTest(MultipartFile image, SendAllowanceRequest sendAllowanceRequest) {
+	public String uploadTest( MultipartFile image) {
 		log.info("이미지 업로드 테스트 서비스 진입");
-		s3Service.upload(image);
-		return "test";
+		return s3Service.upload(image);
 	}
 	public String sendAllowance(MultipartFile image, SendAllowanceRequest sendAllowanceRequest) {
-
+		// TODO: Security 이후 수정
 		Member sender = memberRepository.findById(sendAllowanceRequest.recieverId())
 			.orElseThrow(() -> new CommonException(
 				ErrorCode.NOT_FOUND_MEMBER));

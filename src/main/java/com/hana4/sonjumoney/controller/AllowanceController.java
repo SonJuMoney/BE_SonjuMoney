@@ -30,9 +30,14 @@ public class AllowanceController {
 
 	@PostMapping("/test")
 	public ResponseEntity<?> testUpload(
-		@RequestPart("image") MultipartFile image,
-		@RequestPart(value = "data") SendAllowanceRequest sendAllowanceRequest
+		@RequestPart(value = "image", required = false) MultipartFile image,
+		@RequestPart(value = "data") SendAllowanceRequest data
 	) {
-		return ResponseEntity.ok().body(allowanceService.uploadTest(image, sendAllowanceRequest));
+
+		System.out.println(data);
+		if (image.isEmpty()) {
+			throw new IllegalArgumentException();
+		}
+		return ResponseEntity.ok().body(allowanceService.uploadTest(image));
 	}
 }

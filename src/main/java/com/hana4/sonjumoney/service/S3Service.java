@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+// import com.hana4.sonjumoney.dto.ContentExtension;
+// import com.hana4.sonjumoney.dto.PresignedUrlDto;
+
 import io.awspring.cloud.s3.S3Exception;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -27,6 +30,11 @@ public class S3Service {
 
 	@Value("${spring.cloud.aws.s3.bucket-name}")
 	private String bucketName;
+
+	// public PresignedUrlDto getPresignedUrlforAllowance(ContentExtension contentExtension) {
+	// 	String extension = contentExtension.getUploadExtension();
+	// 	String
+	// }
 
 	public String upload(MultipartFile file) throws S3Exception {
 		if (file.isEmpty() || Objects.isNull(file.getOriginalFilename())) {
