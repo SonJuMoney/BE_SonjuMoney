@@ -39,7 +39,7 @@ public class MockAccountControllerTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		SignInRequest signInRequest = new SignInRequest("user1", "1234");
+		SignInRequest signInRequest = new SignInRequest("test1", "1234");
 		MvcResult mvcResult = mockMvc.perform(post("/api/auth/sign-in")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(signInRequest)))
@@ -49,8 +49,6 @@ public class MockAccountControllerTest {
 		Map<String, String> responseMap = objectMapper.readValue(responseBody, Map.class);
 		accessToken = responseMap.get("access_token");
 	}
-
-
 
 	@Test
 	@DisplayName("유저의 MockAccounts 목록 조회 테스트")
