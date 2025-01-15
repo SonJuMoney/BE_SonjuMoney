@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hana4.sonjumoney.dto.request.EventAddRequest;
 import com.hana4.sonjumoney.service.EventService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Events", description = "일정 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/events")

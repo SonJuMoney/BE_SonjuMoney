@@ -34,7 +34,7 @@ public class EventService {
 		Event event = eventAddRequest.toEntity(family);
 		eventRepository.save(event);
 
-		List<Member> members = memberRepository.findAllById(eventAddRequest.memberId());
+		List<Member> members = memberRepository.findAllWithUserByIds(eventAddRequest.memberId());
 		List<EventParticipant> eventParticipants = members.stream()
 			.map(member -> EventParticipant.builder()
 				.event(event)

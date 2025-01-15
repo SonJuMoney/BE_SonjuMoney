@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDate;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -50,8 +50,8 @@ public class EventControllerTest extends ControllerTest {
 	@Autowired
 	ObjectMapper objectMapper;
 
-	@BeforeAll
-	public void setUp() throws Exception {
+	@BeforeEach
+	public void before() throws Exception {
 
 		Family family = Family.builder()
 			.familyName("준용이네")
@@ -76,7 +76,7 @@ public class EventControllerTest extends ControllerTest {
 	}
 
 	@Test
-	@DisplayName("가족 일정 등록 테스트")
+	@DisplayName("일정 등록 테스트")
 	void addEventTest() throws Exception {
 		EventAddRequest eventAddRequest = EventAddRequest.builder()
 			.eventCategory(EventCategory.MEMORIAL)
