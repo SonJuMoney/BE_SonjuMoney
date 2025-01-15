@@ -28,23 +28,23 @@ public class AllowanceService {
 		log.info("이미지 업로드 테스트 서비스 진입");
 		return s3Service.upload(image);
 	}
-	public String sendAllowance(MultipartFile image, SendAllowanceRequest sendAllowanceRequest) {
-		// TODO: Security 이후 수정
-		Member sender = memberRepository.findById(sendAllowanceRequest.recieverId())
+	public String sendAllowance(MultipartFile image, Long userId, SendAllowanceRequest sendAllowanceRequest) {
+		Member receiver = memberRepository.findById(sendAllowanceRequest.receiverId())
 			.orElseThrow(() -> new CommonException(
 				ErrorCode.NOT_FOUND_MEMBER));
-		Member receiver = memberRepository.findById(sendAllowanceRequest.recieverId())
+		Member sender = memberRepository.findByUser_IdAndFamily(userId, receiver.getFamily())
 			.orElseThrow(() -> new CommonException(
 				ErrorCode.NOT_FOUND_MEMBER));
-		accountService.makeTransferByUserId(new AllowanceDto(sender.getUser().getId(), receiver.getUser().getId(),
+		accountService.makeTransferByUserId(AllowanceDto.of(sender.getUser().getId(), receiver.getUser().getId(),
 			sendAllowanceRequest.amount()));
-		s3Service.upload(image);
+
+		String url = s3Service.upload(image);
 		allowanceRepository.save(Allowance.builder()
 			.receiver(receiver)
 			.sender(sender)
 			.amount(sendAllowanceRequest.amount())
 			.build());
 
-		return "Success";
+		return url;
 	}
 }

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record SendAllowanceRequest(
 	@JsonProperty(value = "to_id", required = true)
-	Long recieverId,
+	Long receiverId,
 
 	@JsonProperty(value = "amount", required = true)
 	Long amount,
