@@ -10,4 +10,5 @@ import com.hana4.sonjumoney.domain.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 	Optional<User> findByAuthId(String authId);
+	Optional<User> findByUserId(Long userId);
 }
