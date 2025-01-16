@@ -1,5 +1,7 @@
 package com.hana4.sonjumoney.service;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,6 +58,12 @@ public class AccountService {
 		MockAccount mockAccount = mockAccountRepository.findById(mockaccId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		User user = userRepository.findById(userId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+
+		/* user_id가 unique key 이므로 DB에 param으로 전달된 user_id를 갖는 Account 데이터가 있으면 잘못된 요청 */
+		Optional<Account> savedAccount = accountRepository.findByUserId(userId);
+		if (savedAccount.isPresent()) {
+			throw new CommonException(ErrorCode.BAD_REQUEST);
+		}
 
 		Account account = Account.builder()
 			.accountType(mockAccount.getAccountType())
