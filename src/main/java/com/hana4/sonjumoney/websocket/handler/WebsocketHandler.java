@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
@@ -11,6 +12,8 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hana4.sonjumoney.websocket.dto.AlarmDto;
@@ -54,7 +57,9 @@ public class WebsocketHandler extends TextWebSocketHandler {
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session)throws Exception {
 		sessions.add(session);
-		log.info("session id: " + session.getId() + "session uri: " + session.getUri());
+		UriComponents uriComponents =
+			UriComponentsBuilder.fromUriString(Objects.requireNonNull(session.getUri()).toString()).build();
+		log.info("session id: " + session.getId() + " session uri: " + session.getUri()+" uid: "+uriComponents.getQueryParams().getFirst("uid"));
 		try {
 			session.sendMessage(
 				new TextMessage("웹소켓 연결 성공")
