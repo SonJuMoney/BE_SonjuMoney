@@ -1,6 +1,7 @@
 package com.hana4.sonjumoney.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.DisplayName;
@@ -44,6 +45,7 @@ public class AccountControllerTest extends ControllerTest {
 				.header("Authorization", "Bearer " + accessToken))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.account_name").value("하나자유입출금통장"))
-			.andExpect(jsonPath("$.bank").value("하나은행"));
+			.andExpect(jsonPath("$.bank").value("하나은행"))
+			.andDo(print());
 	}
 }
