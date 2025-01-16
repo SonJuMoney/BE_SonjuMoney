@@ -56,8 +56,8 @@ public class EventControllerTest extends ControllerTest {
 			.andExpect(jsonPath("$.event_name").value("결혼"))
 			.andExpect(jsonPath("$.start_date").value("2025-01-06"))
 			.andExpect(jsonPath("$.end_date").value("2025-01-06"))
-			.andExpect(jsonPath("$.event_participants[0].member_id").value(1))
-			.andExpect(jsonPath("$.event_participants[1].member_id").value(2))
+			.andExpect(jsonPath("$.event_participants[0].user_name").value("계좌 있는 놈"))
+			.andExpect(jsonPath("$.event_participants[1].user_name").value("계좌 없는 놈"))
 			.andDo(print());
 	}
 
@@ -76,16 +76,16 @@ public class EventControllerTest extends ControllerTest {
 			.andExpect(jsonPath("$[0].event_name").value("고기 먹는날 ~"))
 			.andExpect(jsonPath("$[0].start_date").value("2025-01-19"))
 			.andExpect(jsonPath("$[0].end_date").value("2025-01-19"))
-			.andExpect(jsonPath("$[0].event_participants[0].participation_id").value(3))
-			.andExpect(jsonPath("$[0].event_participants[1].participation_id").value(4))
+			.andExpect(jsonPath("$[0].event_participants[0].user_name").value("계좌 있는 놈"))
+			.andExpect(jsonPath("$[0].event_participants[1].user_name").value("계좌 없는 놈"))
 			//두번째 일정
 			.andExpect(jsonPath("$[1].event_id").value(1))
 			.andExpect(jsonPath("$[1].event_category").value("TRAVEL"))
 			.andExpect(jsonPath("$[1].event_name").value("우리 가족 여행"))
 			.andExpect(jsonPath("$[1].start_date").value("2025-01-25"))
 			.andExpect(jsonPath("$[1].end_date").value("2025-01-31"))
-			.andExpect(jsonPath("$[1].event_participants[0].participation_id").value(1))
-			.andExpect(jsonPath("$[1].event_participants[1].participation_id").value(2))
+			.andExpect(jsonPath("$[1].event_participants[0].user_name").value("계좌 있는 놈"))
+			.andExpect(jsonPath("$[1].event_participants[1].user_name").value("계좌 없는 놈"))
 			.andDo(print());
 
 	}
@@ -106,8 +106,8 @@ public class EventControllerTest extends ControllerTest {
 			.andExpect(jsonPath("$[0].event_name").value("결기❤️"))
 			.andExpect(jsonPath("$[0].start_date").value("2025-02-01"))
 			.andExpect(jsonPath("$[0].end_date").value("2025-02-01"))
-			.andExpect(jsonPath("$[0].event_participants[0].participation_id").value(5))
-			.andExpect(jsonPath("$[0].event_participants[1].participation_id").value(6))
+			.andExpect(jsonPath("$[0].event_participants[0].user_name").value("계좌 있는 놈"))
+			.andExpect(jsonPath("$[0].event_participants[1].user_name").value("계좌 없는 놈"))
 			.andDo(print());
 
 	}
@@ -124,8 +124,8 @@ public class EventControllerTest extends ControllerTest {
 			.andExpect(jsonPath("$.event_category").value("DINING"))
 			.andExpect(jsonPath("$.start_date").value("2025-01-19"))
 			.andExpect(jsonPath("$.end_date").value("2025-01-19"))
-			.andExpect(jsonPath("$.event_participants[0].participation_id").value(3))
-			.andExpect(jsonPath("$.event_participants[1].participation_id").value(4))
+			.andExpect(jsonPath("$.event_participants[0].user_name").value("계좌 있는 놈"))
+			.andExpect(jsonPath("$.event_participants[1].user_name").value("계좌 없는 놈"))
 			.andDo(print());
 	}
 

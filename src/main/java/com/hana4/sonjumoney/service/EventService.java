@@ -2,9 +2,8 @@ package com.hana4.sonjumoney.service;
 
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
-import java.util.LinkedHashMap;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
@@ -81,10 +80,9 @@ public class EventService {
 		} catch (NoSuchElementException e) {
 			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
 		}
-		Map<Event, List<EventParticipant>> groupedByEvent = participants.stream()
-			.collect(Collectors.groupingBy(EventParticipant::getEvent, LinkedHashMap::new, Collectors.toList()));
-
-		List<EventResponse> eventResponses = groupedByEvent.entrySet().stream()
+		List<EventResponse> eventResponses = participants.stream()
+			.collect(Collectors.groupingBy(EventParticipant::getEvent))
+			.entrySet().stream()
 			.map(entry -> {
 				Event event = entry.getKey();
 				List<EventParticipantResponse> participantResponses = entry.getValue().stream()
@@ -102,7 +100,13 @@ public class EventService {
 			})
 			.toList();
 
-		return eventResponses;
+		//일정 시작날짜 오름차순
+		List<EventResponse> sortResponses = eventResponses.stream()
+			.sorted(Comparator.comparing(EventResponse::startDate))
+			.toList();
+
+		return sortResponses;
+
 	}
 
 	public EventResponse getEvent(Long eventId) {
