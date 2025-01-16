@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hana4.sonjumoney.dto.response.MockAccountResponse;
+import com.hana4.sonjumoney.dto.response.PinValidResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.security.model.CustomUserDetails;
@@ -41,11 +42,8 @@ public class MockAccountController {
 	}
 
 	@PostMapping("/mock/accounts/pin")
-	public ResponseEntity<?> validateMockAccountPin(@RequestParam("pin") String pin, @RequestParam("mockacc_id") Long mockAccId){
-		Boolean response = mockAccountService.checkMockAccountPin(pin, mockAccId);
-		if(response){
-			return ResponseEntity.ok().body("Mock계좌 비밀번호 일치");
-		}
-		return ResponseEntity.status(401).body("Mock계좌 비밀번호 불일치");
+	public ResponseEntity<PinValidResponse> validateMockAccountPin(@RequestParam("pin") String pin, @RequestParam("mockacc_id") Long mockAccId){
+		PinValidResponse response = mockAccountService.checkMockAccountPin(pin, mockAccId);
+		return ResponseEntity.ok().body(response);
 	}
 }
