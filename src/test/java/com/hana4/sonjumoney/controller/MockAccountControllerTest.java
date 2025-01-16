@@ -1,4 +1,4 @@
-package com.hana4.sonjumoney;
+package com.hana4.sonjumoney.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -17,11 +17,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hana4.sonjumoney.dto.request.SignInRequest;
+import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.service.MockAccountService;
 
 @SpringBootTest
@@ -70,6 +72,34 @@ public class MockAccountControllerTest {
 		mockMvc.perform(get(api).param("user_id", "2")
 			.header("Authorization", "Bearer " + accessToken))
 			.andExpect(status().isOk())
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("Mock계좌 비밀번호 일치 확인 테스트")
+	void checkValidMockAccountPin() throws Exception{
+		String api = "/api/mock/accounts/pin";
+		String pin = "1234";
+		String mockAccId = "1";
+		mockMvc.perform(post(api)
+				.param("pin", pin)
+				.param("mockacc_id", mockAccId)
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("Mock계좌 비밀번호 불일치 확인 테스트")
+	void checkInvalidMockAccountPin() throws Exception{
+		String api = "/api/mock/accounts/pin";
+		String pin = "5000";
+		String mockAccId = "1";
+		mockMvc.perform(post(api)
+				.param("pin", pin)
+				.param("mockacc_id", mockAccId)
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().is(ErrorCode.INVALID_PIN.getHttpStatus().value()))
 			.andDo(print());
 	}
 }

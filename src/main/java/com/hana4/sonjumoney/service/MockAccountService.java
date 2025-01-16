@@ -11,6 +11,7 @@ import com.hana4.sonjumoney.domain.User;
 import com.hana4.sonjumoney.domain.enums.AccountProduct;
 import com.hana4.sonjumoney.domain.enums.Bank;
 import com.hana4.sonjumoney.dto.response.MockAccountResponse;
+import com.hana4.sonjumoney.dto.response.PinValidResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.MockAccountRepository;
@@ -55,6 +56,15 @@ public class MockAccountService {
 		}
 
 		return makeMockAccountResponse(mockAccounts);
+	}
+
+	public PinValidResponse checkMockAccountPin(String pin, Long mockAccId){
+		MockAccount mockAccount = mockAccountRepository.findById(mockAccId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		if(!mockAccount.getAccountPassword().equals(pin)){
+			throw new CommonException(ErrorCode.INVALID_PIN);
+		}
+
+		return PinValidResponse.of(200, "Mock계좌 비밀번호 일치");
 	}
 
 	private List<MockAccountResponse> makeMockAccountResponse(List<MockAccount> mockAccounts){
