@@ -12,7 +12,7 @@ import com.hana4.sonjumoney.domain.EventParticipant;
 
 @Repository
 public interface EventParticipantRepository extends JpaRepository<EventParticipant, Long> {
-	@Query("SELECT ep FROM EventParticipant ep JOIN FETCH ep.event e WHERE e.family.id = :familyId AND e.startDate BETWEEN :startDate AND :endDate")
+	@Query("SELECT ep FROM EventParticipant ep JOIN FETCH ep.event e WHERE e.family.id = :familyId AND e.startDate BETWEEN :startDate AND :endDate ORDER BY e.startDate ASC")
 	List<EventParticipant> findAllParticipantsByFamilyIdAndEventDateRange(
 		@Param("familyId") Long familyId,
 		@Param("startDate") LocalDate startDate,

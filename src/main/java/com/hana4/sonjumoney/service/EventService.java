@@ -2,6 +2,7 @@ package com.hana4.sonjumoney.service;
 
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -81,7 +82,7 @@ public class EventService {
 			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
 		}
 		Map<Event, List<EventParticipant>> groupedByEvent = participants.stream()
-			.collect(Collectors.groupingBy(EventParticipant::getEvent));
+			.collect(Collectors.groupingBy(EventParticipant::getEvent, LinkedHashMap::new, Collectors.toList()));
 
 		List<EventResponse> eventResponses = groupedByEvent.entrySet().stream()
 			.map(entry -> {
