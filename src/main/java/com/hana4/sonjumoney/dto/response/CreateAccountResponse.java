@@ -3,12 +3,12 @@ package com.hana4.sonjumoney.dto.response;
 import lombok.Builder;
 
 @Builder
-public record AccountResponse(
+public record CreateAccountResponse(
 	Integer code,
 	String message
 ) {
-	public static AccountResponse of(Integer code, String message) {
-		return AccountResponse.builder()
+	public static CreateAccountResponse of(Integer code, String message) {
+		return CreateAccountResponse.builder()
 			.code(code)
 			.message(message)
 			.build();
