@@ -65,4 +65,17 @@ public class EventService {
 		);
 
 	}
+
+	/*public List<EventResponse> getAllEvents(Long familyId, int getYear, int getMonth) {
+		LocalDate startDate = LocalDate.of(getYear, getMonth, 1);
+		LocalDate endDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
+		List<EventParticipant> participants;
+		try {
+			participants = eventParticipantRepository.findAllParticipantsByFamilyIdAndEventDateRange(familyId,
+				startDate, endDate);
+		} catch (NoSuchElementException e) {
+			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
+		}
+
+	}*/
 }
