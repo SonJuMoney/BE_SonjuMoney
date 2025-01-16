@@ -74,22 +74,27 @@ public class AuthService implements UserDetailsService {
 		if (signUpRequest.pin().length() != 6) {
 			throw new CommonException(ErrorCode.BAD_REQUEST);
 		}
-		if (signUpRequest.residentNum().length() != 14) {
+		if (signUpRequest.residentNum().length() != 13) {
 			throw new CommonException(ErrorCode.BAD_REQUEST);
 		}
-		
+
 		//----------예외처리 완료----------//
 
 		try {
+			// 주민등록번호 '-' 추가
+			String residentNum = signUpRequest.residentNum()
+				.substring(0, 6)
+				.concat("-")
+				.concat(signUpRequest.residentNum().substring(6, 13));
 			String password = passwordEncoder.encode(signUpRequest.password());
-			Gender gender = CommonUtil.getGender(signUpRequest.residentNum());
+			Gender gender = CommonUtil.getGender(residentNum);
 
 			User user = User.builder()
 				.username(signUpRequest.name())
 				.authId(signUpRequest.authId())
 				.password(password)
 				.phone(signUpRequest.phone())
-				.residentNum(signUpRequest.residentNum())
+				.residentNum(residentNum)
 				.pin(signUpRequest.pin())
 				.gender(gender)
 				.build();

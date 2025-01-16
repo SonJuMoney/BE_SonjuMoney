@@ -64,7 +64,7 @@ public class AuthControllerTest {
 			final String name = "테스트유저0";
 
 			String authId = "test0";
-			String residentNumber = "010101-1112233";
+			String residentNumber = "0101011112233";
 			String pin = "123456";
 			String phone = "01011112222";
 
@@ -86,7 +86,6 @@ public class AuthControllerTest {
 			}
 
 			void badCase() throws Exception {
-				System.out.println("test!--------------");
 				mockMvc.perform(
 						post(url).contentType(MediaType.APPLICATION_JSON)
 							.content(objectMapper.writeValueAsString(signUpRequest)))
@@ -115,7 +114,7 @@ public class AuthControllerTest {
 		//
 		// Case3 - 주민등록번호 오류
 		Test test3 = new Test();
-		test3.residentNumber = "010101-000333322";
+		test3.residentNumber = "010101000333322";
 		test3.setNewRequest();
 		test3.badCase();
 

@@ -9,6 +9,7 @@ public record SignUpRequest(
 	String password,
 	@JsonProperty(value = "name", required = true)
 	String name,
+	//주민등록번호를 13자리로 받음.
 	@JsonProperty(value = "resident_num", required = true)
 	String residentNum,
 	@JsonProperty(value = "pin", required = true)
