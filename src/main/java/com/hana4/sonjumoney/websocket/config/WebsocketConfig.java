@@ -6,6 +6,8 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
+import com.hana4.sonjumoney.websocket.interceptor.WebsocketInterceptor;
+
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -13,8 +15,11 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSocket
 public class WebsocketConfig implements WebSocketConfigurer {
 	private final WebSocketHandler webSocketHandler;
+	private final WebsocketInterceptor websocketInterceptor;
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-		registry.addHandler(webSocketHandler, "/ws/alarms").setAllowedOrigins("*");
+		registry.addHandler(webSocketHandler, "/ws/alarms")
+			.setAllowedOrigins("*")
+			.addInterceptors(websocketInterceptor);
 	}
 }

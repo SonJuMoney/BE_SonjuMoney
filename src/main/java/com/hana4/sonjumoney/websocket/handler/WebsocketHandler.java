@@ -60,9 +60,11 @@ public class WebsocketHandler extends TextWebSocketHandler {
 		UriComponents uriComponents =
 			UriComponentsBuilder.fromUriString(Objects.requireNonNull(session.getUri()).toString()).build();
 		log.info("session id: " + session.getId() + " session uri: " + session.getUri()+" uid: "+uriComponents.getQueryParams().getFirst("uid"));
+		Long userId = (Long)session.getAttributes().get("userId");
+		System.out.println();
 		try {
 			session.sendMessage(
-				new TextMessage("웹소켓 연결 성공")
+				new TextMessage(userId + " 웹소켓 연결 성공")
 			);
 		} catch (Exception e) {
 			log.error(e.getMessage());
