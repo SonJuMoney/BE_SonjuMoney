@@ -6,10 +6,10 @@ import lombok.Builder;
 
 @Builder
 public record PinValidRequest(
-	@JsonProperty("pin")
+	@JsonProperty(value = "pin", required = true)
 	String pin,
 
-	@JsonProperty("mockacc_id")
+	@JsonProperty(value = "mockacc_id", required = true)
 	Long mockaccId
 ) {
 
