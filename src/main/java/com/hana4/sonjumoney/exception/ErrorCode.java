@@ -28,6 +28,9 @@ public enum ErrorCode {
 	NOT_FOUND_MEMBER(40401, HttpStatus.NOT_FOUND, "존재하지 않는 멤버입니다."),
 	NOT_FOUND_DATA(40402, HttpStatus.NOT_FOUND, "해당 데이터를 찾을 수 없습니다."),
 
+	// 409
+	CONFLICT_USER(40901, HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),
+
 	// 500
 	INTERNAL_SERVER_ERROR(50000, HttpStatus.INTERNAL_SERVER_ERROR, "서버내부 오류입니다."),
 	IMAGE_UPLOAD_ERROR(50001, HttpStatus.INTERNAL_SERVER_ERROR, "이미지 업로드에 실패했습니다."),
