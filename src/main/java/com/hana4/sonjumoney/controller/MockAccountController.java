@@ -6,15 +6,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hana4.sonjumoney.dto.request.PinValidRequest;
 import com.hana4.sonjumoney.dto.response.MockAccountResponse;
 import com.hana4.sonjumoney.dto.response.PinValidResponse;
-import com.hana4.sonjumoney.exception.CommonException;
-import com.hana4.sonjumoney.exception.ErrorCode;
-import com.hana4.sonjumoney.security.model.CustomUserDetails;
 import com.hana4.sonjumoney.service.MockAccountService;
 import com.hana4.sonjumoney.util.AuthenticationUtil;
 
@@ -24,17 +23,18 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class MockAccountController {
-	
+
 	private final MockAccountService mockAccountService;
 
 	@GetMapping("/mock/accounts")
-	public ResponseEntity<List<MockAccountResponse>> mockAccountList(@RequestParam(value = "user_id", required = false) Long childId, Authentication authentication){
+	public ResponseEntity<List<MockAccountResponse>> mockAccountList(
+		@RequestParam(value = "user_id", required = false) Long childId, Authentication authentication) {
 		Long userId = AuthenticationUtil.getUserId(authentication);
 
 		List<MockAccountResponse> response;
-		if(childId == null){
+		if (childId == null) {
 			response = mockAccountService.findMyMockAccounts(userId);
-		}else{
+		} else {
 			response = mockAccountService.findChildMockAccounts(userId, childId);
 		}
 
@@ -42,8 +42,8 @@ public class MockAccountController {
 	}
 
 	@PostMapping("/mock/accounts/pin")
-	public ResponseEntity<PinValidResponse> validateMockAccountPin(@RequestParam("pin") String pin, @RequestParam("mockacc_id") Long mockAccId){
-		PinValidResponse response = mockAccountService.checkMockAccountPin(pin, mockAccId);
+	public ResponseEntity<PinValidResponse> validateMockAccountPin(@RequestBody PinValidRequest request) {
+		PinValidResponse response = mockAccountService.checkMockAccountPin(request);
 		return ResponseEntity.ok().body(response);
 	}
 }
