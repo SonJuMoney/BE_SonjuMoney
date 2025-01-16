@@ -1,5 +1,6 @@
 package com.hana4.sonjumoney.websocket.handler;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -27,14 +28,22 @@ public class WebsocketHandler extends TextWebSocketHandler {
 
 	private final Map<Long, Set<WebSocketSession>> alarmSessionMap = new HashMap<>();
 
-	public void sendAlarm(WebSocketSession session, AlarmDto alarmDto) {
+	public void sendAlarm(AlarmDto alarmDto) {
 		Long alarmSessionId = alarmDto.alarmSessionId();
 		if (!alarmSessionMap.containsKey(alarmSessionId)) {
 			alarmSessionMap.put(alarmSessionId, new HashSet<>());
 		}
 		Set<WebSocketSession> alarmSession = alarmSessionMap.get(alarmSessionId);
-		alarmSession.add(session);
+		for (WebSocketSession session : alarmSession) {
+			try {
+				session.sendMessage(new TextMessage(alarmDto.alarmType()));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		// alarmSession.add(session);
 	}
+
 	@Override
 	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 		String payload = message.getPayload();
@@ -45,6 +54,7 @@ public class WebsocketHandler extends TextWebSocketHandler {
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session)throws Exception {
 		sessions.add(session);
+		log.info("session id: " + session.getId() + "session uri: " + session.getUri());
 		try {
 			session.sendMessage(
 				new TextMessage("웹소켓 연결 성공")
