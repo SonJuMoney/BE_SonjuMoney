@@ -52,7 +52,7 @@ public class AccountControllerTest {
 		String api = "/api/accounts";
 		AccountRequest request = AccountRequest.builder()
 			.mockaccId(1L)
-			.userId(1L)
+			.userId(2L)
 			.build();
 
 		mockMvc.perform(post(api)
