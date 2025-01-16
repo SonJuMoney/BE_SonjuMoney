@@ -9,7 +9,7 @@ public record AccountRequest(
 	@JsonProperty(value = "user_id", required = false)
 	Long userId,
 
-	@JsonProperty(value = "mockadd_id", required = true)
+	@JsonProperty(value = "mockacc_id", required = true)
 	Long mockaccId) {
 
 }
