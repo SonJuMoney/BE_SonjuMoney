@@ -26,9 +26,10 @@ public record AccountInfoResponse(
 
 	public static AccountInfoResponse from(Account account) {
 		String name = account.getBank().getValue() + account.getAccountType().getAccountProduct().getName() + "통장";
+		String bank = account.getBank().getValue() + "은행";
 		return AccountInfoResponse.builder()
 			.accountName(name)
-			.bank(account.getBank().getValue())
+			.bank(bank)
 			.accountNum(account.getAccountNum())
 			.balance(account.getBalance())
 			.build();
