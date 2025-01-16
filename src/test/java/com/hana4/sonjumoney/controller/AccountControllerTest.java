@@ -11,7 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
 import com.hana4.sonjumoney.ControllerTest;
-import com.hana4.sonjumoney.dto.request.AccountRequest;
+import com.hana4.sonjumoney.dto.request.CreateAccountRequest;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -22,7 +22,7 @@ public class AccountControllerTest extends ControllerTest {
 	@DisplayName("계좌 등록 테스트")
 	void makeAccountTest() throws Exception {
 		String api = "/api/accounts";
-		AccountRequest request = AccountRequest.builder()
+		CreateAccountRequest request = CreateAccountRequest.builder()
 			.mockaccId(1L)
 			.userId(2L)
 			.build();
@@ -32,5 +32,18 @@ public class AccountControllerTest extends ControllerTest {
 				.content(objectMapper.writeValueAsString(request))
 				.header("Authorization", "Bearer " + accessToken))
 			.andExpect(status().isOk());
+	}
+
+	@Test
+	@DisplayName("계좌 조회 테스트")
+	void getAccountTest()throws Exception {
+		String api = "/api/accounts";
+
+		mockMvc.perform(get(api)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.accountName").value("하나자유입출금통장"))
+			.andExpect(jsonPath("$.bank").value("하나은행"));
 	}
 }
