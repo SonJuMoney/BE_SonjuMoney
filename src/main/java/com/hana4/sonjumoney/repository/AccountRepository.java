@@ -12,4 +12,6 @@ import com.hana4.sonjumoney.domain.enums.AccountProduct;
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
 	Optional<Account> findByUser_IdAndAccountType_AccountProduct(Long userId, AccountProduct accountProduct);
+
+	Optional<Account> findByUserId(Long userId);
 }

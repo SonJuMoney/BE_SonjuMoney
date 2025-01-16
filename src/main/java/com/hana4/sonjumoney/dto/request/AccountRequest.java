@@ -5,12 +5,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 
 @Builder
-public record PinValidRequest(
-	@JsonProperty(value = "pin", required = true)
-	String pin,
+public record AccountRequest(
+	@JsonProperty(value = "user_id", required = false)
+	Long userId,
 
 	@JsonProperty(value = "mockacc_id", required = true)
-	Long mockaccId
-) {
+	Long mockaccId) {
 
 }
