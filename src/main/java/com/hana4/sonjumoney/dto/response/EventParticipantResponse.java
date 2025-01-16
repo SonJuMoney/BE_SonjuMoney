@@ -16,7 +16,7 @@ public record EventParticipantResponse(
 	@JsonProperty("user_name")
 	String userName
 ) {
-	public static EventParticipantResponse of(EventParticipant participant) {
+	public static EventParticipantResponse from(EventParticipant participant) {
 		return EventParticipantResponse.builder()
 			.participationId(participant.getId())
 			.memberId(participant.getMember().getId())

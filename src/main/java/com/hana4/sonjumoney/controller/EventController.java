@@ -1,7 +1,11 @@
 package com.hana4.sonjumoney.controller;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,13 +33,13 @@ public class EventController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(eventResponse);
 	}
 
-	/*@GetMapping()
+	@GetMapping()
 	public ResponseEntity<List<EventResponse>> getAllEvents(@RequestParam Long familyId,
 		@RequestParam(required = false) Integer year,
 		@RequestParam(required = false) Integer month) {
 		int getYear = (year == null) ? LocalDate.now().getYear() : year;
 		int getMonth = (month == null) ? LocalDate.now().getMonthValue() : month;
 		List<EventResponse> eventResponseList = eventService.getAllEvents(familyId, getYear, getMonth);
-		return ResponseEntity.ok(eventResponseList);
-	}*/
+		return ResponseEntity.ok().body(eventResponseList);
+	}
 }
