@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 
 import com.hana4.sonjumoney.domain.User;
 import com.hana4.sonjumoney.domain.enums.Gender;
+import com.hana4.sonjumoney.dto.request.AuthPinRequest;
 import com.hana4.sonjumoney.dto.request.SignUpRequest;
 import com.hana4.sonjumoney.dto.response.DuplicationResponse;
+import com.hana4.sonjumoney.dto.response.PinValidResponse;
 import com.hana4.sonjumoney.dto.response.ReissueResponse;
 import com.hana4.sonjumoney.dto.response.SignUpResponse;
 import com.hana4.sonjumoney.exception.CommonException;
@@ -110,6 +112,20 @@ public class AuthService implements UserDetailsService {
 		return SignUpResponse.builder()
 			.code(201)
 			.message("회원가입에 성공했습니다.")
+			.build();
+	}
+
+	public PinValidResponse validatePin(AuthPinRequest authPinRequest, Long userId) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new UserNotFoundException(ErrorCode.NOT_FOUND_USER.getMessage()));
+		String requestPin = authPinRequest.pin();
+		String userPin = user.getPin();
+		if (!requestPin.equals(userPin)) {
+			throw new CommonException(ErrorCode.INVALID_PIN);
+		}
+		return PinValidResponse.builder()
+			.code(200)
+			.message("요청을 성공했습니다.")
 			.build();
 	}
 }
