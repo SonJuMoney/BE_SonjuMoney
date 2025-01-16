@@ -2,6 +2,9 @@ package com.hana4.sonjumoney.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.Builder;
+
+@Builder
 public record AccountRequest(
 	@JsonProperty(value = "user_id", required = false)
 	Long userId,
