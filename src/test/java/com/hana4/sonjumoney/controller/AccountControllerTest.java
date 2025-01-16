@@ -43,7 +43,7 @@ public class AccountControllerTest extends ControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer " + accessToken))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.accountName").value("하나자유입출금통장"))
+			.andExpect(jsonPath("$.account_name").value("하나자유입출금통장"))
 			.andExpect(jsonPath("$.bank").value("하나은행"));
 	}
 }
