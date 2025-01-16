@@ -46,7 +46,7 @@ public class EventControllerTest extends ControllerTest {
 			.notifyStatus(NotifyStatus.REGISTERED)
 			.build();
 		mockMvc.perform(post("/api/events")
-				.param("familyId", "1")
+				.param("family_id", "1")
 				.header("Authorization", "Bearer " + accessToken)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(eventAddRequest)))
@@ -66,7 +66,7 @@ public class EventControllerTest extends ControllerTest {
 	@DisplayName("일정 목록 조회 테스트(기본값: 현재 연도, 현재 월)")
 	public void getAllEventsDeafaulDateTest() throws Exception {
 		mockMvc.perform(get("/api/events")
-				.param("familyId", "1")
+				.param("family_id", "1")
 				.header("Authorization", "Bearer " + accessToken)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
@@ -95,7 +95,7 @@ public class EventControllerTest extends ControllerTest {
 	@DisplayName("일정 목록 조회 테스트(조회 연도, 조회 월)")
 	public void getAllEventsGetDateTest() throws Exception {
 		mockMvc.perform(get("/api/events")
-				.param("familyId", "1")
+				.param("family_id", "1")
 				.param("year", "2025")
 				.param("month", "2")
 				.header("Authorization", "Bearer " + accessToken)

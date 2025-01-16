@@ -19,4 +19,7 @@ public interface EventParticipantRepository extends JpaRepository<EventParticipa
 		@Param("endDate") LocalDate endDate
 	);
 
+	@Query("SELECT ep FROM EventParticipant ep JOIN FETCH ep.event e WHERE e.id =:eventId")
+	List<EventParticipant> findAllParticipantsByEventId(@Param("eventId") Long eventId);
+
 }

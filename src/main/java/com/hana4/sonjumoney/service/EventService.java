@@ -103,4 +103,29 @@ public class EventService {
 
 		return eventResponses;
 	}
+
+	public EventResponse getEvent(Long eventId) {
+		List<EventParticipant> participants;
+		try {
+			participants = eventParticipantRepository.findAllParticipantsByEventId(eventId);
+
+		} catch (NoSuchElementException e) {
+			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
+		}
+
+		Event event = participants.get(0).getEvent();
+
+		List<EventParticipantResponse> participantResponses = participants.stream()
+			.map(EventParticipantResponse::from)
+			.toList();
+
+		return EventResponse.of(
+			event.getId(),
+			event.getEventCategory(),
+			event.getEventName(),
+			event.getStartDate(),
+			event.getEndDate(),
+			participantResponses
+		);
+	}
 }
