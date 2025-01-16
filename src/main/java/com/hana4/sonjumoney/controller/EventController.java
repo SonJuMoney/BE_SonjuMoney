@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,19 +28,25 @@ public class EventController {
 	private final EventService eventService;
 
 	@PostMapping()
-	public ResponseEntity<EventResponse> addEvent(@RequestParam Long familyId,
+	public ResponseEntity<EventResponse> addEvent(@RequestParam(value = "family_id") Long familyId,
 		@RequestBody EventAddRequest eventAddRequest) {
 		EventResponse eventResponse = eventService.addEvent(familyId, eventAddRequest);
 		return ResponseEntity.status(HttpStatus.CREATED).body(eventResponse);
 	}
 
 	@GetMapping()
-	public ResponseEntity<List<EventResponse>> getAllEvents(@RequestParam Long familyId,
+	public ResponseEntity<List<EventResponse>> getAllEvents(@RequestParam(value = "family_id") Long familyId,
 		@RequestParam(required = false) Integer year,
 		@RequestParam(required = false) Integer month) {
 		int getYear = (year == null) ? LocalDate.now().getYear() : year;
 		int getMonth = (month == null) ? LocalDate.now().getMonthValue() : month;
 		List<EventResponse> eventResponseList = eventService.getAllEvents(familyId, getYear, getMonth);
 		return ResponseEntity.ok().body(eventResponseList);
+	}
+
+	@GetMapping("/{event_id}")
+	public ResponseEntity<EventResponse> getEvent(@PathVariable(value = "event_id") Long eventId) {
+		EventResponse eventResponse = eventService.getEvent(eventId);
+		return ResponseEntity.ok().body(eventResponse);
 	}
 }
