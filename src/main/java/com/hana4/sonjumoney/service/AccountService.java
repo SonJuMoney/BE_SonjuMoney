@@ -12,7 +12,8 @@ import com.hana4.sonjumoney.domain.enums.AccountProduct;
 import com.hana4.sonjumoney.domain.enums.Bank;
 import com.hana4.sonjumoney.dto.AllowanceDto;
 import com.hana4.sonjumoney.dto.TransferDto;
-import com.hana4.sonjumoney.dto.response.AccountResponse;
+import com.hana4.sonjumoney.dto.response.AccountInfoResponse;
+import com.hana4.sonjumoney.dto.response.CreateAccountResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.AccountRepository;
@@ -20,6 +21,7 @@ import com.hana4.sonjumoney.repository.MockAccountRepository;
 import com.hana4.sonjumoney.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 @Service
 @RequiredArgsConstructor
@@ -54,7 +56,7 @@ public class AccountService {
 
 	}
 
-	public AccountResponse makeAccount(Long userId, Long mockaccId) {
+	public CreateAccountResponse makeAccount(Long userId, Long mockaccId) {
 		MockAccount mockAccount = mockAccountRepository.findById(mockaccId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		User user = userRepository.findById(userId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
@@ -76,6 +78,13 @@ public class AccountService {
 			.build();
 
 		accountRepository.save(account);
-		return AccountResponse.of(200, "계좌 등록에 성공했습니다.");
+		return CreateAccountResponse.of(200, "계좌 등록에 성공했습니다.");
 	}
+
+	public AccountInfoResponse getAccountByUserId(Long userId) {
+		Account account = accountRepository.findByUser_IdAndAccountType_AccountProduct(userId,
+			AccountProduct.FREE_DEPOSIT).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		return AccountInfoResponse.from(account);
+	}
+
 }
