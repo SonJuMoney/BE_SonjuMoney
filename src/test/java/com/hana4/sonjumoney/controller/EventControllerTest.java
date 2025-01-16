@@ -112,6 +112,23 @@ public class EventControllerTest extends ControllerTest {
 
 	}
 
+	@Test
+	@Transactional
+	@DisplayName("일정 조회 테스트")
+	public void getEventTest() throws Exception {
+		mockMvc.perform(get("/api/events/{event_id}", 2)
+				.header("Authorization", "Bearer " + accessToken)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.event_id").value(2))
+			.andExpect(jsonPath("$.event_category").value("DINING"))
+			.andExpect(jsonPath("$.start_date").value("2025-01-19"))
+			.andExpect(jsonPath("$.end_date").value("2025-01-19"))
+			.andExpect(jsonPath("$.event_participants[0].participation_id").value(3))
+			.andExpect(jsonPath("$.event_participants[1].participation_id").value(4))
+			.andDo(print());
+	}
+
 }
 
 
