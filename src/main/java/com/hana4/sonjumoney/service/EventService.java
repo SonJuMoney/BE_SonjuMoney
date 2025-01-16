@@ -1,7 +1,11 @@
 package com.hana4.sonjumoney.service;
 
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +56,7 @@ public class EventService {
 		eventParticipantRepository.saveAll(eventParticipants);
 
 		List<EventParticipantResponse> participantResponses = eventParticipants.stream()
-			.map(EventParticipantResponse::of)
+			.map(EventParticipantResponse::from)
 			.toList();
 
 		return EventResponse.of(
@@ -64,5 +68,39 @@ public class EventService {
 			participantResponses
 		);
 
+	}
+
+	public List<EventResponse> getAllEvents(Long familyId, int getYear, int getMonth) {
+		LocalDate startDate = LocalDate.of(getYear, getMonth, 1);
+		LocalDate endDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
+		List<EventParticipant> participants;
+		try {
+			participants = eventParticipantRepository.findAllParticipantsByFamilyIdAndEventDateRange(familyId,
+				startDate, endDate);
+		} catch (NoSuchElementException e) {
+			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
+		}
+		Map<Event, List<EventParticipant>> groupedByEvent = participants.stream()
+			.collect(Collectors.groupingBy(EventParticipant::getEvent));
+
+		List<EventResponse> eventResponses = groupedByEvent.entrySet().stream()
+			.map(entry -> {
+				Event event = entry.getKey();
+				List<EventParticipantResponse> participantResponses = entry.getValue().stream()
+					.map(EventParticipantResponse::from)
+					.toList();
+
+				return EventResponse.of(
+					event.getId(),
+					event.getEventCategory(),
+					event.getEventName(),
+					event.getStartDate(),
+					event.getEndDate(),
+					participantResponses
+				);
+			})
+			.toList();
+
+		return eventResponses;
 	}
 }
