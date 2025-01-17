@@ -95,6 +95,7 @@ public class AccountService {
 		return AccountInfoResponse.from(account);
 	}
 
+	@Transactional
 	public CreateSavingAccountResponse makeSavingAccount(CreateSavingAccountRequest request) {
 		/* 자동이체 등록 적금 계좌인 경우 */
 		if (request.autoTransferable()) {
