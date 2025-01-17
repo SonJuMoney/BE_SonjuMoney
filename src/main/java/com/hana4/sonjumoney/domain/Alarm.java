@@ -19,7 +19,7 @@ import lombok.Getter;
 @Entity
 @Getter
 @Table(name = "Alarm")
-public class Alarm {
+public class Alarm extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
