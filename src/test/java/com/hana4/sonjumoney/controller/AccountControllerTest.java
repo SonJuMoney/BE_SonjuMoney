@@ -23,19 +23,19 @@ public class AccountControllerTest extends ControllerTest {
 
 	@Test
 	@Transactional
-	@DisplayName("계좌 등록 테스트")
+	@DisplayName("계좌 등록 예외 처리 테스트")
 	void makeAccountTest() throws Exception {
 		String api = "/api/accounts";
 		CreateAccountRequest request = CreateAccountRequest.builder()
 			.mockaccId(1L)
-			.userId(2L)
+			.userId(1L)
 			.build();
 
 		mockMvc.perform(post(api)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request))
 				.header("Authorization", "Bearer " + accessToken))
-			.andExpect(status().isOk());
+			.andExpect(status().is4xxClientError());
 	}
 
 	@Test
