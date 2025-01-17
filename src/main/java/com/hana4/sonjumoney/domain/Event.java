@@ -1,7 +1,6 @@
 package com.hana4.sonjumoney.domain;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 import com.hana4.sonjumoney.domain.enums.EventCategory;
 import com.hana4.sonjumoney.domain.enums.NotifyStatus;
@@ -55,7 +54,8 @@ public class Event extends BaseEntity {
 	private NotifyStatus notifyStatus;
 
 	@Builder
-	public Event(Family family, String eventName, LocalDate startDate, LocalDate endDate, EventCategory eventCategory, NotifyStatus status) {
+	public Event(Family family, String eventName, LocalDate startDate, LocalDate endDate, EventCategory eventCategory,
+		NotifyStatus status) {
 		this.family = family;
 		this.eventName = eventName;
 		this.startDate = startDate;
@@ -63,4 +63,12 @@ public class Event extends BaseEntity {
 		this.eventCategory = eventCategory;
 		this.notifyStatus = status;
 	}
+
+	public void updateEvent(EventCategory eventCategory, String eventName, LocalDate startDate, LocalDate endDate) {
+		this.eventCategory = eventCategory;
+		this.eventName = eventName;
+		this.startDate = startDate;
+		this.endDate = endDate;
+	}
+
 }

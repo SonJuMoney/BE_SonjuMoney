@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hana4.sonjumoney.dto.request.EventAddRequest;
+import com.hana4.sonjumoney.dto.request.AddEventRequest;
+import com.hana4.sonjumoney.dto.request.UpdateEventRequest;
 import com.hana4.sonjumoney.dto.response.EventResponse;
 import com.hana4.sonjumoney.service.EventService;
 
@@ -30,8 +31,8 @@ public class EventController {
 
 	@PostMapping()
 	public ResponseEntity<EventResponse> addEvent(@RequestParam(value = "family_id") Long familyId,
-		@RequestBody EventAddRequest eventAddRequest) {
-		EventResponse eventResponse = eventService.addEvent(familyId, eventAddRequest);
+		@RequestBody AddEventRequest addEventRequest) {
+		EventResponse eventResponse = eventService.addEvent(familyId, addEventRequest);
 		return ResponseEntity.status(HttpStatus.CREATED).body(eventResponse);
 	}
 
@@ -53,8 +54,8 @@ public class EventController {
 
 	@PatchMapping("/{event_id}")
 	public ResponseEntity<EventResponse> updateEvent(@PathVariable(value = "event_id") Long eventId,
-		@RequestBody EventAddRequest eventAddRequest) {
-		EventResponse eventResponse = eventService.updateEvent(eventId);
+		@RequestBody UpdateEventRequest updateEventRequest) {
+		EventResponse eventResponse = eventService.updateEvent(eventId, updateEventRequest);
 		return ResponseEntity.ok().body(eventResponse);
 	}
 

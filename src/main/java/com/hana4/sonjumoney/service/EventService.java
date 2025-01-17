@@ -14,7 +14,8 @@ import com.hana4.sonjumoney.domain.Event;
 import com.hana4.sonjumoney.domain.EventParticipant;
 import com.hana4.sonjumoney.domain.Family;
 import com.hana4.sonjumoney.domain.Member;
-import com.hana4.sonjumoney.dto.request.EventAddRequest;
+import com.hana4.sonjumoney.dto.request.AddEventRequest;
+import com.hana4.sonjumoney.dto.request.UpdateEventRequest;
 import com.hana4.sonjumoney.dto.response.EventParticipantResponse;
 import com.hana4.sonjumoney.dto.response.EventResponse;
 import com.hana4.sonjumoney.exception.CommonException;
@@ -35,14 +36,14 @@ public class EventService {
 	private final EventParticipantRepository eventParticipantRepository;
 
 	@Transactional
-	public EventResponse addEvent(Long familyId, EventAddRequest eventAddRequest) {
+	public EventResponse addEvent(Long familyId, AddEventRequest addEventRequest) {
 		Family family = familyRepository.findById(familyId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
-		Event event = eventAddRequest.toEntity(family);
+		Event event = addEventRequest.toEntity(family);
 		eventRepository.save(event);
 		List<Member> members;
 		try {
-			members = memberRepository.findAllWithUserByIds(eventAddRequest.memberId());
+			members = memberRepository.findAllWithUserByIds(addEventRequest.memberId());
 		} catch (NoSuchElementException e) {
 			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
 		}
@@ -134,9 +135,45 @@ public class EventService {
 		);
 	}
 
-	public EventResponse updateEvent(Long eventId, EventAddRequest eventAddRequest) {
+	@Transactional
+	public EventResponse updateEvent(Long eventId, UpdateEventRequest updateEventRequest) {
 		Event event = eventRepository.findById(eventId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		event.updateEvent(
+			updateEventRequest.eventCategory(),
+			updateEventRequest.eventName(),
+			updateEventRequest.startDate(),
+			updateEventRequest.endDate()
+		);
+		eventRepository.save(event);
 
+		List<Member> newMembers;
+		try {
+			newMembers = memberRepository.findAllWithUserByIds(updateEventRequest.memberId());
+		} catch (NoSuchElementException e) {
+			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
+		}
+
+		List<EventParticipant> newParticipants = newMembers.stream()
+			.map(member -> EventParticipant.builder()
+				.event(event)
+				.member(member)
+				.build())
+			.toList();
+		eventParticipantRepository.saveAll(newParticipants);
+
+		List<EventParticipantResponse> participantResponses = newParticipants.stream()
+			.map(EventParticipantResponse::from)
+			.toList();
+
+		return EventResponse.of(
+			event.getId(),
+			event.getEventCategory(),
+			event.getEventName(),
+			event.getStartDate(),
+			event.getEndDate(),
+			participantResponses
+
+		);
 	}
 }

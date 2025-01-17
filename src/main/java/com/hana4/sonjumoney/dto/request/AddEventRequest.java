@@ -12,7 +12,7 @@ import com.hana4.sonjumoney.domain.enums.NotifyStatus;
 import lombok.Builder;
 
 @Builder
-public record EventAddRequest(
+public record AddEventRequest(
 	@JsonProperty("event_category")
 	EventCategory eventCategory,
 

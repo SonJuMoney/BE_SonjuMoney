@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hana4.sonjumoney.ControllerTest;
 import com.hana4.sonjumoney.domain.enums.EventCategory;
 import com.hana4.sonjumoney.domain.enums.NotifyStatus;
-import com.hana4.sonjumoney.dto.request.EventAddRequest;
+import com.hana4.sonjumoney.dto.request.AddEventRequest;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -37,7 +37,7 @@ public class EventControllerTest extends ControllerTest {
 	@Transactional
 	@DisplayName("일정 등록 테스트")
 	void addEventTest() throws Exception {
-		EventAddRequest eventAddRequest = EventAddRequest.builder()
+		AddEventRequest eventAddRequest = AddEventRequest.builder()
 			.eventCategory(EventCategory.MEMORIAL)
 			.eventName("결혼")
 			.memberId(List.of(1L, 2L))
