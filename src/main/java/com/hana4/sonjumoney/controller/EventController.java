@@ -52,7 +52,8 @@ public class EventController {
 	}
 
 	@PatchMapping("/{event_id}")
-	public ResponseEntity<EventResponse> updateEvent(@PathVariable(value = "event_id") Long eventId) {
+	public ResponseEntity<EventResponse> updateEvent(@PathVariable(value = "event_id") Long eventId,
+		@RequestBody EventAddRequest eventAddRequest) {
 		EventResponse eventResponse = eventService.updateEvent(eventId);
 		return ResponseEntity.ok().body(eventResponse);
 	}
