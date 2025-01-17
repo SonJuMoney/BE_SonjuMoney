@@ -9,6 +9,4 @@ import com.hana4.sonjumoney.domain.Family;
 
 @Repository
 public interface FamilyRepository extends JpaRepository<Family,Long> {
-	@Override
-	Optional<Family> findById(Long aLong);
 }
