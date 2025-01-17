@@ -72,7 +72,7 @@ public class AccountService {
 		/* user_id가 unique key 이므로 DB에 param으로 전달된 user_id를 갖는 Account 데이터가 있으면 잘못된 요청 */
 		Optional<Account> savedAccount = accountRepository.findByUserId(userId);
 		if (savedAccount.isPresent()) {
-			throw new CommonException(ErrorCode.BAD_REQUEST);
+			throw new CommonException(ErrorCode.ALREADY_EXIST_ACCOUNT);
 		}
 
 		Account account = Account.builder()
@@ -102,6 +102,12 @@ public class AccountService {
 				.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 			Account depositAccount = accountRepository.findById(request.depositAccountId())
 				.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+
+			/* 입,출금 계좌가 동일한 경우 예외처리 */
+			if (request.depositAccountId().equals(request.withdrawalAccountId())) {
+				throw new CommonException(ErrorCode.SAME_ACCOUNT);
+			}
+
 			AutoTransfer autoTransferSetting = AutoTransfer.builder()
 				.withdrawalAccount(withdrawalAccount)
 				.depositAccount(depositAccount)
