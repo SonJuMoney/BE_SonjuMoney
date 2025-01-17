@@ -25,11 +25,11 @@ public class AutoTransfer {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "account_id", nullable = false)
+	@JoinColumn(name = "withdrawal_account_id", nullable = false)
 	private Account account;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "account_id2", nullable = false)
+	@JoinColumn(name = "deposit_account_id", nullable = false)
 	private Account account2;
 
 	@Column(name = "pay_day", nullable = false)
