@@ -30,10 +30,10 @@ public class FamilyService {
 
 	public List<GetFamilyResponse> findFamilies(Long userId) {
 		// 유저가 속한 가족(들)의 family_id를 찾는다.
-		List<Member> member = memberRepository.findAllByUserId(userId);
+		List<Member> members = memberRepository.findAllByUserId(userId);
 		List<GetFamilyResponse> responses = new ArrayList<>();
 
-		for (Member m : member) {
+		for (Member m : members) {
 			Family family = familyRepository.findById(m.getFamily().getId())
 				.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 
