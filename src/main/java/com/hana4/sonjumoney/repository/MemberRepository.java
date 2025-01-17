@@ -13,6 +13,5 @@ import com.hana4.sonjumoney.domain.Member;
 public interface MemberRepository extends JpaRepository<Member, Long> {
 	@Query("SELECT m FROM Member m JOIN FETCH m.user WHERE m.id IN :ids")
 	List<Member> findAllWithUserByIds(@Param("ids") List<Long> ids);
-
-	List<Member> findAllByUser_Id(Long userId);
+	List<Member> findAllByUserId(Long userId);
 }

@@ -84,7 +84,7 @@ public class WebsocketHandler extends TextWebSocketHandler {
 			UriComponentsBuilder.fromUriString(Objects.requireNonNull(session.getUri()).toString()).build();
 		log.info("session id: " + session.getId() + " session uri: " + session.getUri()+" uid: "+uriComponents.getQueryParams().getFirst("uid"));
 		Long userId = (Long)session.getAttributes().get("userId");
-		List<Member> members = memberRepository.findAllByUser_Id(userId);
+		List<Member> members = memberRepository.findAllByUserId(userId);
 		for (Member member : members) {
 			Long memberId = member.getId();
 			if (!memberAlarmSessionMap.containsKey(memberId)) {
