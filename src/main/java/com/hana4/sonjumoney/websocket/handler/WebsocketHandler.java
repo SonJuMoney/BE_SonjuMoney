@@ -43,7 +43,17 @@ public class WebsocketHandler extends TextWebSocketHandler {
 	private final FamilyRepository familyRepository;
 	private final MemberRepository memberRepository;
 
-
+	public void sendFamilyAlarm(AlarmDto alarmDto) {
+		Long familyAlarmSessionId = alarmDto.alarmSessionId();
+		Set<WebSocketSession> alarmSession = familyAlarmSessionMap.get(familyAlarmSessionId);
+		for (WebSocketSession session : alarmSession) {
+			try {
+				session.sendMessage(new TextMessage(alarmDto.alarmType()));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
 
 	public void sendMemberAlarm(AlarmDto alarmDto) {
 
