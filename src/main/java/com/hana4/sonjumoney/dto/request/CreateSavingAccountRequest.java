@@ -2,6 +2,9 @@ package com.hana4.sonjumoney.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.Builder;
+
+@Builder
 public record CreateSavingAccountRequest(
 	@JsonProperty(value = "account_type_id", required = true)
 	Long accountTypeId,
@@ -11,8 +14,6 @@ public record CreateSavingAccountRequest(
 	String holderResidentNum,
 	@JsonProperty(value = "account_password", required = true)
 	String accountPassword,
-	@JsonProperty(value = "balance", required = true)
-	Long balance,
 	@JsonProperty(value = "auto_transferable", required = true)
 	Boolean autoTransferable,
 	@JsonProperty(value = "user_id", required = true)
