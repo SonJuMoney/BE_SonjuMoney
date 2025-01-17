@@ -26,11 +26,11 @@ public class AutoTransfer {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "withdrawal_account_id", nullable = false)
-	private Account account;
+	private Account witdrawalAccount;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "deposit_account_id", nullable = false)
-	private Account account2;
+	private Account depositAccount;
 
 	@Column(name = "pay_day", nullable = false)
 	private Integer payDay;
@@ -42,9 +42,9 @@ public class AutoTransfer {
 	private String message;
 
 	@Builder
-	public AutoTransfer(Account account, Account account2, Integer payDay, Long payAmount, String message) {
-		this.account = account;
-		this.account2 = account2;
+	public AutoTransfer(Account witdrawalAccount, Account depositAccount, Integer payDay, Long payAmount, String message) {
+		this.witdrawalAccount = witdrawalAccount;
+		this.depositAccount = depositAccount;
 		this.payDay = payDay;
 		this.payAmount = payAmount;
 		this.message = message;
