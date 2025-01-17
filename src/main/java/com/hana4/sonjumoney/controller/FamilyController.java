@@ -1,0 +1,30 @@
+package com.hana4.sonjumoney.controller;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.hana4.sonjumoney.dto.global.ResponseDto;
+import com.hana4.sonjumoney.dto.request.CreateFamilyRequest;
+import com.hana4.sonjumoney.dto.response.CreateFamilyResponse;
+import com.hana4.sonjumoney.service.FamilyService;
+import com.hana4.sonjumoney.util.AuthenticationUtil;
+
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/families")
+public class FamilyController {
+	private final FamilyService familyService;
+
+	@PostMapping
+	public ResponseDto<CreateFamilyResponse> createFamily(Authentication authentication,
+		@RequestBody CreateFamilyRequest createFamilyRequest) {
+		return ResponseDto.created(CreateFamilyResponse.of(201,
+			familyService.createFamily(AuthenticationUtil.getUserId(authentication), createFamilyRequest)));
+	}
+
+}
