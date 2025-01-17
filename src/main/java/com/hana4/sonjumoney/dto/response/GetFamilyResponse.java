@@ -1,6 +1,6 @@
 package com.hana4.sonjumoney.dto.response;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -12,22 +12,18 @@ public record GetFamilyResponse(
 	Long familyId,
 	@JsonProperty("family_name")
 	String familyName,
-	@JsonProperty("created_at")
-	LocalDateTime createdAt,
-	@JsonProperty("updated_at")
-	LocalDateTime updatedAt
+	@JsonProperty("members")
+	List<MemberResponse> members
 ) {
 	public static GetFamilyResponse of(
 		Long familyId,
 		String familyName,
-		LocalDateTime createdAt,
-		LocalDateTime updatedAt
+		List<MemberResponse> members
 	) {
 		return GetFamilyResponse.builder()
 			.familyId(familyId)
 			.familyName(familyName)
-			.createdAt(createdAt)
-			.updatedAt(updatedAt)
+			.members(members)
 			.build();
 	}
 }

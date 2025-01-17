@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FamilyController {
 
-	private FamilyService familyService;
+	private final FamilyService familyService;
 
 	@GetMapping
 	public ResponseEntity<List<GetFamilyResponse>> getFamilies(Authentication authentication) {
