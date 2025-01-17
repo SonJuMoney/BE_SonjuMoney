@@ -1,11 +1,9 @@
 package com.hana4.sonjumoney.controller;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +42,7 @@ class FamilyControllerTest extends ControllerTest {
 	@DisplayName("가족 생성 api 테스트")
 	void addFamilyTest() throws Exception {
 		List<InviteUserDto> inviteUsers = new ArrayList<>();
-		inviteUsers.add(new InviteUserDto(2L, "아빠"));
+		inviteUsers.add(new InviteUserDto("01012341234", "아빠"));
 		CreateFamilyRequest request = CreateFamilyRequest.builder()
 			.familyName("OO이네")
 			.role("아들")
@@ -61,5 +59,17 @@ class FamilyControllerTest extends ControllerTest {
 			CreateFamilyResponse.class);
 		Long familyId = response.familyId();
 		assertEquals(familyRepository.findById(familyId).get().getFamilyName(), "OO이네");
+	}
+
+	@Test
+	@DisplayName("가족 목록 조회 테스트")
+	void findFamiliesTest() throws Exception {
+		String api = "/api/families";
+
+		mockMvc.perform(get(api)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andDo(print());
 	}
 }
