@@ -45,10 +45,14 @@ public class WebsocketHandler extends TextWebSocketHandler {
 
 	public void sendFamilyAlarm(AlarmDto alarmDto) {
 		Long familyAlarmSessionId = alarmDto.alarmSessionId();
+		Long userId = alarmDto.senderId();
 		Set<WebSocketSession> alarmSession = familyAlarmSessionMap.get(familyAlarmSessionId);
 		for (WebSocketSession session : alarmSession) {
 			try {
-				session.sendMessage(new TextMessage(alarmDto.alarmType()));
+				// 전송자 제외
+				if (session.getAttributes().get("userId") != userId) {
+					session.sendMessage(new TextMessage(alarmDto.alarmType()));
+				}
 			} catch (Exception e) {
 				throw new CommonException(ErrorCode.ALARM_SEND_FAILED);
 			}
