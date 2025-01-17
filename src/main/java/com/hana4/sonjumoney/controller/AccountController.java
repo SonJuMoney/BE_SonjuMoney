@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hana4.sonjumoney.dto.request.CreateAccountRequest;
+import com.hana4.sonjumoney.dto.request.CreateSavingAccountRequest;
 import com.hana4.sonjumoney.dto.response.AccountInfoResponse;
 import com.hana4.sonjumoney.dto.response.CreateAccountResponse;
+import com.hana4.sonjumoney.dto.response.CreateSavingAccountResponse;
 import com.hana4.sonjumoney.service.AccountService;
 import com.hana4.sonjumoney.util.AuthenticationUtil;
 
@@ -44,5 +46,12 @@ public class AccountController {
 	public ResponseEntity<AccountInfoResponse> getAccount(Authentication authentication) {
 		Long userId = AuthenticationUtil.getUserId(authentication);
 		return ResponseEntity.ok().body(accountService.getAccountByUserId(userId));
+	}
+
+	@PostMapping("/savings")
+	public ResponseEntity<CreateSavingAccountResponse> createSavingAccount(
+		@RequestBody CreateSavingAccountRequest request) {
+
+		return ResponseEntity.ok().body(accountService.makeSavingAccount(request));
 	}
 }
