@@ -50,8 +50,8 @@ public class AccountController {
 
 	@PostMapping("/savings")
 	public ResponseEntity<CreateSavingAccountResponse> createSavingAccount(
-		@RequestBody CreateSavingAccountRequest request,
-		Authentication authentication) {
+		@RequestBody CreateSavingAccountRequest request) {
+
 		return ResponseEntity.ok().body(accountService.makeSavingAccount(request));
 	}
 }
