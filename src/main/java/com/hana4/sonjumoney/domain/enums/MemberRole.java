@@ -1,5 +1,8 @@
 package com.hana4.sonjumoney.domain.enums;
 
+import com.hana4.sonjumoney.exception.CommonException;
+import com.hana4.sonjumoney.exception.ErrorCode;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,4 +17,13 @@ public enum MemberRole {
 	DAUGHTER("딸")
 	;
 	private final String value;
+
+	public  static MemberRole fromValue(String value) {
+		for (MemberRole role : values()) {
+			if (role.value.equals(value)) {
+				return role;
+			}
+		}
+		throw new CommonException(ErrorCode.IMPROPER_MEMBER_ROLE);
+	}
 }

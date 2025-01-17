@@ -29,7 +29,7 @@ public class FamilyService {
 		Family family = familyRepository.save(new Family(
 			request.familyName()
 		));
-		memberRepository.save(new Member(family, user, MemberRole.valueOf(request.role())));
+		memberRepository.save(new Member(family, user, MemberRole.fromValue(request.role())));
 
 		// TODO: 초대 보내기 구현
 		return family.getId();
