@@ -14,6 +14,7 @@ public enum ErrorCode {
 	INSUFFICIENT_BALANCE(40001, HttpStatus.BAD_REQUEST, "잔액이 부족합니다."),
 	SAME_ACCOUNT(40002, HttpStatus.BAD_REQUEST, "입, 출금 계좌는 동일할 수 없습니다."),
 	ALREADY_EXIST_ACCOUNT(40003, HttpStatus.BAD_REQUEST, "이미 계좌가 등록되어 있습니다."),
+	IMPROPER_MEMBER_ROLE(40004, HttpStatus.BAD_REQUEST, "적절하지 않은 멤버역할입니다."),
 
 	//401
 	UNAUTHORIZED(40100, HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),
