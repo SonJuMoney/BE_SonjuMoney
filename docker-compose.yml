@@ -11,8 +11,12 @@ services:
       MYSQL_DATABASE: sonjudb
       MYSQL_USER: sonju
       MYSQL_PASSWORD: 1234
+      TZ: Asia/Seoul  # 한국 시간대 설정
+      MYSQL_CHARSET: utf8mb4  # 문자셋 설정
+      MYSQL_COLLATION: utf8mb4_general_ci  # 콜레이션 설정
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./my.cnf:/etc/mysql/conf.d/my.cnf  # 커스텀 설정 파일 추가
 
 volumes:
   mysql_data:
