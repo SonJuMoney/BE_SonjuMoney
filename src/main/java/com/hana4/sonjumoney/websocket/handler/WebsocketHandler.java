@@ -37,11 +37,13 @@ public class WebsocketHandler extends TextWebSocketHandler {
 	private final ObjectMapper objectMapper;
 
 	private final Set<WebSocketSession> sessions = new HashSet<>();
-
 	private final Map<Long, Set<WebSocketSession>> familyAlarmSessionMap = new HashMap<>();
 	private final Map<Long, WebSocketSession> memberAlarmSessionMap = new HashMap<>();
+	private final Map<Long,WebSocketSession> userAlarmSessionMap = new HashMap<>();
+
 	private final FamilyRepository familyRepository;
 	private final MemberRepository memberRepository;
+	private final UserRepository userRepository;
 
 	public void sendFamilyAlarm(AlarmDto alarmDto) {
 		Long familyAlarmSessionId = alarmDto.alarmSessionId();
@@ -84,6 +86,7 @@ public class WebsocketHandler extends TextWebSocketHandler {
 			UriComponentsBuilder.fromUriString(Objects.requireNonNull(session.getUri()).toString()).build();
 		log.info("session id: " + session.getId() + " session uri: " + session.getUri()+" uid: "+uriComponents.getQueryParams().getFirst("uid"));
 		Long userId = (Long)session.getAttributes().get("userId");
+		userAlarmSessionMap.put(userId, session);
 		List<Member> members = memberRepository.findAllByUserId(userId);
 		for (Member member : members) {
 			Long memberId = member.getId();
