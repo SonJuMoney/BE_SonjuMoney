@@ -142,8 +142,15 @@ public class AccountService {
 	}
 
 	private String makeRandomAccountNum() {
-		/* 13자리 계좌번호 랜덤 생성 */
-		long randomNumber = ThreadLocalRandom.current().nextLong((long)1e12, (long)1e13);
-		return String.valueOf(randomNumber);
+		while (true) {
+			/* 13자리 계좌번호 랜덤 생성 */
+			long randomNumber = ThreadLocalRandom.current().nextLong((long)1e12, (long)1e13);
+			String randomAccountNum = String.valueOf(randomNumber);
+
+			/* 계좌번호 중복 체크 */
+			Optional<Account> account = accountRepository.findByHolderResidentNum(randomAccountNum);
+			if (account.isEmpty())
+				return randomAccountNum;
+		}
 	}
 }
