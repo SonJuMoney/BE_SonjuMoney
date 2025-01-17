@@ -49,13 +49,20 @@ public class WebsocketHandler extends TextWebSocketHandler {
 		for (WebSocketSession session : alarmSession) {
 			try {
 				session.sendMessage(new TextMessage(alarmDto.alarmType()));
-			} catch (IOException e) {
-				throw new RuntimeException(e);
+			} catch (Exception e) {
+				throw new CommonException(ErrorCode.ALARM_SEND_FAILED);
 			}
 		}
 	}
 
 	public void sendMemberAlarm(AlarmDto alarmDto) {
+		Long memberAlarmSessionId = alarmDto.alarmSessionId();
+		WebSocketSession session = memberAlarmSessionMap.get(memberAlarmSessionId);
+		try {
+			session.sendMessage(new TextMessage(alarmDto.alarmType()));
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.ALARM_SEND_FAILED);
+		}
 
 	}
 
