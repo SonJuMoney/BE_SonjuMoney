@@ -127,6 +127,7 @@ public class AccountService {
 			.holderResidentNum(user.getResidentNum())
 			.accountNum(randomAccountNum)
 			.accountPassword(request.accountPassword())
+			.balance(0L)
 			.build();
 
 		accountRepository.save(account);
