@@ -1,6 +1,6 @@
 package com.hana4.sonjumoney.service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Comparator;
 import java.util.List;
@@ -64,20 +64,21 @@ public class EventService {
 			event.getId(),
 			event.getEventCategory(),
 			event.getEventName(),
-			event.getStartDate(),
-			event.getEndDate(),
+			event.getStartDateTime(),
+			event.getEndDateTime(),
+			event.getAllDayStatus(),
 			participantResponses
 		);
 
 	}
 
 	public List<EventResponse> getAllEvents(Long familyId, int getYear, int getMonth) {
-		LocalDate startDate = LocalDate.of(getYear, getMonth, 1);
-		LocalDate endDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
+		LocalDateTime startDateTime = LocalDateTime.of(getYear, getMonth, 1, 0, 0, 0);
+		LocalDateTime endDateTime = startDateTime.with(TemporalAdjusters.lastDayOfMonth());
 		List<EventParticipant> participants;
 		try {
 			participants = eventParticipantRepository.findAllParticipantsByFamilyIdAndEventDateRange(familyId,
-				startDate, endDate);
+				startDateTime, endDateTime);
 		} catch (NoSuchElementException e) {
 			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
 		}
@@ -94,8 +95,9 @@ public class EventService {
 					event.getId(),
 					event.getEventCategory(),
 					event.getEventName(),
-					event.getStartDate(),
-					event.getEndDate(),
+					event.getStartDateTime(),
+					event.getEndDateTime(),
+					event.getAllDayStatus(),
 					participantResponses
 				);
 			})
@@ -103,7 +105,7 @@ public class EventService {
 
 		//일정 시작날짜 오름차순
 		List<EventResponse> sortResponses = eventResponses.stream()
-			.sorted(Comparator.comparing(EventResponse::startDate))
+			.sorted(Comparator.comparing(EventResponse::startDateTime))
 			.toList();
 
 		return sortResponses;
@@ -129,8 +131,9 @@ public class EventService {
 			event.getId(),
 			event.getEventCategory(),
 			event.getEventName(),
-			event.getStartDate(),
-			event.getEndDate(),
+			event.getStartDateTime(),
+			event.getEndDateTime(),
+			event.getAllDayStatus(),
 			participantResponses
 		);
 	}
@@ -142,8 +145,9 @@ public class EventService {
 		event.updateEvent(
 			updateEventRequest.eventCategory(),
 			updateEventRequest.eventName(),
-			updateEventRequest.startDate(),
-			updateEventRequest.endDate()
+			updateEventRequest.startDateTime(),
+			updateEventRequest.endDateTime(),
+			updateEventRequest.allDayStatus()
 		);
 		eventRepository.save(event);
 
@@ -170,8 +174,9 @@ public class EventService {
 			event.getId(),
 			event.getEventCategory(),
 			event.getEventName(),
-			event.getStartDate(),
-			event.getEndDate(),
+			event.getStartDateTime(),
+			event.getEndDateTime(),
+			event.getAllDayStatus(),
 			participantResponses
 
 		);

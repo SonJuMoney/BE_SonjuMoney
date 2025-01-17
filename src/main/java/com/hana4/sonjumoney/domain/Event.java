@@ -1,7 +1,8 @@
 package com.hana4.sonjumoney.domain;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
+import com.hana4.sonjumoney.domain.enums.AllDayStatus;
 import com.hana4.sonjumoney.domain.enums.EventCategory;
 import com.hana4.sonjumoney.domain.enums.NotifyStatus;
 
@@ -39,11 +40,11 @@ public class Event extends BaseEntity {
 	@Column(name = "event_name", length = 30, nullable = false)
 	private String eventName;
 
-	@Column(name = "start_date", nullable = false, columnDefinition = "DATE")
-	private LocalDate startDate;
+	@Column(name = "start_date_time", nullable = false, columnDefinition = "DATE")
+	private LocalDateTime startDateTime;
 
-	@Column(name = "end_date", nullable = false, columnDefinition = "DATE")
-	private LocalDate endDate;
+	@Column(name = "end_date_time", nullable = false, columnDefinition = "DATE")
+	private LocalDateTime endDateTime;
 
 	@Column(name = "event_category", nullable = false)
 	@Enumerated(EnumType.STRING)
@@ -53,22 +54,31 @@ public class Event extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private NotifyStatus notifyStatus;
 
+	@Column(name = "all_day_status", nullable = false)
+	@Enumerated(EnumType.STRING)
+	private AllDayStatus allDayStatus;
+
 	@Builder
-	public Event(Family family, String eventName, LocalDate startDate, LocalDate endDate, EventCategory eventCategory,
-		NotifyStatus status) {
+	public Event(Family family, String eventName, LocalDateTime startDateTime, LocalDateTime endDateTime,
+		EventCategory eventCategory,
+		NotifyStatus status, AllDayStatus allDayStatus) {
 		this.family = family;
 		this.eventName = eventName;
-		this.startDate = startDate;
-		this.endDate = endDate;
+		this.startDateTime = startDateTime;
+		this.endDateTime = endDateTime;
 		this.eventCategory = eventCategory;
 		this.notifyStatus = status;
+		this.allDayStatus = allDayStatus;
 	}
 
-	public void updateEvent(EventCategory eventCategory, String eventName, LocalDate startDate, LocalDate endDate) {
+	public void updateEvent(EventCategory eventCategory, String eventName, LocalDateTime startDateTime,
+		LocalDateTime endDateTime,
+		AllDayStatus allDayStatus) {
 		this.eventCategory = eventCategory;
 		this.eventName = eventName;
-		this.startDate = startDate;
-		this.endDate = endDate;
+		this.startDateTime = startDateTime;
+		this.endDateTime = endDateTime;
+		this.allDayStatus = allDayStatus;
 	}
 
 }
