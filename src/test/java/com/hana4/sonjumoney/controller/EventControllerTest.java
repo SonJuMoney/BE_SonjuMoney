@@ -138,7 +138,7 @@ public class EventControllerTest extends ControllerTest {
 		UpdateEventRequest updateEventRequest = UpdateEventRequest.builder()
 			.eventCategory(EventCategory.DINING)
 			.eventName("치킨 먹는날!")
-			.memberId(List.of(1L, 2L))
+			.memberId(List.of(1L))
 			.startDateTime(LocalDateTime.of(2025, 1, 19, 12, 0, 0))
 			.endDateTime(LocalDateTime.of(2025, 1, 19, 23, 59, 59))
 			.allDayStatus(AllDayStatus.ALL_DAY)
@@ -154,7 +154,7 @@ public class EventControllerTest extends ControllerTest {
 			.andExpect(jsonPath("$.start_date_time").value("2025-01-19T12:00:00"))
 			.andExpect(jsonPath("$.end_date_time").value("2025-01-19T23:59:59"))
 			.andExpect(jsonPath("$.event_participants[0].user_name").value("계좌 있는 놈"))
-			.andExpect(jsonPath("$.event_participants[1].user_name").value("계좌 없는 놈"))
+			.andExpect(jsonPath("$.event_participants[1].user_name").doesNotExist())
 			.andDo(print());
 	}
 

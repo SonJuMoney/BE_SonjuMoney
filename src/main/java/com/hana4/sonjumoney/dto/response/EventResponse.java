@@ -28,7 +28,7 @@ public record EventResponse(
 	LocalDateTime endDateTime,
 
 	@JsonProperty("all_day_status")
-	AllDayStatus allDayStatus,
+	String allDayStatus,
 
 	@JsonProperty("event_participants")
 	List<EventParticipantResponse> participants) {
@@ -41,7 +41,7 @@ public record EventResponse(
 			.eventName(eventName)
 			.startDateTime(startDateTime)
 			.endDateTime(endDateTime)
-			.allDayStatus(allDayStatus)
+			.allDayStatus(allDayStatus.getValue())
 			.participants(participants)
 			.build();
 	}
