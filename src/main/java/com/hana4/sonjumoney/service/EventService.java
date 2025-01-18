@@ -99,6 +99,7 @@ public class EventService {
 			LocalDate eventStartDate = event.getStartDateTime().toLocalDate();
 			LocalDate eventEndDate = event.getEndDateTime().toLocalDate();
 
+			//이벤트 시작날짜-종료날짜 해당되는 데이터 날짜별 분리
 			for (LocalDate currentDate = eventStartDate; !currentDate.isAfter(
 				eventEndDate); currentDate = currentDate.plusDays(1)) {
 				eventResponses.add(
@@ -116,7 +117,7 @@ public class EventService {
 			}
 		});
 
-		//날짜 기준 오름차순
+		//currentdate 기준 오름차순
 		return eventResponses.stream()
 			.sorted(Comparator.comparing(EventResponse::currentDate))
 			.toList();

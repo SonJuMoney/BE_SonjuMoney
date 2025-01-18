@@ -17,7 +17,7 @@ public record EventResponse(
 	Long eventId,
 
 	@JsonProperty("event_category")
-	EventCategory eventCategory,
+	String eventCategory,
 
 	@JsonProperty("event_name")
 	String eventName,
@@ -42,7 +42,7 @@ public record EventResponse(
 		List<EventParticipantResponse> participants) {
 		return EventResponse.builder()
 			.eventId(eventId)
-			.eventCategory(eventCategory)
+			.eventCategory(eventCategory.getValue())
 			.eventName(eventName)
 			.startDateTime(startDateTime)
 			.endDateTime(endDateTime)
@@ -57,7 +57,7 @@ public record EventResponse(
 		List<EventParticipantResponse> participants) {
 		return EventResponse.builder()
 			.eventId(eventId)
-			.eventCategory(eventCategory)
+			.eventCategory(eventCategory.getValue())
 			.eventName(eventName)
 			.startDateTime(startDateTime)
 			.endDateTime(endDateTime)
