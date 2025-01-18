@@ -1,9 +1,12 @@
 package com.hana4.sonjumoney.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
@@ -82,33 +85,42 @@ public class EventService {
 		} catch (NoSuchElementException e) {
 			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
 		}
-		List<EventResponse> eventResponses = participants.stream()
-			.collect(Collectors.groupingBy(EventParticipant::getEvent))
-			.entrySet().stream()
-			.map(entry -> {
-				Event event = entry.getKey();
-				List<EventParticipantResponse> participantResponses = entry.getValue().stream()
-					.map(EventParticipantResponse::from)
-					.toList();
+		Map<Event, List<EventParticipant>> groupedParticipants =
+			participants.stream()
+				.collect(Collectors.groupingBy(EventParticipant::getEvent));
 
-				return EventResponse.of(
-					event.getId(),
-					event.getEventCategory(),
-					event.getEventName(),
-					event.getStartDateTime(),
-					event.getEndDateTime(),
-					event.getAllDayStatus(),
-					participantResponses
+		List<EventResponse> eventResponses = new ArrayList<>();
+
+		groupedParticipants.forEach((event, participantList) -> {
+			List<EventParticipantResponse> participantResponses = participantList.stream()
+				.map(EventParticipantResponse::from)
+				.toList();
+
+			LocalDate eventStartDate = event.getStartDateTime().toLocalDate();
+			LocalDate eventEndDate = event.getEndDateTime().toLocalDate();
+
+			//이벤트 시작날짜-종료날짜 해당되는 데이터 날짜별 분리
+			for (LocalDate currentDate = eventStartDate; !currentDate.isAfter(
+				eventEndDate); currentDate = currentDate.plusDays(1)) {
+				eventResponses.add(
+					EventResponse.ofWithCurrentDate(
+						event.getId(),
+						event.getEventCategory(),
+						event.getEventName(),
+						event.getStartDateTime(),
+						event.getEndDateTime(),
+						currentDate,
+						event.getAllDayStatus(),
+						participantResponses
+					)
 				);
-			})
-			.toList();
+			}
+		});
 
-		//일정 시작날짜 오름차순
-		List<EventResponse> sortResponses = eventResponses.stream()
-			.sorted(Comparator.comparing(EventResponse::startDateTime))
+		//currentdate 기준 오름차순
+		return eventResponses.stream()
+			.sorted(Comparator.comparing(EventResponse::currentDate))
 			.toList();
-
-		return sortResponses;
 
 	}
 
@@ -182,4 +194,5 @@ public class EventService {
 
 		);
 	}
+
 }
