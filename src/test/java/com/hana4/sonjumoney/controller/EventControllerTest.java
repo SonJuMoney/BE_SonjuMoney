@@ -57,7 +57,7 @@ public class EventControllerTest extends ControllerTest {
 			.andExpect(jsonPath("$.event_name").value("결혼"))
 			.andExpect(jsonPath("$.start_date_time").value("2025-01-06T00:00:00"))
 			.andExpect(jsonPath("$.end_date_time").value("2025-01-06T00:00:00"))
-			.andExpect(jsonPath("$.all_day_status").value("ALL_DAY"))
+			.andExpect(jsonPath("$.all_day_status").value("하루 종일"))
 			.andExpect(jsonPath("$.event_participants[0].user_name").value("계좌 있는 놈"))
 			.andExpect(jsonPath("$.event_participants[1].user_name").value("계좌 없는 놈"))
 			.andDo(print());
