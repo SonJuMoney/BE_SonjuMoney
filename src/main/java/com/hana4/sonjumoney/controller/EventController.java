@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,6 +57,12 @@ public class EventController {
 	public ResponseEntity<EventResponse> updateEvent(@PathVariable(value = "event_id") Long eventId,
 		@RequestBody UpdateEventRequest updateEventRequest) {
 		EventResponse eventResponse = eventService.updateEvent(eventId, updateEventRequest);
+		return ResponseEntity.ok().body(eventResponse);
+	}
+
+	@DeleteMapping("/{event_id}")
+	public ResponseEntity<EventResponse> deleteEvent(@PathVariable(value = "event_id") Long eventId) {
+		EventResponse eventResponse = eventService.deleteEvent(eventId);
 		return ResponseEntity.ok().body(eventResponse);
 	}
 
