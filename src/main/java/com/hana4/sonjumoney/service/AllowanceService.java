@@ -52,7 +52,8 @@ public class AllowanceService {
 		);
 		Long feedId = feedService.saveAllowanceFeed(
 			CreateAllowanceDto.of(allowance, image, sendAllowanceRequest.message()));
-		websocketHandler.sendMemberAlarm(AlarmDto.of(receiver.getId(), sender.getId(), AlarmType.ALLOWANCE));
+		// TODO: 웹소켓 테스트 생각해오기
+		// websocketHandler.sendMemberAlarm(AlarmDto.of(receiver.getId(), sender.getId(), AlarmType.ALLOWANCE));
 		return SendAllowanceResponse.of("송금을 완료했습니다.");
 	}
 }
