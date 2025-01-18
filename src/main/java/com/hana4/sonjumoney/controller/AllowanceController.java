@@ -1,5 +1,6 @@
 package com.hana4.sonjumoney.controller;
 
+import com.hana4.sonjumoney.dto.response.SendAllowanceResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,8 +9,6 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.hana4.sonjumoney.dto.global.CreatedDto;
-import com.hana4.sonjumoney.dto.global.ResponseDto;
 import com.hana4.sonjumoney.dto.request.SendAllowanceRequest;
 import com.hana4.sonjumoney.service.AllowanceService;
 import com.hana4.sonjumoney.util.AuthenticationUtil;
@@ -25,12 +24,13 @@ public class AllowanceController {
 	private final AllowanceService allowanceService;
 
 	@PostMapping
-	public ResponseDto<CreatedDto> sendAllowance(
-		Authentication authentication,
-		@RequestPart(value = "image", required = false) MultipartFile image,
-		@RequestPart(value = "data") SendAllowanceRequest sendAllowanceRequest
+	public ResponseEntity<SendAllowanceResponse> sendAllowance(
+			Authentication authentication,
+			@RequestPart(value = "image", required = false) MultipartFile image,
+			@RequestPart(value = "data") SendAllowanceRequest sendAllowanceRequest
 	) {
-		return ResponseDto.created(allowanceService.sendAllowance(image, AuthenticationUtil.getUserId(authentication),
-			sendAllowanceRequest));
+		return ResponseEntity.ok()
+				.body(allowanceService.sendAllowance(image, AuthenticationUtil.getUserId(authentication),
+						sendAllowanceRequest));
 	}
 }
