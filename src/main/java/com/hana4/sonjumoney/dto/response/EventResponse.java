@@ -28,8 +28,8 @@ public record EventResponse(
 	@JsonProperty("end_date_time")
 	LocalDateTime endDateTime,
 
-	@JsonProperty("dispaky_date")
-	LocalDate displayDate,
+	@JsonProperty("current_date")
+	LocalDate currentDate,
 
 	@JsonProperty("all_day_status")
 	String allDayStatus,
@@ -38,7 +38,7 @@ public record EventResponse(
 	List<EventParticipantResponse> participants) {
 	public static EventResponse of(Long eventId, EventCategory eventCategory, String eventName,
 		LocalDateTime startDateTime,
-		LocalDateTime endDateTime, LocalDate displayDate, AllDayStatus allDayStatus,
+		LocalDateTime endDateTime, LocalDate eventDate, AllDayStatus allDayStatus,
 		List<EventParticipantResponse> participants) {
 		return EventResponse.builder()
 			.eventId(eventId)
@@ -46,7 +46,7 @@ public record EventResponse(
 			.eventName(eventName)
 			.startDateTime(startDateTime)
 			.endDateTime(endDateTime)
-			.displayDate(displayDate)
+			.eventDate(eventDate)
 			.allDayStatus(allDayStatus.getValue())
 			.participants(participants)
 			.build();
