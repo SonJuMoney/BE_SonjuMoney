@@ -158,6 +158,7 @@ public class EventService {
 			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
 		}
 
+		eventParticipantRepository.deleteByEventId(eventId);
 		List<EventParticipant> newParticipants = newMembers.stream()
 			.map(member -> EventParticipant.builder()
 				.event(event)
