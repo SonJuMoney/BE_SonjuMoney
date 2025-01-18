@@ -4,12 +4,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hana4.sonjumoney.domain.enums.AllDayStatus;
 import com.hana4.sonjumoney.domain.enums.EventCategory;
 
 import lombok.Builder;
 
+@JsonInclude(JsonInclude.Include.NON_NULL) //null값 필드 제외
 @Builder
 public record EventResponse(
 
@@ -29,7 +31,7 @@ public record EventResponse(
 	LocalDateTime endDateTime,
 
 	@JsonProperty("current_date")
-	LocalDate currentDate,
+	LocalDate currentDate, //null일경우 json 필드에서 제외
 
 	@JsonProperty("all_day_status")
 	String allDayStatus,
