@@ -1,7 +1,9 @@
 package com.hana4.sonjumoney.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -105,7 +107,7 @@ public class EventService {
 
 		//일정 시작날짜 오름차순
 		List<EventResponse> sortResponses = eventResponses.stream()
-			.sorted(Comparator.comparing(EventResponse::startDateTime))
+			.sorted(Comparator.comparing(EventResponse::displayDate))
 			.toList();
 
 		return sortResponses;
@@ -182,4 +184,32 @@ public class EventService {
 
 		);
 	}
+
+	/*날짜별로 데이터 분리하는 메서드*/
+	private List<EventResponse> createDisplayDate(
+		Event event,
+		List<EventParticipantResponse> participantResponses,
+		LocalDate start,
+		LocalDate end
+	) {
+		List<EventResponse> responses = new ArrayList<>();
+		while (!start.isAfter(end)) {
+			responses.add(
+				EventResponse.of(
+					event.getId(),
+					event.getEventCategory(),
+					event.getEventName(),
+					event.getStartDateTime(),
+					event.getEndDateTime(),
+					start,
+					event.getAllDayStatus(),
+					participantResponses
+
+				)
+			);
+			start = start.plusDays(1);
+		}
+		return responses;
+	}
+
 }

@@ -1,5 +1,6 @@
 package com.hana4.sonjumoney.dto.response;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,6 +28,9 @@ public record EventResponse(
 	@JsonProperty("end_date_time")
 	LocalDateTime endDateTime,
 
+	@JsonProperty("dispaky_date")
+	LocalDate displayDate,
+
 	@JsonProperty("all_day_status")
 	String allDayStatus,
 
@@ -34,13 +38,15 @@ public record EventResponse(
 	List<EventParticipantResponse> participants) {
 	public static EventResponse of(Long eventId, EventCategory eventCategory, String eventName,
 		LocalDateTime startDateTime,
-		LocalDateTime endDateTime, AllDayStatus allDayStatus, List<EventParticipantResponse> participants) {
+		LocalDateTime endDateTime, LocalDate displayDate, AllDayStatus allDayStatus,
+		List<EventParticipantResponse> participants) {
 		return EventResponse.builder()
 			.eventId(eventId)
 			.eventCategory(eventCategory)
 			.eventName(eventName)
 			.startDateTime(startDateTime)
 			.endDateTime(endDateTime)
+			.displayDate(displayDate)
 			.allDayStatus(allDayStatus.getValue())
 			.participants(participants)
 			.build();
