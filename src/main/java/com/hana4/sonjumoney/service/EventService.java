@@ -1,9 +1,12 @@
 package com.hana4.sonjumoney.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
@@ -14,7 +17,8 @@ import com.hana4.sonjumoney.domain.Event;
 import com.hana4.sonjumoney.domain.EventParticipant;
 import com.hana4.sonjumoney.domain.Family;
 import com.hana4.sonjumoney.domain.Member;
-import com.hana4.sonjumoney.dto.request.EventAddRequest;
+import com.hana4.sonjumoney.dto.request.AddEventRequest;
+import com.hana4.sonjumoney.dto.request.UpdateEventRequest;
 import com.hana4.sonjumoney.dto.response.EventParticipantResponse;
 import com.hana4.sonjumoney.dto.response.EventResponse;
 import com.hana4.sonjumoney.exception.CommonException;
@@ -35,14 +39,14 @@ public class EventService {
 	private final EventParticipantRepository eventParticipantRepository;
 
 	@Transactional
-	public EventResponse addEvent(Long familyId, EventAddRequest eventAddRequest) {
+	public EventResponse addEvent(Long familyId, AddEventRequest addEventRequest) {
 		Family family = familyRepository.findById(familyId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
-		Event event = eventAddRequest.toEntity(family);
+		Event event = addEventRequest.toEntity(family);
 		eventRepository.save(event);
 		List<Member> members;
 		try {
-			members = memberRepository.findAllWithUserByIds(eventAddRequest.memberId());
+			members = memberRepository.findAllWithUserByIds(addEventRequest.memberId());
 		} catch (NoSuchElementException e) {
 			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
 		}
@@ -63,49 +67,60 @@ public class EventService {
 			event.getId(),
 			event.getEventCategory(),
 			event.getEventName(),
-			event.getStartDate(),
-			event.getEndDate(),
+			event.getStartDateTime(),
+			event.getEndDateTime(),
+			event.getAllDayStatus(),
 			participantResponses
 		);
 
 	}
 
 	public List<EventResponse> getAllEvents(Long familyId, int getYear, int getMonth) {
-		LocalDate startDate = LocalDate.of(getYear, getMonth, 1);
-		LocalDate endDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
+		LocalDateTime startDateTime = LocalDateTime.of(getYear, getMonth, 1, 0, 0, 0);
+		LocalDateTime endDateTime = startDateTime.with(TemporalAdjusters.lastDayOfMonth());
 		List<EventParticipant> participants;
 		try {
 			participants = eventParticipantRepository.findAllParticipantsByFamilyIdAndEventDateRange(familyId,
-				startDate, endDate);
+				startDateTime, endDateTime);
 		} catch (NoSuchElementException e) {
 			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
 		}
-		List<EventResponse> eventResponses = participants.stream()
-			.collect(Collectors.groupingBy(EventParticipant::getEvent))
-			.entrySet().stream()
-			.map(entry -> {
-				Event event = entry.getKey();
-				List<EventParticipantResponse> participantResponses = entry.getValue().stream()
-					.map(EventParticipantResponse::from)
-					.toList();
+		Map<Event, List<EventParticipant>> groupedParticipants =
+			participants.stream()
+				.collect(Collectors.groupingBy(EventParticipant::getEvent));
 
-				return EventResponse.of(
-					event.getId(),
-					event.getEventCategory(),
-					event.getEventName(),
-					event.getStartDate(),
-					event.getEndDate(),
-					participantResponses
+		List<EventResponse> eventResponses = new ArrayList<>();
+
+		groupedParticipants.forEach((event, participantList) -> {
+			List<EventParticipantResponse> participantResponses = participantList.stream()
+				.map(EventParticipantResponse::from)
+				.toList();
+
+			LocalDate eventStartDate = event.getStartDateTime().toLocalDate();
+			LocalDate eventEndDate = event.getEndDateTime().toLocalDate();
+
+			//이벤트 시작날짜-종료날짜 해당되는 데이터 날짜별 분리
+			for (LocalDate currentDate = eventStartDate; !currentDate.isAfter(
+				eventEndDate); currentDate = currentDate.plusDays(1)) {
+				eventResponses.add(
+					EventResponse.ofWithCurrentDate(
+						event.getId(),
+						event.getEventCategory(),
+						event.getEventName(),
+						event.getStartDateTime(),
+						event.getEndDateTime(),
+						currentDate,
+						event.getAllDayStatus(),
+						participantResponses
+					)
 				);
-			})
-			.toList();
+			}
+		});
 
-		//일정 시작날짜 오름차순
-		List<EventResponse> sortResponses = eventResponses.stream()
-			.sorted(Comparator.comparing(EventResponse::startDate))
+		//currentdate 기준 오름차순
+		return eventResponses.stream()
+			.sorted(Comparator.comparing(EventResponse::currentDate))
 			.toList();
-
-		return sortResponses;
 
 	}
 
@@ -128,9 +143,56 @@ public class EventService {
 			event.getId(),
 			event.getEventCategory(),
 			event.getEventName(),
-			event.getStartDate(),
-			event.getEndDate(),
+			event.getStartDateTime(),
+			event.getEndDateTime(),
+			event.getAllDayStatus(),
 			participantResponses
 		);
 	}
+
+	@Transactional
+	public EventResponse updateEvent(Long eventId, UpdateEventRequest updateEventRequest) {
+		Event event = eventRepository.findById(eventId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		event.updateEvent(
+			updateEventRequest.eventCategory(),
+			updateEventRequest.eventName(),
+			updateEventRequest.startDateTime(),
+			updateEventRequest.endDateTime(),
+			updateEventRequest.allDayStatus()
+		);
+		eventRepository.save(event);
+
+		List<Member> newMembers;
+		try {
+			newMembers = memberRepository.findAllWithUserByIds(updateEventRequest.memberId());
+		} catch (NoSuchElementException e) {
+			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
+		}
+
+		eventParticipantRepository.deleteByEventId(eventId);
+		List<EventParticipant> newParticipants = newMembers.stream()
+			.map(member -> EventParticipant.builder()
+				.event(event)
+				.member(member)
+				.build())
+			.toList();
+		eventParticipantRepository.saveAll(newParticipants);
+
+		List<EventParticipantResponse> participantResponses = newParticipants.stream()
+			.map(EventParticipantResponse::from)
+			.toList();
+
+		return EventResponse.of(
+			event.getId(),
+			event.getEventCategory(),
+			event.getEventName(),
+			event.getStartDateTime(),
+			event.getEndDateTime(),
+			event.getAllDayStatus(),
+			participantResponses
+
+		);
+	}
+
 }
