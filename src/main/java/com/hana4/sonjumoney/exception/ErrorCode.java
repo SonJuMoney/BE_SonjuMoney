@@ -37,7 +37,7 @@ public enum ErrorCode {
 
 	// 500
 	INTERNAL_SERVER_ERROR(50000, HttpStatus.INTERNAL_SERVER_ERROR, "서버내부 오류입니다."),
-	IMAGE_UPLOAD_ERROR(50001, HttpStatus.INTERNAL_SERVER_ERROR, "이미지 업로드에 실패했습니다."),
+	IMAGE_UPLOAD_FAILED(50001, HttpStatus.INTERNAL_SERVER_ERROR, "이미지 업로드에 실패했습니다."),
 	TRANSACTION_FAILED(50002, HttpStatus.INTERNAL_SERVER_ERROR, "거래가 실패했습니다."),
 	ALARM_SEND_FAILED(50003, HttpStatus.INTERNAL_SERVER_ERROR, "알림 전송에 실패했습니다."),
 	;
