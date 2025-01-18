@@ -42,7 +42,7 @@ public class FamilyService {
 			for (Member fbfMember : findByFamilyIdMembers) {
 				memberResponses.add(
 					MemberResponse.of(fbfMember.getId(), fbfMember.getUser().getId(), fbfMember.getUser().getUsername(),
-						fbfMember.getMemberRole()));
+						fbfMember.getMemberRole().getValue()));
 			}
 			GetFamilyResponse getFamilyResponse = GetFamilyResponse.of(family.getId(), family.getFamilyName(),
 				memberResponses);

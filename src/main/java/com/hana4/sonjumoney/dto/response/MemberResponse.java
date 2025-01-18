@@ -1,7 +1,6 @@
 package com.hana4.sonjumoney.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.hana4.sonjumoney.domain.enums.MemberRole;
 
 import lombok.Builder;
 
@@ -14,13 +13,13 @@ public record MemberResponse(
 	@JsonProperty("member_name")
 	String memberName,
 	@JsonProperty("member_role")
-	MemberRole memberRole
+	String memberRole
 ) {
 	public static MemberResponse of(
 		Long memberId,
 		Long userId,
 		String memberName,
-		MemberRole memberRole
+		String memberRole
 	) {
 		return MemberResponse.builder()
 			.memberId(memberId)
