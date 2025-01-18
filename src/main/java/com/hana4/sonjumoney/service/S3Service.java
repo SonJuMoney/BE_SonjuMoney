@@ -14,6 +14,9 @@ import org.springframework.web.multipart.MultipartFile;
 // import com.hana4.sonjumoney.dto.ContentExtension;
 // import com.hana4.sonjumoney.dto.PresignedUrlDto;
 
+import com.hana4.sonjumoney.dto.ImagePrefix;
+import com.hana4.sonjumoney.util.ContentUtil;
+
 import io.awspring.cloud.s3.S3Exception;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -39,35 +42,21 @@ public class S3Service {
 	// 	String
 	// }
 
-	public String upload(MultipartFile file) throws S3Exception {
-		if (file.isEmpty() || Objects.isNull(file.getOriginalFilename())) {
-			throw new S3Exception(NOT_FOUND_DATA.getMessage(), null);
-		}
-		return this.uploadImage(file);
-	}
-
-	private String uploadImage(MultipartFile image) {
-		try{
-			return this.uploadImageToS3(image);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private String uploadImageToS3(MultipartFile image) throws IOException {
+	public String uploadImageToS3(MultipartFile image, ImagePrefix prefix) throws IOException {
 		String originalFilename = image.getOriginalFilename();
 		if (originalFilename == null) {
-			throw new IllegalArgumentException("파일이름은 null일 수 없습니다.");
+			throw new IllegalArgumentException("파일이름은 null 일 수 없습니다.");
 		}
-		String extention = originalFilename.substring(originalFilename.lastIndexOf("."));
-		String s3FileName = createFileName(originalFilename);
+		String extension = ContentUtil.getExtension(originalFilename);
+		String s3FileName = prefix.getPrefix() + createFileName(originalFilename);
 
 		InputStream is = image.getInputStream();
 		PutObjectRequest putObjectRequest = PutObjectRequest.builder()
 			.bucket(bucketName)
 			.key(s3FileName)
-			.contentType("image/" + extention)
+			.contentType("image/" + extension)
 			.build();
+
 		byte[] bytes = IoUtils.toByteArray(is);
 		RequestBody requestBody = RequestBody.fromBytes(bytes);
 		s3Client.putObject(putObjectRequest, requestBody);
