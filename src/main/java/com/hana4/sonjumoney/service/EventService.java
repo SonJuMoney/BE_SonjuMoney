@@ -99,9 +99,10 @@ public class EventService {
 			LocalDate eventStartDate = event.getStartDateTime().toLocalDate();
 			LocalDate eventEndDate = event.getEndDateTime().toLocalDate();
 
-			for (LocalDate currentDate = eventStartDate; !currentDate.isAfter(eventEndDate); currentDate = currentDate.plusDays(1)) {
+			for (LocalDate currentDate = eventStartDate; !currentDate.isAfter(
+				eventEndDate); currentDate = currentDate.plusDays(1)) {
 				eventResponses.add(
-					EventResponse.of(
+					EventResponse.ofWithCurrentDate(
 						event.getId(),
 						event.getEventCategory(),
 						event.getEventName(),
@@ -117,7 +118,7 @@ public class EventService {
 
 		//날짜 기준 오름차순
 		return eventResponses.stream()
-			.sorted(Comparator.comparing(EventResponse::displayDate))
+			.sorted(Comparator.comparing(EventResponse::currentDate))
 			.toList();
 
 	}
@@ -191,8 +192,6 @@ public class EventService {
 			participantResponses
 
 		);
-	}
-
 	}
 
 }

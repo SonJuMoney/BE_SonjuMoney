@@ -38,7 +38,7 @@ public record EventResponse(
 	List<EventParticipantResponse> participants) {
 	public static EventResponse of(Long eventId, EventCategory eventCategory, String eventName,
 		LocalDateTime startDateTime,
-		LocalDateTime endDateTime, LocalDate eventDate, AllDayStatus allDayStatus,
+		LocalDateTime endDateTime, AllDayStatus allDayStatus,
 		List<EventParticipantResponse> participants) {
 		return EventResponse.builder()
 			.eventId(eventId)
@@ -46,9 +46,25 @@ public record EventResponse(
 			.eventName(eventName)
 			.startDateTime(startDateTime)
 			.endDateTime(endDateTime)
-			.eventDate(eventDate)
 			.allDayStatus(allDayStatus.getValue())
 			.participants(participants)
 			.build();
 	}
+
+	public static EventResponse ofWithCurrentDate(Long eventId, EventCategory eventCategory, String eventName,
+		LocalDateTime startDateTime,
+		LocalDateTime endDateTime, LocalDate currentDate, AllDayStatus allDayStatus,
+		List<EventParticipantResponse> participants) {
+		return EventResponse.builder()
+			.eventId(eventId)
+			.eventCategory(eventCategory)
+			.eventName(eventName)
+			.startDateTime(startDateTime)
+			.endDateTime(endDateTime)
+			.currentDate(currentDate)
+			.allDayStatus(allDayStatus.getValue())
+			.participants(participants)
+			.build();
+	}
+
 }
