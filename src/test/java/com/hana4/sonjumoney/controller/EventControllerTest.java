@@ -145,7 +145,7 @@ public class EventControllerTest extends ControllerTest {
 
 	@Test
 	@Transactional
-	@DisplayName("일정 목록 수정 테스트")
+	@DisplayName("일정 수정 테스트")
 	public void updateEventTest() throws Exception {
 		UpdateEventRequest updateEventRequest = UpdateEventRequest.builder()
 			.eventCategory(EventCategory.DINING)
@@ -170,6 +170,15 @@ public class EventControllerTest extends ControllerTest {
 			.andDo(print());
 	}
 
+	@Test
+	@Transactional
+	@DisplayName("일정 삭제 테스트")
+	public void deleteEventTest() throws Exception {
+		mockMvc.perform(delete("/api/events/{event_id}", 2)
+				.header("Authorization", "Bearer " + accessToken)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
 }
-
 

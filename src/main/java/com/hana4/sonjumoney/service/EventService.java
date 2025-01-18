@@ -195,4 +195,12 @@ public class EventService {
 		);
 	}
 
+	@Transactional
+	public void deleteEvent(Long eventId) {
+		Event event = eventRepository.findById(eventId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		eventRepository.delete(event);
+		eventParticipantRepository.deleteByEventId(eventId);
+	}
+
 }
