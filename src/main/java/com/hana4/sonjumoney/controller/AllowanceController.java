@@ -1,5 +1,6 @@
 package com.hana4.sonjumoney.controller;
 
+import com.hana4.sonjumoney.dto.response.SendAllowanceResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,24 +24,13 @@ public class AllowanceController {
 	private final AllowanceService allowanceService;
 
 	@PostMapping
-	public ResponseEntity<?> sendAllowance(
-		@RequestPart(value = "image", required = false) MultipartFile image,
-		@RequestPart(value = "data") SendAllowanceRequest sendAllowanceRequest
+	public ResponseEntity<SendAllowanceResponse> sendAllowance(
+			Authentication authentication,
+			@RequestPart(value = "image", required = false) MultipartFile image,
+			@RequestPart(value = "data") SendAllowanceRequest sendAllowanceRequest
 	) {
-		return ResponseEntity.ok().body(allowanceService.sendAllowance(image, sendAllowanceRequest));
-	}
-
-	@PostMapping("/test")
-	public ResponseEntity<?> testUpload(
-		Authentication authentication,
-		@RequestPart(value = "image", required = false) MultipartFile image,
-		@RequestPart(value = "data") SendAllowanceRequest data
-	) {
-		Long userId = AuthenticationUtil.getUserId(authentication);
-		System.out.println(userId);
-		if (image.isEmpty()) {
-			throw new IllegalArgumentException();
-		}
-		return ResponseEntity.ok().body(allowanceService.uploadTest(image));
+		return ResponseEntity.ok()
+				.body(allowanceService.sendAllowance(image, AuthenticationUtil.getUserId(authentication),
+						sendAllowanceRequest));
 	}
 }
