@@ -77,13 +77,14 @@ class FeedControllerTest extends ControllerTest {
 			.andDo(print())
 			.andExpect(status().isCreated())
 			.andExpect(jsonPath("$.message").value("피드 등록이 완료되었습니다."));
-
+		CreateFeedResponse createFeedResponse = objectMapper.readValue(
+			resultActions.andReturn().getResponse().getContentAsString(), CreateFeedResponse.class);
+		feedId = createFeedResponse.feedId();
 	}
 
 	@Test
 	@Order(2)
 	void deleteFeedTest() throws Exception {
-
 		// given
 		CreateFeedRequest request = new CreateFeedRequest(1L, "즐거운 여행~");
 		MockMultipartFile image1 = new MockMultipartFile(
@@ -105,8 +106,7 @@ class FeedControllerTest extends ControllerTest {
 			objectMapper.writeValueAsString(request).getBytes(StandardCharsets.UTF_8)
 		);
 
-		String api = "/api/feeds";
-		ResultActions resultActions = mockMvc.perform(multipart(api)
+		ResultActions resultActions = mockMvc.perform(multipart("/api/feeds")
 				.file(image1)
 				.file(image2)
 				.file(data)
@@ -119,11 +119,13 @@ class FeedControllerTest extends ControllerTest {
 			resultActions.andReturn().getResponse().getContentAsString(), CreateFeedResponse.class);
 		feedId = createFeedResponse.feedId();
 
-		api = "/api/feeds/" + feedId;
+		// when
+		String api = "/api/feeds/" + feedId;
 		mockMvc.perform(delete(api)
 				.header("Authorization", "Bearer " + accessToken))
 			.andDo(print())
 			.andExpect(status().isOk());
+		// then
 		Assertions.assertThat(feedRepository.findById(feedId).isEmpty());
 	}
 }
