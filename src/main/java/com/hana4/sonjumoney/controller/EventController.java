@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -19,6 +20,7 @@ import com.hana4.sonjumoney.dto.request.AddEventRequest;
 import com.hana4.sonjumoney.dto.request.UpdateEventRequest;
 import com.hana4.sonjumoney.dto.response.EventResponse;
 import com.hana4.sonjumoney.service.EventService;
+import com.hana4.sonjumoney.util.AuthenticationUtil;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -31,38 +33,48 @@ public class EventController {
 	private final EventService eventService;
 
 	@PostMapping()
-	public ResponseEntity<EventResponse> addEvent(@RequestParam(value = "family_id") Long familyId,
+	public ResponseEntity<EventResponse> addEvent(Authentication authentication,
+		@RequestParam(value = "family_id") Long familyId,
 		@RequestBody AddEventRequest addEventRequest) {
-		EventResponse eventResponse = eventService.addEvent(familyId, addEventRequest);
+		Long userId = AuthenticationUtil.getUserId(authentication);
+		EventResponse eventResponse = eventService.addEvent(userId, familyId, addEventRequest);
 		return ResponseEntity.status(HttpStatus.CREATED).body(eventResponse);
 	}
 
 	@GetMapping()
-	public ResponseEntity<List<EventResponse>> getAllEvents(@RequestParam(value = "family_id") Long familyId,
+	public ResponseEntity<List<EventResponse>> getAllEvents(Authentication authentication,
+		@RequestParam(value = "family_id") Long familyId,
 		@RequestParam(required = false) Integer year,
 		@RequestParam(required = false) Integer month) {
+		Long userId = AuthenticationUtil.getUserId(authentication);
 		int getYear = (year == null) ? LocalDate.now().getYear() : year;
 		int getMonth = (month == null) ? LocalDate.now().getMonthValue() : month;
-		List<EventResponse> eventResponseList = eventService.getAllEvents(familyId, getYear, getMonth);
+		List<EventResponse> eventResponseList = eventService.getAllEvents(userId, familyId, getYear, getMonth);
 		return ResponseEntity.ok().body(eventResponseList);
 	}
 
 	@GetMapping("/{event_id}")
-	public ResponseEntity<EventResponse> getEvent(@PathVariable(value = "event_id") Long eventId) {
-		EventResponse eventResponse = eventService.getEvent(eventId);
+	public ResponseEntity<EventResponse> getEvent(Authentication authentication,
+		@PathVariable(value = "event_id") Long eventId) {
+		Long userId = AuthenticationUtil.getUserId(authentication);
+		EventResponse eventResponse = eventService.getEvent(userId, eventId);
 		return ResponseEntity.ok().body(eventResponse);
 	}
 
 	@PatchMapping("/{event_id}")
-	public ResponseEntity<EventResponse> updateEvent(@PathVariable(value = "event_id") Long eventId,
+	public ResponseEntity<EventResponse> updateEvent(Authentication authentication,
+		@PathVariable(value = "event_id") Long eventId,
 		@RequestBody UpdateEventRequest updateEventRequest) {
-		EventResponse eventResponse = eventService.updateEvent(eventId, updateEventRequest);
+		Long userId = AuthenticationUtil.getUserId(authentication);
+		EventResponse eventResponse = eventService.updateEvent(userId, eventId, updateEventRequest);
 		return ResponseEntity.ok().body(eventResponse);
 	}
 
 	@DeleteMapping("/{event_id}")
-	public ResponseEntity<Void> deleteEvent(@PathVariable(value = "event_id") Long eventId) {
-		eventService.deleteEvent(eventId);
+	public ResponseEntity<Void> deleteEvent(Authentication authentication,
+		@PathVariable(value = "event_id") Long eventId) {
+		Long userId = AuthenticationUtil.getUserId(authentication);
+		eventService.deleteEvent(userId, eventId);
 		return ResponseEntity.ok().build();
 	}
 

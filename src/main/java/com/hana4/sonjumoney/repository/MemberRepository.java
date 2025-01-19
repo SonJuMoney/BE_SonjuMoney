@@ -3,8 +3,6 @@ package com.hana4.sonjumoney.repository;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.text.html.Option;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,6 +24,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 	Optional<Member> findByUser_IdAndFamily(Long userId, Family family);
 
 	Optional<Member> findByUserIdAndFamilyId(Long userId, Long familyId);
+
+	boolean existsByUserIdAndFamilyId(Long userId, Long familyId);
 
 	Long user(User user);
 }
