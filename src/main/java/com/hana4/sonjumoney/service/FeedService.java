@@ -80,8 +80,11 @@ public class FeedService {
 	}
 
 	@Transactional
-	public void deleteFeedById(Long feedId) {
+	public void deleteFeedById(Long userId, Long feedId) {
 		Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		if (!userId.equals(feed.getMember().getUser().getId())) {
+			throw new CommonException(ErrorCode.UNAUTHORIZED);
+		}
 		List<FeedContent> feedContents = feedContentRepository.findAllByFeed(feed);
 		for (FeedContent feedContent : feedContents) {
 			s3Service.deleteImage(feedContent.getContentUrl());
