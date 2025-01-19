@@ -3,6 +3,8 @@ package com.hana4.sonjumoney.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -30,5 +32,11 @@ public class FeedController {
 	) {
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(feedService.saveNormalFeed(AuthenticationUtil.getUserId(authentication), images, createFeedRequest));
+	}
+
+	@DeleteMapping("/{feed_id}")
+	public ResponseEntity<Void> deleteFeed(@PathVariable(value = "feed_id")Long feedId) {
+		feedService.deleteFeedById(feedId);
+		return ResponseEntity.ok().build();
 	}
 }

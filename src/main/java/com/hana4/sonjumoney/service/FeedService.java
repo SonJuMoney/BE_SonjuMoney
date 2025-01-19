@@ -54,7 +54,7 @@ public class FeedService {
 			}
 		}
 		// TODO: 웹소켓 알림 전송
-		return CreateFeedResponse.of(200,"피드 등록이 완료되었습니다.");
+		return CreateFeedResponse.of(200, savedFeed.getId(), "피드 등록이 완료되었습니다.");
 	}
 
 	@Transactional
@@ -77,5 +77,15 @@ public class FeedService {
 			);
 		}
 		return savedFeed.getId();
+	}
+
+	@Transactional
+	public void deleteFeedById(Long feedId) {
+		Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		List<FeedContent> feedContents = feedContentRepository.findAllByFeed(feed);
+		for (FeedContent feedContent : feedContents) {
+			s3Service.deleteImage(feedContent.getContentUrl());
+		}
+		feedContentRepository.deleteFeedContentsByFeedId(feedId);
 	}
 }

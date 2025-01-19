@@ -14,11 +14,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.hana4.sonjumoney.dto.ImagePrefix;
 import com.hana4.sonjumoney.exception.CommonException;
+import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.util.ContentUtil;
 
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.utils.IoUtils;
 
@@ -63,9 +65,22 @@ public class S3Service {
 			RequestBody requestBody = RequestBody.fromBytes(bytes);
 			s3Client.putObject(putObjectRequest, requestBody);
 		} catch (IOException e) {
-			throw new CommonException(IMAGE_UPLOAD_FAILED);
+			throw new CommonException(S3_PROCESS_FAILED);
 		}
-		return "https://" + baseUrl + s3FileName;
+		return getUrlFromKey(s3FileName);
+	}
+
+	public void deleteImage(String url) {
+		String key = getKeyFromUrl(url);
+		try {
+			DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+				.bucket(bucketName)
+				.key(key)
+				.build();
+			s3Client.deleteObject(deleteObjectRequest);
+		} catch (Exception e) {
+			throw new CommonException(S3_PROCESS_FAILED);
+		}
 	}
 
 	private String createFileName(String filename) {
@@ -73,6 +88,18 @@ public class S3Service {
 	}
 	private String createFileId() {
 		return UUID.randomUUID().toString();
+	}
+
+	private String getKeyFromUrl(String url) {
+		String domain = "https://" + baseUrl + "/";
+		if (!url.startsWith(domain)) {
+			throw new CommonException(BAD_REQUEST);
+		}
+		return url.substring(domain.length());
+	}
+
+	private String getUrlFromKey(String key) {
+		return "https://" + baseUrl + "/" + key;
 	}
 
 }
