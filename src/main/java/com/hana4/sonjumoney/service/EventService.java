@@ -39,9 +39,12 @@ public class EventService {
 	private final EventParticipantRepository eventParticipantRepository;
 
 	@Transactional
-	public EventResponse addEvent(Long familyId, AddEventRequest addEventRequest) {
-		Family family = familyRepository.findById(familyId)
-			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+	public EventResponse addEvent(Long userId, Long familyId, AddEventRequest addEventRequest) {
+		//userId,familyId기반으로 확인
+		Member findMember = memberRepository.findByUserIdAndFamilyId(userId, familyId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
+
+		Family family = findMember.getFamily();
 		Event event = addEventRequest.toEntity(family);
 		eventRepository.save(event);
 		List<Member> members;
@@ -75,7 +78,12 @@ public class EventService {
 
 	}
 
-	public List<EventResponse> getAllEvents(Long familyId, int getYear, int getMonth) {
+	public List<EventResponse> getAllEvents(Long userId, Long familyId, int getYear, int getMonth) {
+		boolean isMember = memberRepository.existsByUserIdAndFamilyId(userId, familyId);
+		if (!isMember) {
+			throw new CommonException(ErrorCode.UNAUTHORIZED);
+		}
+
 		LocalDateTime startDateTime = LocalDateTime.of(getYear, getMonth, 1, 0, 0, 0);
 		LocalDateTime endDateTime = startDateTime.with(TemporalAdjusters.lastDayOfMonth());
 		List<EventParticipant> participants;
@@ -124,7 +132,8 @@ public class EventService {
 
 	}
 
-	public EventResponse getEvent(Long eventId) {
+	public EventResponse getEvent(Long userId, Long eventId) {
+
 		List<EventParticipant> participants;
 		try {
 			participants = eventParticipantRepository.findAllParticipantsByEventId(eventId);
@@ -134,6 +143,8 @@ public class EventService {
 		}
 
 		Event event = participants.get(0).getEvent();
+
+		validateUserMember(userId, event.getFamily().getId());
 
 		List<EventParticipantResponse> participantResponses = participants.stream()
 			.map(EventParticipantResponse::from)
@@ -151,9 +162,10 @@ public class EventService {
 	}
 
 	@Transactional
-	public EventResponse updateEvent(Long eventId, UpdateEventRequest updateEventRequest) {
+	public EventResponse updateEvent(Long userId, Long eventId, UpdateEventRequest updateEventRequest) {
 		Event event = eventRepository.findById(eventId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		validateUserMember(userId, event.getFamily().getId());
 		event.updateEvent(
 			updateEventRequest.eventCategory(),
 			updateEventRequest.eventName(),
@@ -196,11 +208,19 @@ public class EventService {
 	}
 
 	@Transactional
-	public void deleteEvent(Long eventId) {
+	public void deleteEvent(Long userId, Long eventId) {
 		Event event = eventRepository.findById(eventId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		validateUserMember(userId, event.getFamily().getId());
 		eventRepository.delete(event);
 		eventParticipantRepository.deleteByEventId(eventId);
 	}
 
+	//사용자확인 메서드
+	private void validateUserMember(Long userId, Long familyId) {
+		boolean isMember = memberRepository.existsByUserIdAndFamilyId(userId, familyId);
+		if (!isMember) {
+			throw new CommonException(ErrorCode.UNAUTHORIZED);
+		}
+	}
 }
