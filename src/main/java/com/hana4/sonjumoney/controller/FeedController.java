@@ -25,7 +25,7 @@ public class FeedController {
 	@PostMapping
 	public ResponseEntity<CreateFeedResponse> createFeed(
 		Authentication authentication,
-		@RequestPart(value = "images") MultipartFile[] images,
+		@RequestPart(value = "images", required = false) MultipartFile[] images,
 		@RequestPart(value = "data") CreateFeedRequest createFeedRequest
 	) {
 		return ResponseEntity.status(HttpStatus.CREATED)

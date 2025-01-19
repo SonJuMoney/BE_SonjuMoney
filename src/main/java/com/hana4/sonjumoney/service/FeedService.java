@@ -1,13 +1,12 @@
 package com.hana4.sonjumoney.service;
 
-import java.io.IOException;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.hana4.sonjumoney.domain.Allowance;
-import com.hana4.sonjumoney.domain.Family;
 import com.hana4.sonjumoney.domain.Feed;
 import com.hana4.sonjumoney.domain.FeedContent;
 import com.hana4.sonjumoney.domain.Member;
@@ -37,8 +36,23 @@ public class FeedService {
 		Member writer = memberRepository.findByUserIdAndFamilyId(userId, createFeedRequest.familyId())
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		String feedMessage = createFeedRequest.message();
+		boolean contentExist;
+		if (images == null || images.length == 0) {
+			contentExist = false;
+		} else {
+			contentExist = true;
+		}
+
 		Feed savedFeed = feedRepository.save(
-			new Feed(writer, null, null, true, 0, feedMessage, FeedType.NORMAL));
+			new Feed(writer, null, null, contentExist, 0, feedMessage, FeedType.NORMAL));
+
+		if (contentExist) {
+			List<String> contentsUrl = s3Service.uploadImagesToS3(images, ImagePrefix.FEED, savedFeed.getId());
+			for (String contentUrl : contentsUrl) {
+				feedContentRepository.save(
+					new FeedContent(savedFeed, contentUrl));
+			}
+		}
 
 		return CreateFeedResponse.of(200,"피드 등록이 완료되었습니다.");
 	}
@@ -56,13 +70,7 @@ public class FeedService {
 
 		if (contentExist) {
 			MultipartFile image = createAllowanceDto.image();
-			String contentUrl;
-
-			try {
-				contentUrl = s3Service.uploadImageToS3(image, ImagePrefix.ALLOWANCE);
-			} catch (IOException e) {
-				throw new CommonException(ErrorCode.IMAGE_UPLOAD_FAILED);
-			}
+			String contentUrl = s3Service.uploadImageToS3(image, ImagePrefix.ALLOWANCE, savedFeed.getId());
 
 			feedContentRepository.save(
 				new FeedContent(savedFeed, contentUrl)
