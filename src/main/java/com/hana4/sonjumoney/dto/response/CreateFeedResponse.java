@@ -11,9 +11,10 @@ public record CreateFeedResponse(
 	Long feedId,
 	String message
 ) {
-	public static CreateFeedResponse of(Integer code, String message) {
+	public static CreateFeedResponse of(Integer code,Long feedId, String message) {
 		return CreateFeedResponse.builder()
 			.code(code)
+			.feedId(feedId)
 			.message(message)
 			.build();
 	}

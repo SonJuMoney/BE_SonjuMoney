@@ -16,6 +16,7 @@ public enum ErrorCode {
 	ALREADY_EXIST_ACCOUNT(40003, HttpStatus.BAD_REQUEST, "이미 계좌가 등록되어 있습니다."),
 	IMPROPER_MEMBER_ROLE(40004, HttpStatus.BAD_REQUEST, "적절하지 않은 멤버역할입니다."),
 	DIFFERENT_FAMILY(40005, HttpStatus.BAD_REQUEST, "같은 가족이 아닙니다."),
+	BAD_URL_FROM(40006, HttpStatus.BAD_REQUEST, "잘못된 url 형식입니다."),
 
 	//401
 	UNAUTHORIZED(40100, HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),
@@ -37,7 +38,7 @@ public enum ErrorCode {
 
 	// 500
 	INTERNAL_SERVER_ERROR(50000, HttpStatus.INTERNAL_SERVER_ERROR, "서버내부 오류입니다."),
-	IMAGE_UPLOAD_FAILED(50001, HttpStatus.INTERNAL_SERVER_ERROR, "이미지 업로드에 실패했습니다."),
+	S3_PROCESS_FAILED(50001, HttpStatus.INTERNAL_SERVER_ERROR, "컨텐츠 작업에 실패했습니다."),
 	TRANSACTION_FAILED(50002, HttpStatus.INTERNAL_SERVER_ERROR, "거래가 실패했습니다."),
 	ALARM_SEND_FAILED(50003, HttpStatus.INTERNAL_SERVER_ERROR, "알림 전송에 실패했습니다."),
 	;

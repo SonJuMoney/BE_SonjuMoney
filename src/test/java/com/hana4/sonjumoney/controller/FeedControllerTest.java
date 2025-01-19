@@ -1,6 +1,6 @@
 package com.hana4.sonjumoney.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -8,6 +8,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.nio.charset.StandardCharsets;
 
+import org.assertj.core.api.Assert;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -75,20 +77,53 @@ class FeedControllerTest extends ControllerTest {
 			.andDo(print())
 			.andExpect(status().isCreated())
 			.andExpect(jsonPath("$.message").value("피드 등록이 완료되었습니다."));
-		CreateFeedResponse createFeedResponse = objectMapper.readValue(
-			resultActions.andReturn().getResponse().getContentAsString(), CreateFeedResponse.class);
-		feedId = createFeedResponse.feedId();
+
 	}
 
 	@Test
 	@Order(2)
 	void deleteFeedTest() throws Exception {
-		String api = "/api/feeds" + feedId;
+
+		// given
+		CreateFeedRequest request = new CreateFeedRequest(1L, "즐거운 여행~");
+		MockMultipartFile image1 = new MockMultipartFile(
+			"images",
+			"feed-test-image1.png",
+			MediaType.IMAGE_PNG_VALUE,
+			new byte[] {}
+		);
+		MockMultipartFile image2 = new MockMultipartFile(
+			"images",
+			"feed-test-image2.png",
+			MediaType.IMAGE_PNG_VALUE,
+			new byte[] {}
+		);
+		MockMultipartFile data = new MockMultipartFile(
+			"data",
+			"",
+			"application/json",
+			objectMapper.writeValueAsString(request).getBytes(StandardCharsets.UTF_8)
+		);
+
+		String api = "/api/feeds";
+		ResultActions resultActions = mockMvc.perform(multipart(api)
+				.file(image1)
+				.file(image2)
+				.file(data)
+				.contentType(MediaType.MULTIPART_FORM_DATA)
+				.header("Authorization", "Bearer " + accessToken))
+			.andDo(print())
+			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$.message").value("피드 등록이 완료되었습니다."));
+		CreateFeedResponse createFeedResponse = objectMapper.readValue(
+			resultActions.andReturn().getResponse().getContentAsString(), CreateFeedResponse.class);
+		feedId = createFeedResponse.feedId();
+
+		api = "/api/feeds/" + feedId;
 		mockMvc.perform(delete(api)
 				.header("Authorization", "Bearer " + accessToken))
 			.andDo(print())
 			.andExpect(status().isOk());
-
-		assert feedRepository.findById(feedId).isEmpty();
+		Assertions.assertThat(feedRepository.findById(feedId).isEmpty());
 	}
 }

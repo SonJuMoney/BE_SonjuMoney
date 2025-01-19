@@ -65,9 +65,9 @@ public class S3Service {
 			RequestBody requestBody = RequestBody.fromBytes(bytes);
 			s3Client.putObject(putObjectRequest, requestBody);
 		} catch (IOException e) {
-			throw new CommonException(IMAGE_UPLOAD_FAILED);
+			throw new CommonException(S3_PROCESS_FAILED);
 		}
-		return s3FileName;
+		return getUrlFromKey(s3FileName);
 	}
 
 	public void deleteImage(String url) {
@@ -79,7 +79,7 @@ public class S3Service {
 				.build();
 			s3Client.deleteObject(deleteObjectRequest);
 		} catch (Exception e) {
-			throw new CommonException(INTERNAL_SERVER_ERROR);
+			throw new CommonException(S3_PROCESS_FAILED);
 		}
 	}
 
@@ -96,6 +96,10 @@ public class S3Service {
 			throw new CommonException(BAD_REQUEST);
 		}
 		return url.substring(domain.length());
+	}
+
+	private String getUrlFromKey(String key) {
+		return "https://" + baseUrl + "/" + key;
 	}
 
 }
