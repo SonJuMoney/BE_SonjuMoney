@@ -1,6 +1,7 @@
 package com.hana4.sonjumoney.service;
 
 import com.hana4.sonjumoney.domain.enums.AlarmType;
+import com.hana4.sonjumoney.dto.response.AllowanceInfoResponse;
 import com.hana4.sonjumoney.dto.response.SendAllowanceResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,5 +56,10 @@ public class AllowanceService {
 		// TODO: 웹소켓 테스트 생각해오기
 		// websocketHandler.sendMemberAlarm(AlarmDto.of(receiver.getId(), sender.getId(), AlarmType.ALLOWANCE));
 		return SendAllowanceResponse.of("송금을 완료했습니다.");
+	}
+
+	public AllowanceInfoResponse getAllowanceById(Long allowanceId) {
+		return AllowanceInfoResponse.from(
+			allowanceRepository.findById(allowanceId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA)));
 	}
 }

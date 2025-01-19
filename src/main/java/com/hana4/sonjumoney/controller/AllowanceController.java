@@ -1,8 +1,13 @@
 package com.hana4.sonjumoney.controller;
 
+import com.hana4.sonjumoney.dto.response.AllowanceInfoResponse;
 import com.hana4.sonjumoney.dto.response.SendAllowanceResponse;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -32,5 +37,10 @@ public class AllowanceController {
 		return ResponseEntity.ok()
 				.body(allowanceService.sendAllowance(image, AuthenticationUtil.getUserId(authentication),
 						sendAllowanceRequest));
+	}
+
+	@GetMapping("/{allowance_id}")
+	public ResponseEntity<AllowanceInfoResponse> getAllowance(@PathVariable(value = "allowance_id") Long allowanceId) {
+		return ResponseEntity.ok().body(allowanceService.getAllowanceById(allowanceId));
 	}
 }
