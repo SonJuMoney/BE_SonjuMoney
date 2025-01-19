@@ -20,7 +20,7 @@ public record CommentInfoDto(
 	@JsonProperty("is_update")
 	Boolean isUpdate,
 	@JsonProperty("created_at")
-	LocalDateTime createAt
+	LocalDateTime createdAt
 	) {
 	public static CommentInfoDto of(
 		Long commentId,
@@ -28,7 +28,7 @@ public record CommentInfoDto(
 		String writerName,
 		String writerImage,
 		String message,
-		LocalDateTime createAt
+		LocalDateTime createdAt
 	) {
 		return CommentInfoDto.builder()
 			.commentId(commentId)
@@ -36,7 +36,7 @@ public record CommentInfoDto(
 			.writerName(writerName)
 			.writerImage(writerImage)
 			.message(message)
-			.createAt(createAt)
+			.createdAt(createdAt)
 			.build();
 	}
 }
