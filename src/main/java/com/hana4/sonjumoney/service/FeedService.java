@@ -78,4 +78,14 @@ public class FeedService {
 		}
 		return savedFeed.getId();
 	}
+
+	@Transactional
+	public void deleteFeedById(Long feedId) {
+		Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		List<FeedContent> feedContents = feedContentRepository.findAllByFeed(feed);
+		for (FeedContent feedContent : feedContents) {
+			s3Service.deleteImage(feedContent.getContentUrl());
+		}
+		feedContentRepository.deleteFeedContentsByFeedId(feedId);
+	}
 }
