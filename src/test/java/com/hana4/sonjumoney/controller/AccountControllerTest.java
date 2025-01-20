@@ -59,9 +59,7 @@ public class AccountControllerTest extends ControllerTest {
 		String api = "/api/accounts/savings";
 
 		CreateSavingAccountRequest request = CreateSavingAccountRequest.builder()
-			.accountTypeId(2L)
 			.message("착하게 자라야 한다~")
-			.holderResidentNum("121212-1212121")
 			.accountPassword("1234")
 			.autoTransferable(true)
 			.userId(2L)

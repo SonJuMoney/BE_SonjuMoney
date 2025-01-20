@@ -120,9 +120,10 @@ public class AccountService {
 			autoTransferRepository.save(autoTransferSetting);
 		}
 
+		final Long accountTypeId = 2L;
 		User user = userRepository.findById(request.userId())
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-		AccountType accountType = accountTypeRepository.findById(request.accountTypeId())
+		AccountType accountType = accountTypeRepository.findById(accountTypeId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 
 		String randomAccountNum = makeRandomAccountNum();
