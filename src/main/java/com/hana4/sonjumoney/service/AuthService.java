@@ -39,7 +39,9 @@ public class AuthService implements UserDetailsService {
 		User user = userRepository.findByAuthId(authId)
 			.orElseThrow(() -> new UserNotFoundException(ErrorCode.NOT_FOUND_USER.getMessage()));
 
-		return new CustomUserDetails(user.getId(), user.getAuthId(), user.getPassword(), Collections.emptyList());
+		// return new CustomUserDetails(user.getId(), user.getAuthId(), user.getPassword(), Collections.emptyList());
+		return new CustomUserDetails(user.getId(), user.getAuthId(), user.getPassword(), user.getUsername(),
+			user.getProfileLink(), user.getGender(), user.getResidentNum().substring(0, 6), Collections.emptyList());
 	}
 
 	public ReissueResponse reissue(String refreshToken) {

@@ -63,8 +63,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
 		String accessToken = jwtUtil.generateAccessToken(authId, userId);
 		String refreshToken = jwtUtil.generateRefreshToken(authId, userId);
-		
-		JwtTokenDto tokens = JwtTokenDto.of(accessToken, refreshToken);
+
+		JwtTokenDto tokens = JwtTokenDto.of(accessToken, refreshToken, userDetails.getUserId(), userDetails.getName(),
+			userDetails.getUserProfile(), userDetails.getGender(), userDetails.getBirthday());
 
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("application/json;charset=UTF-8");
