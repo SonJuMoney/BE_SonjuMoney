@@ -10,6 +10,7 @@ import com.hana4.sonjumoney.domain.Alarm;
 import com.hana4.sonjumoney.dto.AlarmContentDto;
 import com.hana4.sonjumoney.dto.AlarmResultDto;
 import com.hana4.sonjumoney.dto.response.AlarmResponse;
+import com.hana4.sonjumoney.dto.response.UpdateAlarmResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.AlarmRepository;
@@ -67,6 +68,25 @@ public class AlarmService {
 		} catch (Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
 		}
+	}
+
+	public UpdateAlarmResponse updateAlarm(Long alarmId) {
+		Alarm alarm = alarmRepository.findById(alarmId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+
+		// 상태 변경 시작
+		try {
+			alarm.changeStatusToChecked();
+			alarmRepository.save(alarm);
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+		// 상태 변경 완료
+
+		return UpdateAlarmResponse.builder()
+			.code(200)
+			.message("요청을 성공했습니다.")
+			.build();
 	}
 
 }
