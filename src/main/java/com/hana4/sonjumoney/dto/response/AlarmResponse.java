@@ -7,11 +7,11 @@ import lombok.Builder;
 @Builder
 public record AlarmResponse(
 	Boolean isSuccess,
-	Long code,
+	Integer code,
 	String message,
 	AlarmResultDto result
 ) {
-	public static AlarmResponse of(Boolean isSuccess, Long code, String message, AlarmResultDto result) {
+	public static AlarmResponse of(Boolean isSuccess, Integer code, String message, AlarmResultDto result) {
 		return AlarmResponse.builder()
 			.isSuccess(isSuccess)
 			.code(code)
