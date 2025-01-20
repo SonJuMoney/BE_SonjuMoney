@@ -40,10 +40,10 @@ public class Event extends BaseEntity {
 	@Column(name = "event_name", length = 30, nullable = false)
 	private String eventName;
 
-	@Column(name = "start_date_time", nullable = false, columnDefinition = "DATE")
+	@Column(name = "start_date_time", nullable = false, columnDefinition = "DATETIME")
 	private LocalDateTime startDateTime;
 
-	@Column(name = "end_date_time", nullable = false, columnDefinition = "DATE")
+	@Column(name = "end_date_time", nullable = false, columnDefinition = "DATETIME")
 	private LocalDateTime endDateTime;
 
 	@Column(name = "event_category", nullable = false)

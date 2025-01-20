@@ -71,11 +71,27 @@ public class AuthService implements UserDetailsService {
 		return DuplicationResponse.of(true);
 	}
 
+	private Boolean isDuplicatedByResidentNum(String residentNumWithoutHyphen) {
+		String residentNum = addHyphenFromResidentNum(residentNumWithoutHyphen);
+		return userRepository.findByResidentNum(residentNum).isPresent();
+	}
+
+	private String addHyphenFromResidentNum(String residentNum) {
+		return residentNum
+			.substring(0, 6)
+			.concat("-")
+			.concat(residentNum.substring(6, 13));
+	}
+
 	public SignUpResponse signUp(SignUpRequest signUpRequest) {
 		//----------예외처리 시작----------//
 
 		Boolean isDuplication = getDuplication(signUpRequest.authId()).duplication();
 		if (isDuplication) {
+			throw new CommonException(ErrorCode.CONFLICT_ID);
+		}
+		Boolean isDuplicatedByResidentNum = isDuplicatedByResidentNum(signUpRequest.residentNum());
+		if (isDuplicatedByResidentNum) {
 			throw new CommonException(ErrorCode.CONFLICT_USER);
 		}
 		if (signUpRequest.phone().length() != 11) {
@@ -92,10 +108,7 @@ public class AuthService implements UserDetailsService {
 
 		try {
 			// 주민등록번호 '-' 추가
-			String residentNum = signUpRequest.residentNum()
-				.substring(0, 6)
-				.concat("-")
-				.concat(signUpRequest.residentNum().substring(6, 13));
+			String residentNum = addHyphenFromResidentNum(signUpRequest.residentNum());
 			String password = passwordEncoder.encode(signUpRequest.password());
 			Gender gender = CommonUtil.getGender(residentNum);
 
@@ -128,6 +141,10 @@ public class AuthService implements UserDetailsService {
 		//----------예외처리 시작----------//
 		Boolean isDuplication = getDuplication(signUpChildRequest.authId()).duplication();
 		if (isDuplication) {
+			throw new CommonException(ErrorCode.CONFLICT_ID);
+		}
+		Boolean isDuplicatedByResidentNum = isDuplicatedByResidentNum(signUpChildRequest.residentNum());
+		if (isDuplicatedByResidentNum) {
 			throw new CommonException(ErrorCode.CONFLICT_USER);
 		}
 		if (signUpChildRequest.residentNum().length() != 13) {
@@ -135,10 +152,7 @@ public class AuthService implements UserDetailsService {
 		}
 		//----------예외처리 완료----------//
 		try {
-			String residentNum = signUpChildRequest.residentNum()
-				.substring(0, 6)
-				.concat("-")
-				.concat(signUpChildRequest.residentNum().substring(6, 13));
+			String residentNum = addHyphenFromResidentNum(signUpChildRequest.residentNum());
 			Gender gender = CommonUtil.getGender(residentNum);
 			User parent = userRepository.findById(parentId)
 				.orElseThrow(() -> new UserNotFoundException(ErrorCode.NOT_FOUND_USER.getMessage()));
