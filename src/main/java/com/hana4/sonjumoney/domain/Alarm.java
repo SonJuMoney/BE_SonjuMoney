@@ -43,4 +43,12 @@ public class Alarm extends BaseEntity {
 
 	@Column(length = 300, nullable = false)
 	private String message;
+
+	public void changeStatusToChecked() {
+		this.alarmStatus = AlarmStatus.CHECKED;
+	}
+
+	public void changeStatusReceived() {
+		this.alarmStatus = AlarmStatus.RECEIVED;
+	}
 }
