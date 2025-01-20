@@ -1,6 +1,5 @@
 package com.hana4.sonjumoney.service;
 
-import com.hana4.sonjumoney.domain.enums.AlarmType;
 import com.hana4.sonjumoney.dto.response.AllowanceInfoResponse;
 import com.hana4.sonjumoney.dto.response.SendAllowanceResponse;
 import org.springframework.stereotype.Service;
@@ -16,8 +15,7 @@ import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.AllowanceRepository;
 import com.hana4.sonjumoney.repository.MemberRepository;
-import com.hana4.sonjumoney.websocket.dto.AlarmDto;
-import com.hana4.sonjumoney.websocket.handler.WebsocketHandler;
+import com.hana4.sonjumoney.websocket.handler.AlarmHandler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +28,7 @@ public class AllowanceService {
 	private final MemberRepository memberRepository;
 	private final AccountService accountService;
 	private final FeedService feedService;
-	private final WebsocketHandler websocketHandler;
+	private final AlarmHandler alarmHandler;
 
 	@Transactional
 	public SendAllowanceResponse sendAllowance(MultipartFile image, Long userId, SendAllowanceRequest sendAllowanceRequest) {

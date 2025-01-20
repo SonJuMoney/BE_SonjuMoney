@@ -1,6 +1,5 @@
 package com.hana4.sonjumoney.websocket.handler;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,12 +18,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hana4.sonjumoney.domain.Family;
 import com.hana4.sonjumoney.domain.Member;
-import com.hana4.sonjumoney.domain.User;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.FamilyRepository;
 import com.hana4.sonjumoney.repository.MemberRepository;
-import com.hana4.sonjumoney.repository.UserRepository;
 import com.hana4.sonjumoney.websocket.dto.AlarmDto;
 
 import lombok.RequiredArgsConstructor;
@@ -33,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class WebsocketHandler extends TextWebSocketHandler {
+public class AlarmHandler extends TextWebSocketHandler {
 	private final ObjectMapper objectMapper;
 
 	private final Set<WebSocketSession> sessions = new HashSet<>();
@@ -43,7 +40,6 @@ public class WebsocketHandler extends TextWebSocketHandler {
 
 	private final FamilyRepository familyRepository;
 	private final MemberRepository memberRepository;
-	private final UserRepository userRepository;
 
 	public void sendFamilyAlarm(AlarmDto alarmDto) {
 		Long familyAlarmSessionId = alarmDto.alarmSessionId();
