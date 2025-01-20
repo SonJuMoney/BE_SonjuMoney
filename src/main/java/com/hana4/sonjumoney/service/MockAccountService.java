@@ -2,10 +2,12 @@ package com.hana4.sonjumoney.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.hana4.sonjumoney.domain.MockAccount;
+import com.hana4.sonjumoney.domain.Relationship;
 import com.hana4.sonjumoney.domain.User;
 import com.hana4.sonjumoney.domain.enums.AccountProduct;
 import com.hana4.sonjumoney.domain.enums.Bank;
@@ -15,6 +17,7 @@ import com.hana4.sonjumoney.dto.response.PinValidResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.MockAccountRepository;
+import com.hana4.sonjumoney.repository.RelationshipRepository;
 import com.hana4.sonjumoney.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -25,19 +28,10 @@ public class MockAccountService {
 
 	private final MockAccountRepository mockAccountRepository;
 	private final UserRepository userRepository;
+	private final RelationshipRepository relationshipRepository;
 
 	public List<MockAccountResponse> findMyMockAccounts(Long userId) {
-		User user = userRepository.findById(userId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
-		String residentNum = user.getResidentNum();
-
-		List<MockAccount> mockAccounts;
-		try {
-			mockAccounts = mockAccountRepository.findUserMockAccounts(residentNum);
-		} catch (CommonException e) {
-			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
-		}
-
-		return makeMockAccountResponse(mockAccounts);
+		return findMockAccount(userId);
 	}
 
 	public List<MockAccountResponse> findChildMockAccounts(Long userId, Long childId) {
@@ -47,15 +41,13 @@ public class MockAccountService {
 		User child = userRepository.findById(childId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 		String childResidentNum = child.getResidentNum();
 
-		List<MockAccount> mockAccounts;
-		try {
-			mockAccounts = mockAccountRepository.findChildMockAccounts(parentResidentNum,
-				childResidentNum);
-		} catch (CommonException e) {
-			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
-		}
+		/* validate relationship */
+		Optional<Relationship> relationship = relationshipRepository.findRelationshipByChildIdAndParentId(
+			userId, childId);
+		if (relationship.isEmpty())
+			throw new CommonException(ErrorCode.DIFFERENT_FAMILY);
 
-		return makeMockAccountResponse(mockAccounts);
+		return findMockAccount(childId);
 	}
 
 	public PinValidResponse checkMockAccountPin(PinValidRequest request) {
@@ -77,5 +69,18 @@ public class MockAccountService {
 		}
 
 		return response;
+	}
+
+	private List<MockAccountResponse> findMockAccount(Long id) {
+		User user = userRepository.findById(id).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		String residentNum = user.getResidentNum();
+		List<MockAccount> mockAccounts;
+		try {
+			mockAccounts = mockAccountRepository.findUserMockAccounts(residentNum);
+		} catch (CommonException e) {
+			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
+		}
+
+		return makeMockAccountResponse(mockAccounts);
 	}
 }
