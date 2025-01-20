@@ -60,6 +60,14 @@ public class FamilyService {
 		return responses;
 	}
 
+	public void findFamilyMembers(Long userId, String range) {
+		/* range = 모두 */
+		if()
+		/* range = 본인 제외 모두 */
+
+		/* range = 자식만 */
+	}
+
 	@Transactional
 	public Long createFamily(Long userId, CreateFamilyRequest request) {
 		User user = userRepository.findById(userId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
