@@ -15,10 +15,6 @@ public record CreateSavingAccountRequest(
 	String accountPassword,
 	@JsonProperty(value = "auto_transferable", required = true)
 	Boolean autoTransferable,
-	@JsonProperty(value = "withdrawal_account_id", required = false)
-	Long withdrawalAccountId,
-	@JsonProperty(value = "deposit_account_id", required = false)
-	Long depositAccountId,
 	@JsonProperty(value = "pay_day", required = false)
 	Integer payDay,
 	@JsonProperty(value = "pay_amount", required = false)

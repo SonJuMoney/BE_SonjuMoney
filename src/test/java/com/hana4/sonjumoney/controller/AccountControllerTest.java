@@ -62,9 +62,7 @@ public class AccountControllerTest extends ControllerTest {
 			.message("착하게 자라야 한다~")
 			.accountPassword("1234")
 			.autoTransferable(true)
-			.userId(2L)
-			.withdrawalAccountId(1L)
-			.depositAccountId(1L)
+			.userId(3L)
 			.payDay(3)
 			.payAmount(50000L)
 			.build();
@@ -73,6 +71,6 @@ public class AccountControllerTest extends ControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer " + accessToken)
 				.content(objectMapper.writeValueAsString(request)))
-			.andExpect(status().is4xxClientError());
+			.andExpect(status().isOk());
 	}
 }
