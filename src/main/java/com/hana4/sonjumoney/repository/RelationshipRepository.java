@@ -10,4 +10,6 @@ import com.hana4.sonjumoney.domain.Relationship;
 @Repository
 public interface RelationshipRepository extends JpaRepository<Relationship, Long> {
 	List<Relationship> findAllByParent_Id(Long userId);
+
+	Relationship findByChildId(Long childId);
 }
