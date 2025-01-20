@@ -153,22 +153,23 @@ public class AuthService implements UserDetailsService {
 				.gender(gender)
 				.build();
 
-			userRepository.save(child);
+			User user = userRepository.save(child);
 			Relationship relationship = Relationship.builder()
 				.parent(parent)
-				.child(child)
+				.child(user)
 				.build();
 			relationshipRepository.save(relationship);
+			return SignUpChildResponse.builder()
+				.code(201)
+				.id(user.getId())
+				.message("회원가입에 성공했습니다.")
+				.build();
 
 		} catch (CommonException e) {
 			throw e;
 		} catch (Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
 		}
-		return SignUpChildResponse.builder()
-			.code(201)
-			.message("회원가입에 성공했습니다.")
-			.build();
 	}
 
 	public PinValidResponse validatePin(AuthPinRequest authPinRequest, Long userId) {
