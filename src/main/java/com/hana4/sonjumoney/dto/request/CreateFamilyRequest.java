@@ -12,7 +12,9 @@ public record CreateFamilyRequest(
 	@JsonProperty("family_name")
 	String familyName,
 	String role,
-	@JsonProperty("add_members")
-	List<InviteUserDto> addMembers
+	@JsonProperty(value = "add_members",required = false)
+	List<InviteUserDto> addMembers,
+	@JsonProperty(value = "add_children",required = false)
+	List<Long> addChildren
 ) {
 }

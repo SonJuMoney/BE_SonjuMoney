@@ -42,6 +42,8 @@ class FamilyControllerTest extends ControllerTest {
 	@DisplayName("가족 생성 api 테스트")
 	void addFamilyTest() throws Exception {
 		List<InviteUserDto> inviteUsers = new ArrayList<>();
+		List<Long> inviteChildren = new ArrayList<>();
+
 		inviteUsers.add(new InviteUserDto("01012341234", "아빠"));
 		CreateFamilyRequest request = CreateFamilyRequest.builder()
 			.familyName("OO이네")

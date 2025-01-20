@@ -1,5 +1,6 @@
 package com.hana4.sonjumoney.service;
 
+import com.hana4.sonjumoney.domain.enums.AlarmType;
 import com.hana4.sonjumoney.dto.response.AllowanceInfoResponse;
 import com.hana4.sonjumoney.dto.response.SendAllowanceResponse;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.AllowanceRepository;
 import com.hana4.sonjumoney.repository.MemberRepository;
+import com.hana4.sonjumoney.websocket.dto.AlarmDto;
 import com.hana4.sonjumoney.websocket.handler.AlarmHandler;
 
 import lombok.RequiredArgsConstructor;
@@ -52,7 +54,7 @@ public class AllowanceService {
 		Long feedId = feedService.saveAllowanceFeed(
 			CreateAllowanceDto.of(allowance, image, sendAllowanceRequest.message()));
 		// TODO: 웹소켓 테스트 생각해오기
-		// websocketHandler.sendMemberAlarm(AlarmDto.of(receiver.getId(), sender.getId(), AlarmType.ALLOWANCE));
+		alarmHandler.sendMemberAlarm(AlarmDto.of(receiver.getId(), sender.getId(), AlarmType.ALLOWANCE));
 		return SendAllowanceResponse.of("송금을 완료했습니다.");
 	}
 

@@ -13,6 +13,7 @@ import com.hana4.sonjumoney.domain.Member;
 import com.hana4.sonjumoney.domain.User;
 import com.hana4.sonjumoney.domain.enums.AllDayStatus;
 import com.hana4.sonjumoney.domain.enums.EventCategory;
+import com.hana4.sonjumoney.domain.enums.Gender;
 import com.hana4.sonjumoney.domain.enums.MemberRole;
 import com.hana4.sonjumoney.dto.request.AddEventRequest;
 import com.hana4.sonjumoney.dto.request.CreateFamilyRequest;
@@ -66,6 +67,16 @@ public class FamilyService {
 			request.familyName()
 		));
 		Member member = memberRepository.save(new Member(family, user, MemberRole.fromValue(request.role())));
+		List<Long> childrenList = request.addChildren();
+		if (childrenList != null && !childrenList.isEmpty()) {
+			for (Long childId : childrenList) {
+				User child = userRepository.findById(childId)
+					.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+				memberRepository.save(
+					new Member(family, child,
+						user.getGender().equals(Gender.MALE) ? MemberRole.SON : MemberRole.DAUGHTER));
+			}
+		}
 		addBirthWhenMemberAdded(userId, user.getUsername(), user.getResidentNum(), member.getId(), family.getId());
 		// TODO: 초대 보내기 구현
 		return family.getId();
