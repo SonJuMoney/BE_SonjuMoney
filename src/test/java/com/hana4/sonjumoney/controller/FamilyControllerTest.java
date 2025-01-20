@@ -20,10 +20,12 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hana4.sonjumoney.ControllerTest;
+import com.hana4.sonjumoney.domain.Member;
 import com.hana4.sonjumoney.dto.InviteUserDto;
 import com.hana4.sonjumoney.dto.request.CreateFamilyRequest;
 import com.hana4.sonjumoney.dto.response.CreateFamilyResponse;
 import com.hana4.sonjumoney.repository.FamilyRepository;
+import com.hana4.sonjumoney.repository.MemberRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -37,6 +39,8 @@ class FamilyControllerTest extends ControllerTest {
 
 	@Autowired
 	FamilyRepository familyRepository;
+	@Autowired
+	MemberRepository memberRepository;
 
 	@Test
 	@DisplayName("가족 생성 api 테스트")
@@ -45,10 +49,12 @@ class FamilyControllerTest extends ControllerTest {
 		List<Long> inviteChildren = new ArrayList<>();
 
 		inviteUsers.add(new InviteUserDto("01012341234", "아빠"));
+		inviteChildren.add(3L);
 		CreateFamilyRequest request = CreateFamilyRequest.builder()
 			.familyName("OO이네")
 			.role("아들")
 			.addMembers(inviteUsers)
+			.addChildren(inviteChildren)
 			.build();
 		String api = "/api/families";
 		ResultActions resultActions = mockMvc.perform(post(api)
@@ -61,6 +67,9 @@ class FamilyControllerTest extends ControllerTest {
 			CreateFamilyResponse.class);
 		Long familyId = response.familyId();
 		assertEquals(familyRepository.findById(familyId).get().getFamilyName(), "OO이네");
+		List<Member> members = memberRepository.findByFamilyId(familyId);
+		System.out.println(members.get(1).getUser().getId());
+
 	}
 
 	@Test
