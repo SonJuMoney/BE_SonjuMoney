@@ -68,7 +68,7 @@ public class FamilyService {
 			request.familyName()
 		));
 		Member member = memberRepository.save(new Member(family, user, MemberRole.fromValue(request.role())));
-		List<InviteChildDto childDtoList = request.addChildren();
+		List<InviteChildDto> childDtoList = request.addChildren();
 
 		if (childDtoList != null && !childDtoList.isEmpty()) {
 			for (InviteChildDto childDto : childDtoList) {

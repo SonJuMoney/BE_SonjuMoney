@@ -20,12 +20,18 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hana4.sonjumoney.ControllerTest;
+import com.hana4.sonjumoney.domain.Family;
 import com.hana4.sonjumoney.domain.Member;
+import com.hana4.sonjumoney.domain.User;
+import com.hana4.sonjumoney.dto.InviteChildDto;
 import com.hana4.sonjumoney.dto.InviteUserDto;
 import com.hana4.sonjumoney.dto.request.CreateFamilyRequest;
 import com.hana4.sonjumoney.dto.response.CreateFamilyResponse;
+import com.hana4.sonjumoney.exception.CommonException;
+import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.FamilyRepository;
 import com.hana4.sonjumoney.repository.MemberRepository;
+import com.hana4.sonjumoney.repository.UserRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -41,15 +47,17 @@ class FamilyControllerTest extends ControllerTest {
 	FamilyRepository familyRepository;
 	@Autowired
 	MemberRepository memberRepository;
+	@Autowired
+	UserRepository userRepository;
 
 	@Test
 	@DisplayName("가족 생성 api 테스트")
 	void addFamilyTest() throws Exception {
 		List<InviteUserDto> inviteUsers = new ArrayList<>();
-		List<Long> inviteChildren = new ArrayList<>();
-
+		List<InviteChildDto> inviteChildren = new ArrayList<>();
+		User user = userRepository.findById(3L).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 		inviteUsers.add(new InviteUserDto("01012341234", "아빠"));
-		inviteChildren.add(3L);
+		inviteChildren.add(new InviteChildDto(user.getId(), user.getUsername()));
 		CreateFamilyRequest request = CreateFamilyRequest.builder()
 			.familyName("OO이네")
 			.role("아들")
@@ -66,7 +74,9 @@ class FamilyControllerTest extends ControllerTest {
 			resultActions.andReturn().getResponse().getContentAsString(),
 			CreateFamilyResponse.class);
 		Long familyId = response.familyId();
-		assertEquals(familyRepository.findById(familyId).get().getFamilyName(), "OO이네");
+		Family family = familyRepository.findById(familyId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		assertEquals(family.getFamilyName(), "OO이네");
 		List<Member> members = memberRepository.findByFamilyId(familyId);
 		System.out.println(members.get(1).getUser().getId());
 
