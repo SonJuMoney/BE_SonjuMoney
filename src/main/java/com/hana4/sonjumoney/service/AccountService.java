@@ -96,16 +96,16 @@ public class AccountService {
 	}
 
 	@Transactional
-	public CreateSavingAccountResponse makeSavingAccount(CreateSavingAccountRequest request) {
+	public CreateSavingAccountResponse makeSavingAccount(CreateSavingAccountRequest request, Long parentId) {
 		/* 자동이체 등록 적금 계좌인 경우 */
 		if (request.autoTransferable()) {
-			Account withdrawalAccount = accountRepository.findByUserId(request.withdrawalAccountId())
+			Account withdrawalAccount = accountRepository.findByUserId(parentId)
 				.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
-			Account depositAccount = accountRepository.findById(request.depositAccountId())
+			Account depositAccount = accountRepository.findByUserId(request.userId())
 				.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 
 			/* 입,출금 계좌가 동일한 경우 예외처리 */
-			if (request.depositAccountId().equals(request.withdrawalAccountId())) {
+			if (depositAccount.getId().equals(withdrawalAccount.getId())) {
 				throw new CommonException(ErrorCode.SAME_ACCOUNT);
 			}
 

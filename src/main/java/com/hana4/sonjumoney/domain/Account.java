@@ -14,7 +14,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -35,7 +34,7 @@ public class Account {
 	@JoinColumn(name = "account_type_id", nullable = false)
 	private AccountType accountType;
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
@@ -52,7 +51,7 @@ public class Account {
 	@Column(name = "account_password", length = 4, nullable = false)
 	private String accountPassword;
 
-	@Column(nullable = false,columnDefinition = "BIGINT UNSIGNED")
+	@Column(nullable = false, columnDefinition = "BIGINT UNSIGNED")
 	private Long balance;
 
 	@Builder
