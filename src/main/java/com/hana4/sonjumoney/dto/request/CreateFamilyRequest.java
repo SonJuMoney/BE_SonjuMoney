@@ -3,6 +3,7 @@ package com.hana4.sonjumoney.dto.request;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.hana4.sonjumoney.dto.InviteChildDto;
 import com.hana4.sonjumoney.dto.InviteUserDto;
 
 import lombok.Builder;
@@ -15,6 +16,6 @@ public record CreateFamilyRequest(
 	@JsonProperty(value = "add_members",required = false)
 	List<InviteUserDto> addMembers,
 	@JsonProperty(value = "add_children",required = false)
-	List<Long> addChildren
+	List<InviteChildDto> addChildren
 ) {
 }
