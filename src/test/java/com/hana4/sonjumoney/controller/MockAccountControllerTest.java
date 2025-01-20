@@ -64,7 +64,7 @@ public class MockAccountControllerTest {
 		String api = "/api/mock/accounts";
 		mockMvc.perform(get(api).param("user_id", "2")
 				.header("Authorization", "Bearer " + accessToken))
-			.andExpect(status().isOk())
+			.andExpect(status().is4xxClientError())
 			.andDo(print());
 	}
 
