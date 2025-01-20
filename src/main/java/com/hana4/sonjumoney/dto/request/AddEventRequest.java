@@ -43,4 +43,15 @@ public record AddEventRequest(
 			.build();
 	}
 
+	public static AddEventRequest of(EventCategory eventCategory, String eventName, LocalDateTime startDateTime,
+		LocalDateTime endDateTime, AllDayStatus allDayStatus, List<Long> memberId) {
+		return AddEventRequest.builder()
+			.eventCategory(eventCategory)
+			.eventName(eventName)
+			.startDateTime(startDateTime)
+			.endDateTime(endDateTime)
+			.allDayStatus(allDayStatus)
+			.memberId(memberId)
+			.build();
+	}
 }
