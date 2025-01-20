@@ -27,21 +27,17 @@ public class AlarmService {
 
 	public AlarmResponse getAlarms(Long userId, Integer page) {
 		try {
-			PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE + 1);
+			PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE);
 			List<Alarm> alarms = alarmRepository.findByUserIdOrderByIdDesc(userId, pageRequest);
 			List<AlarmContentDto> contents = new ArrayList<>();
-			int size = alarms.size();
-			Boolean hasNext = size == 31;
-			if (hasNext) {
-				size -= 1;
-			}
-			for (int i = 0; i < size; i++) {
+			Boolean hasNext = alarmRepository.hasNext(userId, alarms.get(alarms.size() - 1).getId());
+			for (Alarm alarm : alarms) {
 				contents.add(AlarmContentDto.of(
-					alarms.get(i).getId(),
-					alarms.get(i).getAlarmStatus(),
-					alarms.get(i).getMessage(),
-					alarms.get(i).getLinkId(),
-					alarms.get(i).getCreatedAt()
+					alarm.getId(),
+					alarm.getAlarmStatus(),
+					alarm.getMessage(),
+					alarm.getLinkId(),
+					alarm.getCreatedAt()
 				));
 			}
 			AlarmResultDto result = AlarmResultDto.of(
