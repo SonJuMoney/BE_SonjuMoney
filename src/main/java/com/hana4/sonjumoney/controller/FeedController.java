@@ -35,8 +35,9 @@ public class FeedController {
 	}
 
 	@DeleteMapping("/{feed_id}")
-	public ResponseEntity<Void> deleteFeed(@PathVariable(value = "feed_id")Long feedId) {
-		feedService.deleteFeedById(feedId);
+	public ResponseEntity<Void> deleteFeed(Authentication authentication,
+		@PathVariable(value = "feed_id") Long feedId) {
+		feedService.deleteFeedById(AuthenticationUtil.getUserId(authentication), feedId);
 		return ResponseEntity.ok().build();
 	}
 }
