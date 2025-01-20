@@ -2,6 +2,7 @@ package com.hana4.sonjumoney.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -18,7 +19,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(CommonException.class)
 	@ResponseBody
 	public ResponseEntity<ExceptionDto> commonException(CommonException e) {
-		log.error(e.getMessage());
+		log.error(e.getMessage(), " ", e.getStackTrace()[0].getMethodName(), e);
 		return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(ExceptionDto.of(e.getErrorCode()));
 	}
 
