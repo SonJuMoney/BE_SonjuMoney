@@ -34,7 +34,8 @@ public enum ErrorCode {
 	NOT_FOUND_DATA(40402, HttpStatus.NOT_FOUND, "해당 데이터를 찾을 수 없습니다."),
 
 	// 409
-	CONFLICT_USER(40901, HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),
+	CONFLICT_ID(40901, HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),
+	CONFLICT_USER(40902, HttpStatus.CONFLICT, "이미 존재하는 회원입니다."),
 
 	// 500
 	INTERNAL_SERVER_ERROR(50000, HttpStatus.INTERNAL_SERVER_ERROR, "서버내부 오류입니다."),
