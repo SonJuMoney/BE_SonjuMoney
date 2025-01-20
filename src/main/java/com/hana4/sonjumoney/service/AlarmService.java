@@ -29,6 +29,18 @@ public class AlarmService {
 		try {
 			PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE);
 			List<Alarm> alarms = alarmRepository.findByUserIdOrderByIdDesc(userId, pageRequest);
+			if (alarms.isEmpty()) {
+				return AlarmResponse.builder()
+					.isSuccess(true)
+					.code(200)
+					.message("요청성공")
+					.result(AlarmResultDto.builder()
+						.hasNext(false)
+						.page(page)
+						.contents(new ArrayList<>())
+						.build())
+					.build();
+			}
 			List<AlarmContentDto> contents = new ArrayList<>();
 			Boolean hasNext = alarmRepository.hasNext(userId, alarms.get(alarms.size() - 1).getId());
 			for (Alarm alarm : alarms) {
