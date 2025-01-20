@@ -8,22 +8,27 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.hana4.sonjumoney.domain.Relationship;
 import com.hana4.sonjumoney.domain.User;
 import com.hana4.sonjumoney.domain.enums.Gender;
 import com.hana4.sonjumoney.dto.request.AuthPinRequest;
+import com.hana4.sonjumoney.dto.request.SignUpChildRequest;
 import com.hana4.sonjumoney.dto.request.SignUpRequest;
 import com.hana4.sonjumoney.dto.response.DuplicationResponse;
 import com.hana4.sonjumoney.dto.response.PinValidResponse;
 import com.hana4.sonjumoney.dto.response.ReissueResponse;
+import com.hana4.sonjumoney.dto.response.SignUpChildResponse;
 import com.hana4.sonjumoney.dto.response.SignUpResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.exception.UserNotFoundException;
+import com.hana4.sonjumoney.repository.RelationshipRepository;
 import com.hana4.sonjumoney.repository.UserRepository;
 import com.hana4.sonjumoney.security.model.CustomUserDetails;
 import com.hana4.sonjumoney.security.util.JwtUtil;
 import com.hana4.sonjumoney.util.CommonUtil;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -33,6 +38,7 @@ public class AuthService implements UserDetailsService {
 	private final UserRepository userRepository;
 	private final JwtUtil jwtUtil;
 	private final PasswordEncoder passwordEncoder;
+	private final RelationshipRepository relationshipRepository;
 
 	@Override
 	public UserDetails loadUserByUsername(String authId) throws AuthenticationException {
@@ -112,6 +118,54 @@ public class AuthService implements UserDetailsService {
 		}
 
 		return SignUpResponse.builder()
+			.code(201)
+			.message("회원가입에 성공했습니다.")
+			.build();
+	}
+
+	@Transactional
+	public SignUpChildResponse signUpChild(SignUpChildRequest signUpChildRequest, Long parentId) {
+		//----------예외처리 시작----------//
+		Boolean isDuplication = getDuplication(signUpChildRequest.authId()).duplication();
+		if (isDuplication) {
+			throw new CommonException(ErrorCode.CONFLICT_USER);
+		}
+		if (signUpChildRequest.residentNum().length() != 13) {
+			throw new CommonException(ErrorCode.BAD_REQUEST);
+		}
+		//----------예외처리 완료----------//
+		try {
+			String residentNum = signUpChildRequest.residentNum()
+				.substring(0, 6)
+				.concat("-")
+				.concat(signUpChildRequest.residentNum().substring(6, 13));
+			Gender gender = CommonUtil.getGender(residentNum);
+			User parent = userRepository.findById(parentId)
+				.orElseThrow(() -> new UserNotFoundException(ErrorCode.NOT_FOUND_USER.getMessage()));
+
+			User child = User.builder()
+				.username(signUpChildRequest.name())
+				.authId(signUpChildRequest.authId())
+				.password(parent.getPassword())
+				.phone(null)
+				.residentNum(residentNum)
+				.pin(parent.getPin())
+				.gender(gender)
+				.build();
+
+			userRepository.save(child);
+			Relationship relationship = Relationship.builder()
+				.parent(parent)
+				.child(child)
+				.build();
+			relationshipRepository.save(relationship);
+
+		} catch (CommonException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+		return SignUpChildResponse.builder()
 			.code(201)
 			.message("회원가입에 성공했습니다.")
 			.build();
