@@ -1,6 +1,7 @@
 package com.hana4.sonjumoney.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,4 +27,9 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 	Boolean hasNext(@Param("user_id") Long userId, @Param("last_id") Long lastId);
 
 	List<Alarm> findByUserIdAndAlarmStatus(Long userId, AlarmStatus alarmStatus);
+
+	@Query("SELECT a FROM Alarm  a WHERE a.user.id=:userId AND a.alarmStatus=:alarmStatus ORDER BY a.createdAt DESC")
+	Optional<Alarm> findLatestAlarmByUserIdAndAlarmStatus(@Param("userId") Long userId,
+		@Param("alarmStatus") AlarmStatus alarmStatus);
+
 }

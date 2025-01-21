@@ -22,7 +22,8 @@ import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.FamilyRepository;
 import com.hana4.sonjumoney.repository.MemberRepository;
-import com.hana4.sonjumoney.websocket.dto.AlarmDto;
+import com.hana4.sonjumoney.websocket.dto.MessageDto;
+import com.hana4.sonjumoney.dto.SendAlarmDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,31 +42,43 @@ public class AlarmHandler extends TextWebSocketHandler {
 	private final FamilyRepository familyRepository;
 	private final MemberRepository memberRepository;
 
-	public void sendFamilyAlarm(AlarmDto alarmDto) {
-		Long familyAlarmSessionId = alarmDto.alarmSessionId();
-		Long userId = alarmDto.senderId();
-		Set<WebSocketSession> alarmSession = familyAlarmSessionMap.get(familyAlarmSessionId);
-		for (WebSocketSession session : alarmSession) {
-			try {
-				// 전송자 제외
-				if (session.getAttributes().get("userId") != userId) {
-					session.sendMessage(new TextMessage(alarmDto.alarmType()));
-				}
-			} catch (Exception e) {
-				throw new CommonException(ErrorCode.ALARM_SEND_FAILED);
-			}
-		}
-	}
+	// TODO: 가족단위는 스케줄링으로 보낼때 다시 구현
+	// public void sendFamilyAlarm(SendAlarmDto sendAlarmDto) {
+	// 	Long familyAlarmSessionId = sendAlarmDto.alarmSessionId();
+	// 	Long userId = sendAlarmDto.senderId();
+	// 	Set<WebSocketSession> alarmSession = familyAlarmSessionMap.get(familyAlarmSessionId);
+	// 	for (WebSocketSession session : alarmSession) {
+	// 		try {
+	// 			// 전송자 제외
+	// 			if (session.getAttributes().get("userId") != userId) {
+	// 				session.sendMessage(new TextMessage(sendAlarmDto.alarmType().getValue()));
+	// 			}
+	// 		} catch (Exception e) {
+	// 			throw new CommonException(ErrorCode.ALARM_SEND_FAILED);
+	// 		}
+	// 	}
+	// }
 
-	public void sendMemberAlarm(AlarmDto alarmDto) {
-		Long memberAlarmSessionId = alarmDto.alarmSessionId();
+	public void sendMemberAlarm(SendAlarmDto sendAlarmDto) {
+		Long memberAlarmSessionId = sendAlarmDto.alarmSessionId();
 		WebSocketSession session = memberAlarmSessionMap.get(memberAlarmSessionId);
 		try {
-			session.sendMessage(new TextMessage(alarmDto.alarmType()));
+			session.sendMessage(new TextMessage(sendAlarmDto.alarmType().getValue()));
 		} catch (Exception e) {
 			throw new CommonException(ErrorCode.ALARM_SEND_FAILED);
 		}
 
+	}
+
+	public void sendUserAlarm(SendAlarmDto sendAlarmDto) {
+		Long userAlarmSessionId = sendAlarmDto.alarmSessionId();
+		WebSocketSession session = userAlarmSessionMap.get(userAlarmSessionId);
+		try {
+			session.sendMessage(new TextMessage(objectMapper.writeValueAsString(
+				MessageDto.of(sendAlarmDto.alarmType().getValue(), sendAlarmDto.message()))));
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.ALARM_SEND_FAILED);
+		}
 	}
 
 	@Override
@@ -80,7 +93,8 @@ public class AlarmHandler extends TextWebSocketHandler {
 		sessions.add(session);
 		UriComponents uriComponents =
 			UriComponentsBuilder.fromUriString(Objects.requireNonNull(session.getUri()).toString()).build();
-		log.info("session id: " + session.getId() + " session uri: " + session.getUri()+" uid: "+uriComponents.getQueryParams().getFirst("uid"));
+		log.info("session id: " + session.getId() + " session uri: " + session.getUri() + " uid: "
+			+ uriComponents.getQueryParams().getFirst("uid"));
 		Long userId = (Long)session.getAttributes().get("userId");
 		userAlarmSessionMap.put(userId, session);
 		List<Member> members = memberRepository.findAllByUserId(userId);
