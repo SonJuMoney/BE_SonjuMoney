@@ -13,19 +13,23 @@ public record MemberResponse(
 	@JsonProperty("member_name")
 	String memberName,
 	@JsonProperty("member_role")
-	String memberRole
+	String memberRole,
+	@JsonProperty("profile_link")
+	String profileLink
 ) {
 	public static MemberResponse of(
 		Long memberId,
 		Long userId,
 		String memberName,
-		String memberRole
+		String memberRole,
+		String profileLink
 	) {
 		return MemberResponse.builder()
 			.memberId(memberId)
 			.userId(userId)
 			.memberName(memberName)
 			.memberRole(memberRole)
+			.profileLink(profileLink)
 			.build();
 	}
 }
