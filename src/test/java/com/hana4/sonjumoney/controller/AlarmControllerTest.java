@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 
 import com.hana4.sonjumoney.ControllerTest;
 import com.hana4.sonjumoney.domain.Alarm;
+import com.hana4.sonjumoney.domain.enums.AlarmStatus;
 import com.hana4.sonjumoney.repository.AlarmRepository;
 
 @SpringBootTest
@@ -60,5 +61,33 @@ public class AlarmControllerTest extends ControllerTest {
 		Alarm alarm = alarmRepository.findById(ID).orElseThrow();
 		alarm.changeStatusReceived();
 		alarmRepository.save(alarm);
+	}
+
+	@Test
+	void getAlarmStatusTest() throws Exception {
+		String api = "/api/alarms/status/";
+		AlarmStatus status = AlarmStatus.RECEIVED;
+
+		mockMvc.perform(get(api + status)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.is_exist").value(true));
+
+		for (Alarm alarm : alarmRepository.findAll()) {
+			alarm.changeStatusToChecked();
+			alarmRepository.save(alarm);
+		}
+
+		mockMvc.perform(get(api + status)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.is_exist").value(false));
+		
+		for (Alarm alarm : alarmRepository.findAll()) {
+			alarm.changeStatusReceived();
+			alarmRepository.save(alarm);
+		}
 	}
 }
