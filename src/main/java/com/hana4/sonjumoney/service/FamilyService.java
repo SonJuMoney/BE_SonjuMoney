@@ -15,7 +15,6 @@ import com.hana4.sonjumoney.domain.enums.AllDayStatus;
 import com.hana4.sonjumoney.domain.enums.EventCategory;
 import com.hana4.sonjumoney.domain.enums.Gender;
 import com.hana4.sonjumoney.domain.enums.MemberRole;
-import com.hana4.sonjumoney.domain.enums.Range;
 import com.hana4.sonjumoney.dto.InviteChildDto;
 import com.hana4.sonjumoney.dto.request.AddEventRequest;
 import com.hana4.sonjumoney.dto.request.CreateFamilyRequest;
@@ -66,12 +65,16 @@ public class FamilyService {
 	public GetFamilyMemberResponse findFamilyMembers(Long userId, Long familyId, String range) {
 		List<Member> members;
 		try {
-			if (range.equals(Range.ALL.name())) {
-				members = memberRepository.findByFamilyId(familyId);
-			} else if (range.equals(Range.EXCEPTME.name())) {
-				members = memberRepository.findFamilyExceptUser(userId, familyId);
-			} else {
-				members = memberRepository.findChildren(familyId, userId);
+			switch (range) {
+				case "ALL" -> {
+					members = memberRepository.findByFamilyId(familyId);
+				}
+				case "EXCEPTME" -> {
+					members = memberRepository.findFamilyExceptUser(userId, familyId);
+				}
+				default -> {
+					members = memberRepository.findChildren(familyId, userId);
+				}
 			}
 		} catch (Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
