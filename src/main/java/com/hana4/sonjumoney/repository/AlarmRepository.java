@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.hana4.sonjumoney.domain.Alarm;
+import com.hana4.sonjumoney.domain.enums.AlarmStatus;
 
 @Repository
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
@@ -23,4 +24,6 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 			"""
 	)
 	Boolean hasNext(@Param("user_id") Long userId, @Param("last_id") Long lastId);
+
+	List<Alarm> findByUserIdAndAlarmStatus(Long userId, AlarmStatus alarmStatus);
 }

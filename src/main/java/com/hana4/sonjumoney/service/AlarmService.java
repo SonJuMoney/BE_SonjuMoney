@@ -7,9 +7,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.hana4.sonjumoney.domain.Alarm;
+import com.hana4.sonjumoney.domain.enums.AlarmStatus;
 import com.hana4.sonjumoney.dto.AlarmContentDto;
 import com.hana4.sonjumoney.dto.AlarmResultDto;
 import com.hana4.sonjumoney.dto.response.AlarmResponse;
+import com.hana4.sonjumoney.dto.response.AlarmStatusResponse;
 import com.hana4.sonjumoney.dto.response.UpdateAlarmResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
@@ -89,4 +91,9 @@ public class AlarmService {
 			.build();
 	}
 
+	public AlarmStatusResponse getAlarmStatus(Long userId, AlarmStatus alarmStatus) {
+		List<Alarm> alarms = alarmRepository.findByUserIdAndAlarmStatus(userId, alarmStatus);
+		boolean result = !alarms.isEmpty();
+		return AlarmStatusResponse.of(result);
+	}
 }
