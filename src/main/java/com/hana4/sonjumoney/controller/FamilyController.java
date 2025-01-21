@@ -45,9 +45,9 @@ public class FamilyController {
 
 	@GetMapping("/{family_id}/members")
 	public ResponseEntity<GetFamilyMemberResponse> getFamilyMember(@PathVariable("family_id") Long familyId,
-		@RequestParam String range) {
-
-		familyService.findFamilyMembers(familyId, range);
+		@RequestParam String range, Authentication authentication) {
+		Long userId = AuthenticationUtil.getUserId(authentication);
+		familyService.findFamilyMembers(userId, familyId, range);
 
 	}
 }

@@ -21,6 +21,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
 	List<Member> findByFamilyId(Long familyId);
 
+	@Query("select m from Member m where m.family.id = :familyId and m.user.id != :userId")
+	List<Member> findFamilyExceptUser(Long userId, Long familyId);
+
+	@Query(value = "select * from Member as m inner Join Relationship as r on m.user_id = r.parent_id where m.user_id = :userId and m.family_id = :familyId", nativeQuery = true)
+	List<Member> findChildren(Long familyId, Long userId);
+
 	Optional<Member> findByUser_IdAndFamily(Long userId, Family family);
 
 	Optional<Member> findByUserIdAndFamilyId(Long userId, Long familyId);

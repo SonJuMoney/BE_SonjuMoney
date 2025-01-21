@@ -15,6 +15,7 @@ import com.hana4.sonjumoney.domain.enums.AllDayStatus;
 import com.hana4.sonjumoney.domain.enums.EventCategory;
 import com.hana4.sonjumoney.domain.enums.Gender;
 import com.hana4.sonjumoney.domain.enums.MemberRole;
+import com.hana4.sonjumoney.domain.enums.Range;
 import com.hana4.sonjumoney.dto.InviteChildDto;
 import com.hana4.sonjumoney.dto.request.AddEventRequest;
 import com.hana4.sonjumoney.dto.request.CreateFamilyRequest;
@@ -61,12 +62,22 @@ public class FamilyService {
 		return responses;
 	}
 
-	public void findFamilyMembers(Long userId, String range) {
+	public GetFamilyMemberResponse findFamilyMembers(Long userId, Long familyId, String range) {
 		/* range = 모두 */
-		if()
+		List<Member> response;
+		if (range.equals(Range.ALL.name())) {
+			response = memberRepository.findByFamilyId(familyId);
+		}
+
 		/* range = 본인 제외 모두 */
+		if (range.equals(Range.EXCEPTME.name())) {
+			response = memberRepository.findFamilyExceptUser(userId, familyId);
+		}
 
 		/* range = 자식만 */
+		if (range.equals(Range.CHILDREN.name())) {
+			response = memberRepository.findChildren(familyId, userId);
+		}
 	}
 
 	@Transactional
