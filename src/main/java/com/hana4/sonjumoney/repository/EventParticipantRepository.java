@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.hana4.sonjumoney.domain.EventParticipant;
+import com.hana4.sonjumoney.domain.Member;
 
 @Repository
 public interface EventParticipantRepository extends JpaRepository<EventParticipant, Long> {
@@ -26,5 +27,8 @@ public interface EventParticipantRepository extends JpaRepository<EventParticipa
 	@Modifying
 	@Query("DELETE FROM EventParticipant ep WHERE ep.event.id = :eventId")
 	void deleteByEventId(@Param("eventId") Long eventId);
+
+	@Query("SELECT ep.member FROM EventParticipant ep WHERE ep.event.id = :eventId")
+	List<Member> findMembersByEventId(@Param("eventId") Long eventId);
 
 }
