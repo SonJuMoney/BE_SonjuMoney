@@ -147,7 +147,12 @@ public class AlarmService {
 			}
 		}
 	}
-
+	private String makeEventAlarmMessage(Long eventId) {
+		Event event = eventRepository.findById(eventId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		return event.getNotifyStatus().getMessage() + event.getEventName() + "가 있어요.";
+	}
+	// ---------------아래 부분은 추후 추가 구현 예정----------------//
 	// TODO: 이건 개별적으로 안하고 한번에 보내게 바꾸기
 	public void createEventAlarm(CreateAlarmDto createAlarmDto) {
 		AlarmType alarmType = createAlarmDto.alarmType();
@@ -196,10 +201,4 @@ public class AlarmService {
 			new Alarm(user, alarmType, createAlarmDto.linkId(), alarmMessage));
 	}
 
-
-	private String makeEventAlarmMessage(Long eventId) {
-		Event event = eventRepository.findById(eventId)
-			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
-		return event.getNotifyStatus().getMessage() + event.getEventName() + "가 있어요.";
-	}
 }
