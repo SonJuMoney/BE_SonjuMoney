@@ -107,8 +107,8 @@ class FamilyControllerTest extends ControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer " + accessToken))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.familyId").exists())
-			.andExpect(jsonPath("$.familyName").exists())
+			.andExpect(jsonPath("$.family_id").exists())
+			.andExpect(jsonPath("$.family_name").exists())
 			.andExpect(jsonPath("$.members").exists())
 			.andDo(print());
 	}
@@ -123,8 +123,8 @@ class FamilyControllerTest extends ControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer " + accessToken))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.familyId").exists())
-			.andExpect(jsonPath("$.familyName").exists())
+			.andExpect(jsonPath("$.family_id").exists())
+			.andExpect(jsonPath("$.family_name").exists())
 			.andExpect(jsonPath("$.members").exists())
 			/* members response에 userId가 없는지 검증 */
 			.andExpect(result -> {
