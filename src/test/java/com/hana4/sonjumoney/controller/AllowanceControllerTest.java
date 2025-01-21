@@ -1,7 +1,5 @@
 package com.hana4.sonjumoney.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -13,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,7 +27,7 @@ import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.AllowanceRepository;
 import com.hana4.sonjumoney.repository.MemberRepository;
-import com.hana4.sonjumoney.websocket.dto.AlarmDto;
+import com.hana4.sonjumoney.dto.SendAlarmDto;
 import com.hana4.sonjumoney.websocket.handler.AlarmHandler;
 
 @SpringBootTest
@@ -52,7 +49,7 @@ class AllowanceControllerTest extends ControllerTest {
 	@DisplayName("용돈 보내기 기능 테스트")
 	void sendAllowanceTest() throws Exception {
 		// given
-		doNothing().when(alarmHandler).sendMemberAlarm(any(AlarmDto.class));
+		doNothing().when(alarmHandler).sendUserAlarm(any(SendAlarmDto.class));
 		SendAllowanceRequest request = new SendAllowanceRequest(3L, 5000L, "용돈 잘 쓰렴");
 		MockMultipartFile image = new MockMultipartFile(
 			"image",
