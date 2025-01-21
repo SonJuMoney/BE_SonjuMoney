@@ -72,9 +72,11 @@ public class FamilyService {
 				case "EXCEPTME" -> {
 					members = memberRepository.findFamilyExceptUser(userId, familyId);
 				}
-				default -> {
+				case "CHILDREN" -> {
 					members = memberRepository.findChildren(familyId, userId);
 				}
+
+				default -> throw new CommonException(ErrorCode.BAD_REQUEST);
 			}
 		} catch (Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
