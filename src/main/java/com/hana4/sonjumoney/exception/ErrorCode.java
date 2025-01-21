@@ -36,6 +36,7 @@ public enum ErrorCode {
 	// 409
 	CONFLICT_ID(40901, HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),
 	CONFLICT_USER(40902, HttpStatus.CONFLICT, "이미 존재하는 회원입니다."),
+	CONFLICT_INVITATION(40903, HttpStatus.CONFLICT, "이미 수락된 초대입니다."),
 
 	// 500
 	INTERNAL_SERVER_ERROR(50000, HttpStatus.INTERNAL_SERVER_ERROR, "서버내부 오류입니다."),
