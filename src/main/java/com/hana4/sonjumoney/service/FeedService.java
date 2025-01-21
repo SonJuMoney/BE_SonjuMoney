@@ -21,6 +21,7 @@ import com.hana4.sonjumoney.dto.FeedContentCommentDto;
 import com.hana4.sonjumoney.dto.FeedContentContentDto;
 import com.hana4.sonjumoney.dto.FeedContentDto;
 import com.hana4.sonjumoney.dto.FeedResultDto;
+import com.hana4.sonjumoney.dto.CreateAllowanceThanksDto;
 import com.hana4.sonjumoney.dto.ImagePrefix;
 import com.hana4.sonjumoney.dto.request.CreateFeedRequest;
 import com.hana4.sonjumoney.dto.response.CreateFeedResponse;
@@ -68,27 +69,47 @@ public class FeedService {
 			}
 		}
 		// TODO: 웹소켓 알림 전송
+		// alarmService.createOneOffAlarm(CreateAlarmDto.of(writer.getFamily().getId(), writer.getId(), savedFeed.getId(),
+		// 	AlarmType.FEED));
 		return CreateFeedResponse.of(200, savedFeed.getId(), "피드 등록이 완료되었습니다.");
 	}
 
 	@Transactional
-	public Long saveAllowanceFeed(CreateAllowanceDto createAllowanceDto) {
-		Allowance allowance = createAllowanceDto.allowance();
+	public Long saveAllowanceFeed(CreateAllowanceThanksDto createAllowanceThanksDto) {
+		Allowance allowance = createAllowanceThanksDto.allowance();
 		Member sender = allowance.getSender();
 		Member receiver = allowance.getReceiver();
-		boolean contentExist = createAllowanceDto.image() != null;
-		String message = createAllowanceDto.message();
+		boolean  contentExist = createAllowanceThanksDto.image() != null;
+		String message = createAllowanceThanksDto.message();
 
 		Feed savedFeed = feedRepository.save(
 			new Feed(sender, allowance, receiver.getId(), contentExist, 0, message, FeedType.ALLOWANCE));
 
 		if (contentExist) {
-			MultipartFile image = createAllowanceDto.image();
-			String contentUrl = s3Service.uploadImageToS3(image, ImagePrefix.ALLOWANCE, savedFeed.getId());
+			String contentUrl = s3Service.uploadImageToS3(createAllowanceThanksDto.image(), ImagePrefix.ALLOWANCE,
+				savedFeed.getId());
 
-			feedContentRepository.save(
-				new FeedContent(savedFeed, contentUrl)
-			);
+			feedContentRepository.save(new FeedContent(savedFeed, contentUrl));
+		}
+		return savedFeed.getId();
+	}
+
+	@Transactional
+	public Long saveThanksFeed(CreateAllowanceThanksDto createAllowanceThanksDto) {
+		Allowance allowance = createAllowanceThanksDto.allowance();
+		Member sender = allowance.getReceiver();
+		Member receiver = allowance.getSender();
+		boolean contentExist = createAllowanceThanksDto.image() != null;
+		String message = createAllowanceThanksDto.message();
+
+		Feed savedFeed = feedRepository.save(
+			new Feed(sender, allowance, receiver.getId(), contentExist, 0, message, FeedType.THANKS));
+
+		if (contentExist) {
+			String contentUrl = s3Service.uploadImageToS3(createAllowanceThanksDto.image(), ImagePrefix.THANKS,
+				savedFeed.getId());
+
+			feedContentRepository.save(new FeedContent(savedFeed, contentUrl));
 		}
 		return savedFeed.getId();
 	}
