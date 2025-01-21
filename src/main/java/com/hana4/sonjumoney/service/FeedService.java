@@ -107,6 +107,8 @@ public class FeedService {
 	}
 
 	public FeedResponse getFeeds(Long userId, Long familyId, Integer page) {
+		Member member = memberRepository.findByUserIdAndFamilyId(userId, familyId)
+			.orElseThrow(() -> new CommonException(ErrorCode.FORBIDDEN));
 		try {
 			PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE);
 			List<Feed> feeds = feedRepository.findFeedsByFamilyId(familyId, pageRequest);
