@@ -14,7 +14,13 @@ import com.hana4.sonjumoney.domain.Member;
 
 @Repository
 public interface EventParticipantRepository extends JpaRepository<EventParticipant, Long> {
-	@Query("SELECT ep FROM EventParticipant ep JOIN FETCH ep.event e WHERE e.family.id = :familyId AND e.startDateTime BETWEEN :startDateTime AND :endDateTime ORDER BY e.startDateTime ASC")
+	@Query("SELECT ep FROM EventParticipant ep " +
+		"JOIN FETCH ep.event e " +
+		"WHERE e.family.id = :familyId " +
+		"AND (e.startDateTime BETWEEN :startDateTime AND :endDateTime " +
+		"     OR e.endDateTime BETWEEN :startDateTime AND :endDateTime " +
+		"     OR (e.startDateTime <= :startDateTime AND e.endDateTime >= :endDateTime)) " +
+		"ORDER BY e.startDateTime ASC")
 	List<EventParticipant> findAllParticipantsByFamilyIdAndEventDateRange(
 		@Param("familyId") Long familyId,
 		@Param("startDateTime") LocalDateTime startDateTime,
