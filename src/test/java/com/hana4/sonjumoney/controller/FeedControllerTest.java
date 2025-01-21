@@ -1,14 +1,11 @@
 package com.hana4.sonjumoney.controller;
 
-import static org.assertj.core.api.Assertions.*;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.nio.charset.StandardCharsets;
 
-import org.assertj.core.api.Assert;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -25,11 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hana4.sonjumoney.ControllerTest;
 import com.hana4.sonjumoney.domain.Feed;
+import com.hana4.sonjumoney.domain.enums.FeedType;
 import com.hana4.sonjumoney.dto.request.CreateFeedRequest;
 import com.hana4.sonjumoney.dto.response.CreateFeedResponse;
-import com.hana4.sonjumoney.exception.CommonException;
-import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.FeedRepository;
+import com.hana4.sonjumoney.repository.MemberRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -42,6 +39,8 @@ class FeedControllerTest extends ControllerTest {
 	private FeedRepository feedRepository;
 
 	private Long feedId;
+	@Autowired
+	private MemberRepository memberRepository;
 
 	@Test
 	@Order(1)
@@ -127,5 +126,31 @@ class FeedControllerTest extends ControllerTest {
 			.andExpect(status().isOk());
 		// then
 		Assertions.assertThat(feedRepository.findById(feedId).isEmpty());
+	}
+
+	@Test
+	@Order(3)
+	void getFeedsTest() throws Exception {
+		Feed feed = Feed.builder()
+			.member(memberRepository.findByUserIdAndFamilyId(1L, 1L).orElseThrow())
+			.allowance(null)
+			.receiverId(null)
+			.contentExist(true)
+			.likes(0)
+			.feedMessage("ㅋㅋ")
+			.feedType(FeedType.NORMAL)
+			.build();
+		feedRepository.saveAndFlush(feed);
+
+		String api = "/api/feeds";
+
+		mockMvc.perform(get(api).header("Authorization", "Bearer " + accessToken)
+				.contentType(MediaType.APPLICATION_JSON)
+				.param("family_id", "1")
+				.param("page", "0"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.result.contents").isNotEmpty());
+
+		feedRepository.delete(feed);
 	}
 }

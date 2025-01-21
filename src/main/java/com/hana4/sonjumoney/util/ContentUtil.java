@@ -1,8 +1,10 @@
 package com.hana4.sonjumoney.util;
 
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.hana4.sonjumoney.domain.enums.ContentType;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 
@@ -24,5 +26,23 @@ public class ContentUtil {
 		} else {
 			throw new CommonException(ErrorCode.BAD_REQUEST);
 		}
+	}
+
+	public static ContentType classifyContentType(String extension) {
+		if (extension == null || extension.isEmpty()) {
+			throw new CommonException(ErrorCode.BAD_REQUEST);
+		}
+
+		final Set<String> IMAGE_EXTENSIONS = Set.of("png", "jpg", "jpeg", "gif", "bmp", "tiff", "webp");
+		final Set<String> VIDEO_EXTENSIONS = Set.of("mp4", "avi", "mov", "wmv", "flv", "mkv", "webm");
+
+		if (IMAGE_EXTENSIONS.contains(extension)) {
+			return ContentType.IMAGE;
+		} else if (VIDEO_EXTENSIONS.contains(extension)) {
+			return ContentType.VIDEO;
+		} else {
+			throw new CommonException(ErrorCode.BAD_REQUEST);
+		}
+
 	}
 }
