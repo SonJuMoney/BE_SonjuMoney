@@ -42,7 +42,7 @@ public class MockAccountService {
 		String childResidentNum = child.getResidentNum();
 
 		/* validate relationship */
-		Optional<Relationship> relationship = relationshipRepository.findRelationshipByChildIdAndParentId(
+		Optional<Relationship> relationship = relationshipRepository.findRelationship(
 			userId, childId);
 		if (relationship.isEmpty())
 			throw new CommonException(ErrorCode.DIFFERENT_FAMILY);

@@ -62,9 +62,9 @@ public class MockAccountControllerTest {
 	@DisplayName("자녀의 MockAccounts 목록 조회 테스트")
 	void getChildMockAccountsTest() throws Exception {
 		String api = "/api/mock/accounts";
-		mockMvc.perform(get(api).param("user_id", "2")
+		mockMvc.perform(get(api).param("user_id", "3")
 				.header("Authorization", "Bearer " + accessToken))
-			.andExpect(status().is4xxClientError())
+			.andExpect(status().isOk())
 			.andDo(print());
 	}
 
