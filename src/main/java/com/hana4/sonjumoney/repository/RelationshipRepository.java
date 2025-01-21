@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.hana4.sonjumoney.domain.Relationship;
@@ -14,5 +15,6 @@ public interface RelationshipRepository extends JpaRepository<Relationship, Long
 
 	Relationship findByChildId(Long childId);
 
-	Optional<Relationship> findRelationshipByChildIdAndParentId(Long parentId, Long childId);
+	@Query("select r from Relationship r where r.parent.id = :parentId and r.child.id = :childId")
+	Optional<Relationship> findRelationship(Long parentId, Long childId);
 }
