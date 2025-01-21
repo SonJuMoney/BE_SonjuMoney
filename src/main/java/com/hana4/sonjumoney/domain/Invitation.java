@@ -68,4 +68,8 @@ public class Invitation {
 		this.invitationStatus = invitationStatus;
 	}
 
+	public void updateInvitationStatus(InvitationStatus invitationStatus) {
+		this.invitationStatus = invitationStatus;
+	}
+
 }
