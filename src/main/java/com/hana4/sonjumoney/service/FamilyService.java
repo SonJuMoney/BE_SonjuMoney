@@ -18,6 +18,7 @@ import com.hana4.sonjumoney.domain.enums.MemberRole;
 import com.hana4.sonjumoney.dto.InviteChildDto;
 import com.hana4.sonjumoney.dto.request.AddEventRequest;
 import com.hana4.sonjumoney.dto.request.CreateFamilyRequest;
+import com.hana4.sonjumoney.dto.response.GetFamilyMemberResponse;
 import com.hana4.sonjumoney.dto.response.GetFamilyResponse;
 import com.hana4.sonjumoney.dto.response.MemberResponse;
 import com.hana4.sonjumoney.exception.CommonException;
@@ -59,6 +60,27 @@ public class FamilyService {
 		}
 
 		return responses;
+	}
+
+	public GetFamilyMemberResponse findFamilyMembers(Long userId, Long familyId, String range) {
+		List<Member> members;
+		try {
+			switch (range) {
+				case "ALL" -> {
+					members = memberRepository.findByFamilyId(familyId);
+				}
+				case "EXCEPTME" -> {
+					members = memberRepository.findFamilyExceptUser(userId, familyId);
+				}
+				default -> {
+					members = memberRepository.findChildren(familyId, userId);
+				}
+			}
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+
+		return GetFamilyMemberResponse.of(familyId, members.get(0).getFamily().getFamilyName(), members);
 	}
 
 	@Transactional

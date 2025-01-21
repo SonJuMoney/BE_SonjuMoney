@@ -32,6 +32,8 @@ public class ControllerTest {
 
 	protected String accessToken;
 
+	protected String loginUserId;
+
 	@BeforeEach
 	void setUp() throws Exception {
 		SignInRequest signInRequest = new SignInRequest("test1", "1234");
@@ -43,6 +45,7 @@ public class ControllerTest {
 		String responseBody = mvcResult.getResponse().getContentAsString();
 		Map<String, String> responseMap = objectMapper.readValue(responseBody, Map.class);
 		accessToken = responseMap.get("access_token");
+		loginUserId = String.valueOf(responseMap.get("user_id"));
 		System.out.println("accessToken:" + accessToken);
 	}
 }

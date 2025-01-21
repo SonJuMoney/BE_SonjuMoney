@@ -35,12 +35,6 @@ public class MockAccountService {
 	}
 
 	public List<MockAccountResponse> findChildMockAccounts(Long userId, Long childId) {
-		User parent = userRepository.findById(userId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
-		String parentResidentNum = parent.getResidentNum();
-
-		User child = userRepository.findById(childId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-		String childResidentNum = child.getResidentNum();
-
 		/* validate relationship */
 		Optional<Relationship> relationship = relationshipRepository.findRelationship(
 			userId, childId);
