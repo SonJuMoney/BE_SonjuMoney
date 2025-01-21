@@ -1,10 +1,12 @@
 package com.hana4.sonjumoney.controller;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hana4.sonjumoney.ControllerTest;
 import com.hana4.sonjumoney.domain.Family;
@@ -91,6 +94,74 @@ class FamilyControllerTest extends ControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer " + accessToken))
 			.andExpect(status().isOk())
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("가족 구성원 조회 테스트 : 모두")
+	void findFamilyMembersAllTest() throws Exception {
+		long familyId = 1L;
+		String api = "/api/families/" + familyId + "/members?range=ALL";
+
+		mockMvc.perform(get(api)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.familyId").exists())
+			.andExpect(jsonPath("$.familyName").exists())
+			.andExpect(jsonPath("$.members").exists())
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("가족 구성원 조회 테스트 : 본인 제외")
+	void findFamilyMembersExceptUserTest() throws Exception {
+		long familyId = 1L;
+		String api = "/api/families/" + familyId + "/members?range=EXCEPTME";
+
+		mockMvc.perform(get(api)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.familyId").exists())
+			.andExpect(jsonPath("$.familyName").exists())
+			.andExpect(jsonPath("$.members").exists())
+			/* members response에 userId가 없는지 검증 */
+			.andExpect(result -> {
+				String response = result.getResponse().getContentAsString();
+				JsonNode jsonNode = objectMapper.readTree(response);
+				JsonNode members = jsonNode.path("members");
+				for (JsonNode member : members) {
+					String responseId = member.path("user_id").toString();
+					assertThat(loginUserId).isNotEqualTo(responseId);
+				}
+			})
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("가족 구성원 조회 테스트 : 자식만")
+	void findFamilyMembersOnlyChildTest() throws Exception {
+		long familyId = 1L;
+		String api = "/api/families/" + familyId + "/members?range=CHILDREN";
+
+		mockMvc.perform(get(api)
+				.contentType(MediaType.APPLICATION_JSON)
+				.characterEncoding("UTF-8")
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			/* members response에 memberRole이 아들과 딸만 있는지 검증 */
+			.andExpect(result -> {
+				String response = new String(result.getResponse().getContentAsString().getBytes(
+					StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+				JsonNode jsonNode = objectMapper.readTree(response);
+				JsonNode members = jsonNode.path("members");
+				for (JsonNode member : members) {
+					String responseRole = member.path("member_role").toString().replace("\"", "");
+					assertThat(responseRole).satisfiesAnyOf(v -> assertThat(v).isEqualTo("아들"),
+						v -> assertThat(v).isEqualTo("딸"));
+				}
+			})
 			.andDo(print());
 	}
 }
