@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hana4.sonjumoney.dto.request.CreateFamilyRequest;
 import com.hana4.sonjumoney.dto.response.CreateFamilyResponse;
+import com.hana4.sonjumoney.dto.response.GetFamilyMemberResponse;
 import com.hana4.sonjumoney.dto.response.GetFamilyResponse;
 import com.hana4.sonjumoney.service.FamilyService;
 import com.hana4.sonjumoney.util.AuthenticationUtil;
@@ -47,7 +48,6 @@ public class FamilyController {
 	public ResponseEntity<GetFamilyMemberResponse> getFamilyMember(@PathVariable("family_id") Long familyId,
 		@RequestParam String range, Authentication authentication) {
 		Long userId = AuthenticationUtil.getUserId(authentication);
-		familyService.findFamilyMembers(userId, familyId, range);
-
+		return ResponseEntity.ok().body(familyService.findFamilyMembers(userId, familyId, range));
 	}
 }

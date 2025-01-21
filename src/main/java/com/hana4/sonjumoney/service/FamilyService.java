@@ -19,6 +19,7 @@ import com.hana4.sonjumoney.domain.enums.Range;
 import com.hana4.sonjumoney.dto.InviteChildDto;
 import com.hana4.sonjumoney.dto.request.AddEventRequest;
 import com.hana4.sonjumoney.dto.request.CreateFamilyRequest;
+import com.hana4.sonjumoney.dto.response.GetFamilyMemberResponse;
 import com.hana4.sonjumoney.dto.response.GetFamilyResponse;
 import com.hana4.sonjumoney.dto.response.MemberResponse;
 import com.hana4.sonjumoney.exception.CommonException;
@@ -63,21 +64,16 @@ public class FamilyService {
 	}
 
 	public GetFamilyMemberResponse findFamilyMembers(Long userId, Long familyId, String range) {
-		/* range = 모두 */
-		List<Member> response;
+		List<Member> members;
 		if (range.equals(Range.ALL.name())) {
-			response = memberRepository.findByFamilyId(familyId);
+			members = memberRepository.findByFamilyId(familyId);
+		} else if (range.equals(Range.EXCEPTME.name())) {
+			members = memberRepository.findFamilyExceptUser(userId, familyId);
+		} else {
+			members = memberRepository.findChildren(familyId, userId);
 		}
 
-		/* range = 본인 제외 모두 */
-		if (range.equals(Range.EXCEPTME.name())) {
-			response = memberRepository.findFamilyExceptUser(userId, familyId);
-		}
-
-		/* range = 자식만 */
-		if (range.equals(Range.CHILDREN.name())) {
-			response = memberRepository.findChildren(familyId, userId);
-		}
+		return GetFamilyMemberResponse.of(familyId, members.get(0).getFamily().getFamilyName(), members);
 	}
 
 	@Transactional
