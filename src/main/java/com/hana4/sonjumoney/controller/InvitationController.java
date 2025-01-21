@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/invitation")
 public class InvitationController {
-	private final InvitationService invaitationService;
+	private final InvitationService invitationService;
 
 	@PostMapping("/{invitation_id}")
 	public ResponseEntity<AcceptInvitationResponse> acceptInvitation(
@@ -28,6 +28,6 @@ public class InvitationController {
 		@PathVariable(value = "invitation_id") Long invitationId) {
 		Long userId = AuthenticationUtil.getUserId(authentication);
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(invaitationService.acceptInvitation(userId, invitationId));
+			.body(invitationService.acceptInvitation(userId, invitationId));
 	}
 }
