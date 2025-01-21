@@ -14,13 +14,18 @@ public record EventParticipantResponse(
 	Long memberId,
 
 	@JsonProperty("user_name")
-	String userName
+	String userName,
+
+	@JsonProperty("profile_link")
+	String profileLink
+
 ) {
 	public static EventParticipantResponse from(EventParticipant participant) {
 		return EventParticipantResponse.builder()
 			.participationId(participant.getId())
 			.memberId(participant.getMember().getId())
 			.userName(participant.getMember().getUser().getUsername())
+			.profileLink(participant.getMember().getUser().getProfileLink())
 			.build();
 	}
 }

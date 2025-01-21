@@ -79,10 +79,7 @@ public class EventService {
 	}
 
 	public List<EventResponse> getAllEvents(Long userId, Long familyId, int getYear, int getMonth) {
-		boolean isMember = memberRepository.existsByUserIdAndFamilyId(userId, familyId);
-		if (!isMember) {
-			throw new CommonException(ErrorCode.UNAUTHORIZED);
-		}
+		validateUserMember(userId, familyId);
 
 		LocalDateTime startDateTime = LocalDateTime.of(getYear, getMonth, 1, 0, 0, 0);
 		LocalDateTime endDateTime = startDateTime.with(TemporalAdjusters.lastDayOfMonth());
@@ -107,9 +104,13 @@ public class EventService {
 			LocalDate eventStartDate = event.getStartDateTime().toLocalDate();
 			LocalDate eventEndDate = event.getEndDateTime().toLocalDate();
 
-			//이벤트 시작날짜-종료날짜 해당되는 데이터 날짜별 분리
-			for (LocalDate currentDate = eventStartDate; !currentDate.isAfter(
-				eventEndDate); currentDate = currentDate.plusDays(1)) {
+			LocalDate firstDay = startDateTime.toLocalDate();
+			LocalDate lastDay = endDateTime.toLocalDate();
+			LocalDate startDate = eventStartDate.isBefore(firstDay) ? firstDay : eventStartDate;
+			LocalDate endDate = eventEndDate.isAfter(lastDay) ? lastDay : eventEndDate;
+
+			for (LocalDate currentDate = startDate; !currentDate.isAfter(
+				endDate); currentDate = currentDate.plusDays(1)) {
 				eventResponses.add(
 					EventResponse.ofWithCurrentDate(
 						event.getId(),
@@ -120,6 +121,7 @@ public class EventService {
 						currentDate,
 						event.getAllDayStatus(),
 						participantResponses
+
 					)
 				);
 			}
