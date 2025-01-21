@@ -65,12 +65,16 @@ public class FamilyService {
 
 	public GetFamilyMemberResponse findFamilyMembers(Long userId, Long familyId, String range) {
 		List<Member> members;
-		if (range.equals(Range.ALL.name())) {
-			members = memberRepository.findByFamilyId(familyId);
-		} else if (range.equals(Range.EXCEPTME.name())) {
-			members = memberRepository.findFamilyExceptUser(userId, familyId);
-		} else {
-			members = memberRepository.findChildren(familyId, userId);
+		try {
+			if (range.equals(Range.ALL.name())) {
+				members = memberRepository.findByFamilyId(familyId);
+			} else if (range.equals(Range.EXCEPTME.name())) {
+				members = memberRepository.findFamilyExceptUser(userId, familyId);
+			} else {
+				members = memberRepository.findChildren(familyId, userId);
+			}
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
 		}
 
 		return GetFamilyMemberResponse.of(familyId, members.get(0).getFamily().getFamilyName(), members);
