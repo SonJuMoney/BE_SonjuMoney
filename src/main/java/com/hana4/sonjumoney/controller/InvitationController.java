@@ -27,7 +27,7 @@ public class InvitationController {
 		Authentication authentication,
 		@PathVariable(value = "invitation_id") Long invitationId) {
 		Long userId = AuthenticationUtil.getUserId(authentication);
-		Long familyId = invaitationService.acceptInvitation(userId, invitationId);
-		return ResponseEntity.status(HttpStatus.CREATED).body(AcceptInvitationResponse.of(201, familyId));
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(invaitationService.acceptInvitation(userId, invitationId));
 	}
 }

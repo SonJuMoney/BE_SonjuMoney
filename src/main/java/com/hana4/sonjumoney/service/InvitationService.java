@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hana4.sonjumoney.domain.Invitation;
 import com.hana4.sonjumoney.domain.Member;
 import com.hana4.sonjumoney.domain.enums.InvitationStatus;
+import com.hana4.sonjumoney.dto.response.AcceptInvitationResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.InvitationRepository;
@@ -21,7 +22,7 @@ public class InvitationService {
 	private final MemberRepository memberRepository;
 
 	@Transactional
-	public Long acceptInvitation(Long userId, Long invitationId) {
+	public AcceptInvitationResponse acceptInvitation(Long userId, Long invitationId) {
 		Invitation invitation = invitationRepository.findById(invitationId).orElseThrow(() -> new CommonException(
 			ErrorCode.NOT_FOUND_DATA));
 		if (!invitation.getInvitee().getId().equals(userId)) {
@@ -41,6 +42,6 @@ public class InvitationService {
 			.memberRole(invitation.getMemberRole())
 			.build();
 		memberRepository.save(member);
-		return invitation.getFamily().getId();
+		return AcceptInvitationResponse.of(201, invitation.getFamily().getId());
 	}
 }
