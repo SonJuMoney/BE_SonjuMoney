@@ -14,11 +14,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "Alarm")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Alarm extends BaseEntity {
 
 	@Id
@@ -50,5 +54,14 @@ public class Alarm extends BaseEntity {
 
 	public void changeStatusReceived() {
 		this.alarmStatus = AlarmStatus.RECEIVED;
+	}
+
+	@Builder
+	public Alarm(User user, AlarmType alarmType, Long linkId, String message) {
+		this.user = user;
+		this.alarmStatus = AlarmStatus.RECEIVED;
+		this.alarmType = alarmType;
+		this.linkId = linkId;
+		this.message = message;
 	}
 }

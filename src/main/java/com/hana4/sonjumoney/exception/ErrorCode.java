@@ -17,6 +17,7 @@ public enum ErrorCode {
 	IMPROPER_MEMBER_ROLE(40004, HttpStatus.BAD_REQUEST, "적절하지 않은 멤버역할입니다."),
 	DIFFERENT_FAMILY(40005, HttpStatus.BAD_REQUEST, "같은 가족이 아닙니다."),
 	BAD_URL_FROM(40006, HttpStatus.BAD_REQUEST, "잘못된 url 형식입니다."),
+	WRONG_ALARM_TYPE(40007, HttpStatus.BAD_REQUEST, "알림타입이 잘못되었습니다."),
 
 	//401
 	UNAUTHORIZED(40100, HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),
