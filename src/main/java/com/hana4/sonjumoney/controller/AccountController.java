@@ -1,5 +1,7 @@
 package com.hana4.sonjumoney.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +15,7 @@ import com.hana4.sonjumoney.dto.request.CreateSavingAccountRequest;
 import com.hana4.sonjumoney.dto.response.AccountInfoResponse;
 import com.hana4.sonjumoney.dto.response.CreateAccountResponse;
 import com.hana4.sonjumoney.dto.response.CreateSavingAccountResponse;
+import com.hana4.sonjumoney.dto.response.SavingAccountInfoResponse;
 import com.hana4.sonjumoney.service.AccountService;
 import com.hana4.sonjumoney.util.AuthenticationUtil;
 
@@ -53,5 +56,11 @@ public class AccountController {
 		@RequestBody CreateSavingAccountRequest request, Authentication authentication) {
 		return ResponseEntity.ok()
 			.body(accountService.makeSavingAccount(request, AuthenticationUtil.getUserId(authentication)));
+	}
+
+	@GetMapping("/savings")
+	public ResponseEntity<List<SavingAccountInfoResponse>> getSavingAccount(Authentication authentication) {
+		Long userId = AuthenticationUtil.getUserId(authentication);
+		return ResponseEntity.ok().body(accountService.findSavingAccounts(userId));
 	}
 }
