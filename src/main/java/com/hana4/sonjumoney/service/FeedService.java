@@ -1,25 +1,37 @@
 package com.hana4.sonjumoney.service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.hana4.sonjumoney.domain.Allowance;
+import com.hana4.sonjumoney.domain.Comment;
 import com.hana4.sonjumoney.domain.Feed;
 import com.hana4.sonjumoney.domain.FeedContent;
 import com.hana4.sonjumoney.domain.Member;
+import com.hana4.sonjumoney.domain.enums.ContentType;
 import com.hana4.sonjumoney.domain.enums.FeedType;
 import com.hana4.sonjumoney.dto.CreateAllowanceDto;
+import com.hana4.sonjumoney.dto.FeedContentCommentDto;
+import com.hana4.sonjumoney.dto.FeedContentContentDto;
+import com.hana4.sonjumoney.dto.FeedContentDto;
+import com.hana4.sonjumoney.dto.FeedResultDto;
 import com.hana4.sonjumoney.dto.ImagePrefix;
 import com.hana4.sonjumoney.dto.request.CreateFeedRequest;
 import com.hana4.sonjumoney.dto.response.CreateFeedResponse;
+import com.hana4.sonjumoney.dto.response.FeedResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
+import com.hana4.sonjumoney.repository.CommentRepository;
 import com.hana4.sonjumoney.repository.FeedContentRepository;
 import com.hana4.sonjumoney.repository.FeedRepository;
 import com.hana4.sonjumoney.repository.MemberRepository;
+import com.hana4.sonjumoney.util.ContentUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +42,8 @@ public class FeedService {
 	private final FeedRepository feedRepository;
 	private final FeedContentRepository feedContentRepository;
 	private final S3Service s3Service;
+	private static final int PAGE_SIZE = 30;
+	private final CommentRepository commentRepository;
 
 	@Transactional
 	public CreateFeedResponse saveNormalFeed(Long userId, MultipartFile[] images, CreateFeedRequest createFeedRequest) {
@@ -62,7 +76,7 @@ public class FeedService {
 		Allowance allowance = createAllowanceDto.allowance();
 		Member sender = allowance.getSender();
 		Member receiver = allowance.getReceiver();
-		boolean  contentExist = createAllowanceDto.image() != null;
+		boolean contentExist = createAllowanceDto.image() != null;
 		String message = createAllowanceDto.message();
 
 		Feed savedFeed = feedRepository.save(
@@ -90,5 +104,79 @@ public class FeedService {
 			s3Service.deleteImage(feedContent.getContentUrl());
 		}
 		feedContentRepository.deleteFeedContentsByFeedId(feedId);
+	}
+
+	public FeedResponse getFeeds(Long userId, Long familyId, Integer page) {
+		try {
+			PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE);
+			List<Feed> feeds = feedRepository.findFeedsByFamilyId(familyId, pageRequest);
+			if (feeds.isEmpty()) {
+				return FeedResponse.of(true, 200, "요청성공", FeedResultDto.of(false, page, new ArrayList<>()));
+			}
+
+			// FeedResultDto args start //
+			Boolean hasNext = feedRepository.hasNext(familyId, feeds.get(feeds.size() - 1).getId());
+			List<FeedContentDto> contents = new ArrayList<>();
+			// FeedResultDto args end //
+
+			for (Feed feed : feeds) {
+				List<FeedContent> feedContents = feedContentRepository.findAllByFeed(feed);
+				List<Comment> comments = commentRepository.findAllByFeed(feed);
+
+				// FeedContentDto args start //
+				Long feedId = feed.getId();
+				Long writerId = feed.getMember().getUser().getId();
+				String writerName = feed.getMember().getUser().getUsername();
+				Boolean isMine = userId.equals(writerId);
+				String writerImage = feed.getMember().getUser().getProfileLink();
+				FeedType feedType = feed.getFeedType();
+				String message = feed.getFeedMessage();
+				Boolean isUpdate = !feed.getCreatedAt().equals(feed.getUpdatedAt());
+				LocalDateTime createdAt = feed.getCreatedAt();
+				List<FeedContentContentDto> feedContentContentDtos = new ArrayList<>();
+				List<FeedContentCommentDto> feedContentCommentDtos = new ArrayList<>();
+				// FeedContentDto args end //
+
+				for (FeedContent feedContent : feedContents) {
+					String extension = ContentUtil.getExtension(feedContent.getContentUrl());
+					ContentType contentType = ContentUtil.classifyContentType(extension);
+					feedContentContentDtos.add(FeedContentContentDto.of(
+						feedContent.getContentUrl(),
+						contentType
+					));
+				}
+
+				for (Comment comment : comments) {
+					feedContentCommentDtos.add(FeedContentCommentDto.of(
+						comment.getId(),
+						comment.getMember().getUser().getId(),
+						comment.getMember().getUser().getProfileLink(),
+						comment.getMessage(),
+						!comment.getCreatedAt().equals(comment.getUpdatedAt()),
+						comment.getCreatedAt()
+					));
+				}
+
+				contents.add(FeedContentDto.of(
+					feedId,
+					writerId,
+					writerName,
+					isMine,
+					writerImage,
+					feedType,
+					message,
+					isUpdate,
+					createdAt,
+					feedContentContentDtos,
+					feedContentCommentDtos
+				));
+			}
+
+			FeedResultDto result = FeedResultDto.of(hasNext, page, contents);
+
+			return FeedResponse.of(true, 200, "요청성공", result);
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
 	}
 }
