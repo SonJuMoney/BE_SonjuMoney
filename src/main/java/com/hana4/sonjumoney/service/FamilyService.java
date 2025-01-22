@@ -73,7 +73,7 @@ public class FamilyService {
 					members = memberRepository.findFamilyExceptUser(userId, familyId);
 				}
 				case "CHILDREN" -> {
-					members = memberRepository.findChildren(familyId, userId);
+					members = memberRepository.findChildren(familyId);
 				}
 
 				default -> throw new CommonException(ErrorCode.BAD_REQUEST);

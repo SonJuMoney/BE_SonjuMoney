@@ -27,11 +27,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 		"WHERE m.family.id = :familyId AND m.user.id != :userId")
 	List<Member> findFamilyExceptUser(Long userId, Long familyId);
 
-	@Query("SELECT m " +
-		"FROM Member m " +
-		"JOIN Relationship r ON m.user.id = r.child.id " +
-		"WHERE r.parent.id = :userId AND m.family.id = :familyId")
-	List<Member> findChildren(Long familyId, Long userId);
+	@Query("select m from Member m where m.family.id = :familyId and (m.memberRole = 'SON' or m.memberRole = 'DAUGHTER') ")
+	List<Member> findChildren(Long familyId);
 
 	Optional<Member> findByUser_IdAndFamily(Long userId, Family family);
 
