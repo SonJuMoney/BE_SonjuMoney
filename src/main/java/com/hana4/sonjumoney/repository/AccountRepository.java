@@ -22,15 +22,14 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
 	Long user(User user);
 
-	@Query("""
-		    SELECT a
-		    FROM Account a
-		    WHERE a.id IN (
-		        SELECT at.depositAccount.id
-		        FROM AutoTransfer at
-		        JOIN Account aw ON at.withdrawalAccount.id = aw.id
-		        WHERE aw.user.id = :userId
-		    )
-		""")
+	@Query(value = """
+						select acc.id, acc.accountNum, acc.balance, acc.account_type_id
+								from Account acc\s
+						inner join
+						User u
+						on u.residentNum = acc.deputyResidentNum
+						where u.id = :userId
+						
+		""", nativeQuery = true)
 	Optional<List<Account>> findSavingAccountsByUserId(Long userId);
 }
