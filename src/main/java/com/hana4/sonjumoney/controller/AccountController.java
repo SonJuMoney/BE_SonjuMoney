@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hana4.sonjumoney.dto.request.CreateAccountRequest;
@@ -78,9 +79,10 @@ public class AccountController {
 
 	/*특정 적금계좌 이체내역 조회*/
 	@GetMapping("/savings/{account_id}")
-	public ResponseEntity<List<GetSavingAccountResponse>> getSavingAccountTransaction(Authentication authentication,
+	public ResponseEntity<GetSavingAccountResponse> getSavingAccountTransaction(@RequestParam Integer page,
+		Authentication authentication,
 		@PathVariable(value = "account_id") Long accountId) {
 		Long userId = AuthenticationUtil.getUserId(authentication);
-		return ResponseEntity.ok().body(accountService.getSavingAccount(userId, accountId));
+		return ResponseEntity.ok().body(accountService.getSavingAccount(userId, accountId, page));
 	}
 }

@@ -1,9 +1,12 @@
 package com.hana4.sonjumoney.service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +20,7 @@ import com.hana4.sonjumoney.domain.enums.AccountProduct;
 import com.hana4.sonjumoney.domain.enums.Bank;
 import com.hana4.sonjumoney.domain.enums.TransactionType;
 import com.hana4.sonjumoney.dto.AllowanceDto;
+import com.hana4.sonjumoney.dto.SavingAccountContentDto;
 import com.hana4.sonjumoney.dto.TransactionHistoryDto;
 import com.hana4.sonjumoney.dto.TransferDto;
 import com.hana4.sonjumoney.dto.request.CreateSavingAccountRequest;
@@ -26,6 +30,8 @@ import com.hana4.sonjumoney.dto.response.CreateAccountResponse;
 import com.hana4.sonjumoney.dto.response.CreateSavingAccountResponse;
 import com.hana4.sonjumoney.dto.response.GetSavingAccountResponse;
 import com.hana4.sonjumoney.dto.response.SavingAccountInfoResponse;
+import com.hana4.sonjumoney.dto.response.SavingAccountResultDto;
+import com.hana4.sonjumoney.dto.response.SavingAccountTransactionDto;
 import com.hana4.sonjumoney.dto.response.TransferResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
@@ -47,6 +53,8 @@ public class AccountService {
 	private final AccountTypeRepository accountTypeRepository;
 	private final AutoTransferRepository autoTransferRepository;
 	private final TransactionHistoryRepository transactionHistoryRepository;
+
+	private final Integer PAGE_SIZE = 3;
 
 	@Transactional
 	public void makeTransferByUserId(AllowanceDto allowanceDto) {
@@ -231,21 +239,56 @@ public class AccountService {
 		}
 	}
 
-	public List<GetSavingAccountResponse> getSavingAccount(Long userId, Long opponentAccountId) {
+	/*특정 적금계좌 이체내역 조회*/
+	public GetSavingAccountResponse getSavingAccount(Long userId, Long opponentAccountId, Integer page) {
+		PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE);
 		Account userAccount = accountRepository.findByUserId(userId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		Account opponentAccount = accountRepository.findById(opponentAccountId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
-		List<TransactionHistory> transactionHistories = transactionHistoryRepository.findByAccountIdAndOpponentAccountId(
-			userAccount.getId(), opponentAccountId);
-		return transactionHistories.stream()
-			.map(transactionHistory -> GetSavingAccountResponse.of(
-				opponentAccount.getUser().getUsername(),
-				opponentAccount.getUser().getProfileLink(),
-				transactionHistory.getCreatedAt(),
-				transactionHistory.getMessage(),
-				transactionHistory.getAmount(),
-				transactionHistory.getAfterBalance()
-			)).toList();
+
+		try {
+			List<LocalDate> dateList = transactionHistoryRepository.findDistinctDates(userAccount.getId(),
+				opponentAccountId, pageRequest);
+			List<TransactionHistory> transactionHistories = transactionHistoryRepository.findByDates(
+				userAccount.getId(), opponentAccountId, dateList);
+			if (transactionHistories.isEmpty()) {
+				return GetSavingAccountResponse.builder()
+					.isSuccess(true)
+					.code(200)
+					.message("요청 성공")
+					.result(SavingAccountResultDto.builder()
+						.hasNext(false)
+						.page(page)
+						.contents(new ArrayList<>())
+						.build())
+					.build();
+			}
+			List<SavingAccountContentDto> contents = new ArrayList<>();
+			List<SavingAccountTransactionDto> transactions = new ArrayList<>();
+			Boolean hasNext = transactionHistoryRepository.hasNext(userAccount.getId(), opponentAccountId,
+				transactionHistories.get(transactionHistories.size() - 1).getId());
+			for (LocalDate localDate : dateList) {
+				for (TransactionHistory transactionHistory : transactionHistories) {
+					transactions.add(SavingAccountTransactionDto.of(
+						opponentAccount.getUser().getUsername(),
+						opponentAccount.getUser().getProfileLink(),
+						transactionHistory.getCreatedAt(),
+						transactionHistory.getMessage(),
+						transactionHistory.getAmount(),
+						transactionHistory.getAfterBalance()));
+				}
+				contents.add(
+					SavingAccountContentDto.of(
+						localDate, transactions));
+
+			}
+
+			SavingAccountResultDto result = SavingAccountResultDto.of(hasNext, page, contents);
+			return GetSavingAccountResponse.of(true, 200, "요청 성공", result);
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+
 	}
 }
