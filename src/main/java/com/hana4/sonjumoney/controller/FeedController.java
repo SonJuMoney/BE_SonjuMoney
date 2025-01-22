@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -14,10 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.hana4.sonjumoney.dto.request.CreateFeedRequest;
+import com.hana4.sonjumoney.dto.request.PostFeedCommentRequest;
 import com.hana4.sonjumoney.dto.response.CreateFeedResponse;
-import com.hana4.sonjumoney.dto.response.FeedLikeResponse;
 import com.hana4.sonjumoney.dto.response.DeleteFeedResponse;
+import com.hana4.sonjumoney.dto.response.FeedLikeResponse;
 import com.hana4.sonjumoney.dto.response.FeedResponse;
+import com.hana4.sonjumoney.dto.response.PostFeedCommentResponse;
 import com.hana4.sonjumoney.service.FeedService;
 import com.hana4.sonjumoney.util.AuthenticationUtil;
 
@@ -60,6 +63,14 @@ public class FeedController {
 		Long userId = AuthenticationUtil.getUserId(authentication);
 		FeedLikeResponse response = feedService.postFeedLike(userId, feedId);
 		return ResponseEntity.ok().body(response);
+	}
 
+	@PostMapping("/{feed_id}/comments")
+	public ResponseEntity<PostFeedCommentResponse> postFeedComment(Authentication authentication,
+		@PathVariable(value = "feed_id") Long feedId, @RequestBody
+	PostFeedCommentRequest postFeedCommentRequest) {
+		Long userId = AuthenticationUtil.getUserId(authentication);
+		PostFeedCommentResponse response = feedService.postFeedComment(userId, feedId, postFeedCommentRequest);
+		return ResponseEntity.ok().body(response);
 	}
 }

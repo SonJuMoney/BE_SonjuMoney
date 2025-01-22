@@ -16,18 +16,19 @@ import com.hana4.sonjumoney.domain.FeedContent;
 import com.hana4.sonjumoney.domain.Member;
 import com.hana4.sonjumoney.domain.enums.ContentType;
 import com.hana4.sonjumoney.domain.enums.FeedType;
+import com.hana4.sonjumoney.dto.ContentPrefix;
 import com.hana4.sonjumoney.dto.CreateAllowanceThanksDto;
 import com.hana4.sonjumoney.dto.FeedContentCommentDto;
 import com.hana4.sonjumoney.dto.FeedContentContentDto;
 import com.hana4.sonjumoney.dto.FeedContentDto;
 import com.hana4.sonjumoney.dto.FeedResultDto;
-import com.hana4.sonjumoney.dto.CreateAllowanceThanksDto;
-import com.hana4.sonjumoney.dto.ContentPrefix;
 import com.hana4.sonjumoney.dto.request.CreateFeedRequest;
+import com.hana4.sonjumoney.dto.request.PostFeedCommentRequest;
 import com.hana4.sonjumoney.dto.response.CreateFeedResponse;
-import com.hana4.sonjumoney.dto.response.FeedLikeResponse;
 import com.hana4.sonjumoney.dto.response.DeleteFeedResponse;
+import com.hana4.sonjumoney.dto.response.FeedLikeResponse;
 import com.hana4.sonjumoney.dto.response.FeedResponse;
+import com.hana4.sonjumoney.dto.response.PostFeedCommentResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.CommentRepository;
@@ -79,7 +80,7 @@ public class FeedService {
 				if (contentType != null) {
 					if (contentType.startsWith("image/")) {
 						images.add(file);
-					}else if (contentType.startsWith("video/")) {
+					} else if (contentType.startsWith("video/")) {
 						videos.add(file);
 					}
 				}
@@ -200,6 +201,8 @@ public class FeedService {
 					feedContentCommentDtos.add(FeedContentCommentDto.of(
 						comment.getId(),
 						comment.getMember().getUser().getId(),
+						comment.getMember().getUser().getUsername(),
+						comment.getMember().getUser().getId().equals(userId),
 						comment.getMember().getUser().getProfileLink(),
 						comment.getMessage(),
 						!comment.getCreatedAt().equals(comment.getUpdatedAt()),
@@ -246,5 +249,32 @@ public class FeedService {
 
 		return FeedLikeResponse.of(200, "요청 성공");
 
+	}
+
+	public PostFeedCommentResponse postFeedComment(Long userId, Long feedId,
+		PostFeedCommentRequest postFeedCommentRequest) {
+		Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		Long familyId = feed.getMember().getFamily().getId();
+		if (!memberRepository.existsByUserIdAndFamilyId(userId, familyId)) {
+			throw new CommonException(ErrorCode.FORBIDDEN);
+		}
+		try {
+			Member member = memberRepository.findByUserIdAndFamilyId(userId, familyId)
+				.orElseThrow(() -> new CommonException(ErrorCode.FORBIDDEN));
+			Comment comment = Comment.builder()
+				.feed(feed)
+				.member(member)
+				.message(postFeedCommentRequest.message())
+				.build();
+			commentRepository.save(comment);
+		} catch (CommonException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+		return PostFeedCommentResponse.builder()
+			.code(200)
+			.message("요청 성공")
+			.build();
 	}
 }
