@@ -25,6 +25,7 @@ import com.hana4.sonjumoney.dto.FeedResultDto;
 import com.hana4.sonjumoney.dto.request.CreateFeedRequest;
 import com.hana4.sonjumoney.dto.request.PostFeedCommentRequest;
 import com.hana4.sonjumoney.dto.response.CreateFeedResponse;
+import com.hana4.sonjumoney.dto.response.DeleteFeedCommentResponse;
 import com.hana4.sonjumoney.dto.response.DeleteFeedResponse;
 import com.hana4.sonjumoney.dto.response.FeedLikeResponse;
 import com.hana4.sonjumoney.dto.response.FeedResponse;
@@ -255,9 +256,6 @@ public class FeedService {
 		PostFeedCommentRequest postFeedCommentRequest) {
 		Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		Long familyId = feed.getMember().getFamily().getId();
-		if (!memberRepository.existsByUserIdAndFamilyId(userId, familyId)) {
-			throw new CommonException(ErrorCode.FORBIDDEN);
-		}
 		try {
 			Member member = memberRepository.findByUserIdAndFamilyId(userId, familyId)
 				.orElseThrow(() -> new CommonException(ErrorCode.FORBIDDEN));
@@ -273,6 +271,28 @@ public class FeedService {
 			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
 		}
 		return PostFeedCommentResponse.builder()
+			.code(200)
+			.message("요청 성공")
+			.build();
+	}
+
+	public DeleteFeedCommentResponse deleteFeedComment(Long userId, Long commentId) {
+		try {
+			Comment comment = commentRepository.findById(commentId)
+				.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+			Long familyId = comment.getMember().getFamily().getId();
+			Member member = memberRepository.findByUserIdAndFamilyId(userId, familyId)
+				.orElseThrow(() -> new CommonException(ErrorCode.FORBIDDEN));
+			if (!comment.getMember().equals(member)) {
+				throw new CommonException(ErrorCode.FORBIDDEN);
+			}
+			commentRepository.delete(comment);
+		} catch (CommonException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+		return DeleteFeedCommentResponse.builder()
 			.code(200)
 			.message("요청 성공")
 			.build();
