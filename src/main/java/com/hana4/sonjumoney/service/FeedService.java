@@ -201,6 +201,8 @@ public class FeedService {
 					feedContentCommentDtos.add(FeedContentCommentDto.of(
 						comment.getId(),
 						comment.getMember().getUser().getId(),
+						comment.getMember().getUser().getUsername(),
+						comment.getMember().getUser().getId().equals(userId),
 						comment.getMember().getUser().getProfileLink(),
 						comment.getMessage(),
 						!comment.getCreatedAt().equals(comment.getUpdatedAt()),
