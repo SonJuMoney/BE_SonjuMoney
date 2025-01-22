@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.hana4.sonjumoney.dto.request.CreateFeedRequest;
 import com.hana4.sonjumoney.dto.response.CreateFeedResponse;
+import com.hana4.sonjumoney.dto.response.FeedLikeResponse;
 import com.hana4.sonjumoney.dto.response.FeedResponse;
 import com.hana4.sonjumoney.service.FeedService;
 import com.hana4.sonjumoney.util.AuthenticationUtil;
@@ -50,5 +51,14 @@ public class FeedController {
 		Long userId = AuthenticationUtil.getUserId(authentication);
 		FeedResponse response = feedService.getFeeds(userId, familyId, page);
 		return ResponseEntity.ok().body(response);
+	}
+
+	@PostMapping("/{feed_id}/likes")
+	public ResponseEntity<FeedLikeResponse> postFeedLike(Authentication authentication,
+		@PathVariable(value = "feed_id") Long feedId) {
+		Long userId = AuthenticationUtil.getUserId(authentication);
+		FeedLikeResponse response = feedService.postFeedLike(userId, feedId);
+		return ResponseEntity.ok().body(response);
+
 	}
 }
