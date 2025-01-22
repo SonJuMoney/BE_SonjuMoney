@@ -82,6 +82,12 @@ public class FamilyService {
 			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
 		}
 
+		// 가족이 없는 유저 대상 본인 제외 혹은 자녀만 조회할 때 가족 정보 + 빈 members 전달하도록 처리
+		if (members.isEmpty()) {
+			Family family = familyRepository.findById(familyId)
+				.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+			return GetFamilyMemberResponse.of(familyId, family.getFamilyName(), members);
+		}
 		return GetFamilyMemberResponse.of(familyId, members.get(0).getFamily().getFamilyName(), members);
 	}
 
