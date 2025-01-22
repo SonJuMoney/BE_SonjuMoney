@@ -22,14 +22,6 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
 	Long user(User user);
 
-	@Query(value = """
-						select acc.id, acc.accountNum, acc.balance, acc.account_type_id
-								from Account acc\s
-						inner join
-						User u
-						on u.residentNum = acc.deputyResidentNum
-						where u.id = :userId
-						
-		""", nativeQuery = true)
+	@Query("select acc from Account acc join fetch User u on u.residentNum = acc.deputyResidentNum where u.id = :userId")
 	Optional<List<Account>> findSavingAccountsByUserId(Long userId);
 }
