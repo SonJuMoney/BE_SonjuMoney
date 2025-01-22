@@ -16,11 +16,11 @@ import com.hana4.sonjumoney.domain.FeedContent;
 import com.hana4.sonjumoney.domain.Member;
 import com.hana4.sonjumoney.domain.enums.ContentType;
 import com.hana4.sonjumoney.domain.enums.FeedType;
+import com.hana4.sonjumoney.dto.CreateAllowanceThanksDto;
 import com.hana4.sonjumoney.dto.FeedContentCommentDto;
 import com.hana4.sonjumoney.dto.FeedContentContentDto;
 import com.hana4.sonjumoney.dto.FeedContentDto;
 import com.hana4.sonjumoney.dto.FeedResultDto;
-import com.hana4.sonjumoney.dto.CreateAllowanceThanksDto;
 import com.hana4.sonjumoney.dto.ImagePrefix;
 import com.hana4.sonjumoney.dto.request.CreateFeedRequest;
 import com.hana4.sonjumoney.dto.response.CreateFeedResponse;
@@ -78,7 +78,7 @@ public class FeedService {
 		Allowance allowance = createAllowanceThanksDto.allowance();
 		Member sender = allowance.getSender();
 		Member receiver = allowance.getReceiver();
-		boolean  contentExist = createAllowanceThanksDto.image() != null;
+		boolean contentExist = createAllowanceThanksDto.image() != null;
 		String message = createAllowanceThanksDto.message();
 
 		Feed savedFeed = feedRepository.save(
@@ -153,6 +153,7 @@ public class FeedService {
 				String writerImage = feed.getMember().getUser().getProfileLink();
 				FeedType feedType = feed.getFeedType();
 				String message = feed.getFeedMessage();
+				Integer like = feed.getLikes();
 				Boolean isUpdate = !feed.getCreatedAt().equals(feed.getUpdatedAt());
 				LocalDateTime createdAt = feed.getCreatedAt();
 				List<FeedContentContentDto> feedContentContentDtos = new ArrayList<>();
@@ -187,6 +188,7 @@ public class FeedService {
 					writerImage,
 					feedType,
 					message,
+					like,
 					isUpdate,
 					createdAt,
 					feedContentContentDtos,
