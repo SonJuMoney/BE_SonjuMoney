@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.hana4.sonjumoney.dto.request.CreateFeedRequest;
 import com.hana4.sonjumoney.dto.request.PostFeedCommentRequest;
 import com.hana4.sonjumoney.dto.response.CreateFeedResponse;
+import com.hana4.sonjumoney.dto.response.DeleteFeedCommentResponse;
 import com.hana4.sonjumoney.dto.response.DeleteFeedResponse;
 import com.hana4.sonjumoney.dto.response.FeedLikeResponse;
 import com.hana4.sonjumoney.dto.response.FeedResponse;
@@ -71,6 +72,14 @@ public class FeedController {
 	PostFeedCommentRequest postFeedCommentRequest) {
 		Long userId = AuthenticationUtil.getUserId(authentication);
 		PostFeedCommentResponse response = feedService.postFeedComment(userId, feedId, postFeedCommentRequest);
+		return ResponseEntity.ok().body(response);
+	}
+
+	@DeleteMapping("/{feed_id}/comments/{comment_id}")
+	public ResponseEntity<DeleteFeedCommentResponse> deleteFeedComment(Authentication authentication,
+		@PathVariable(value = "feed_id") Long feedId, @PathVariable(value = "comment_id") Long commentId) {
+		Long userId = AuthenticationUtil.getUserId(authentication);
+		DeleteFeedCommentResponse response = feedService.deleteFeedComment(userId, feedId, commentId);
 		return ResponseEntity.ok().body(response);
 	}
 }
