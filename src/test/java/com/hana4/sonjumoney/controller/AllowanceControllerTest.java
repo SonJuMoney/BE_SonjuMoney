@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hana4.sonjumoney.ControllerTest;
@@ -28,6 +29,8 @@ import com.hana4.sonjumoney.domain.Member;
 import com.hana4.sonjumoney.domain.enums.AlarmStatus;
 import com.hana4.sonjumoney.domain.enums.AlarmType;
 import com.hana4.sonjumoney.dto.request.SendAllowanceRequest;
+import com.hana4.sonjumoney.dto.request.SendThanksRequest;
+import com.hana4.sonjumoney.dto.response.SendAllowanceResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.AlarmRepository;
@@ -106,6 +109,47 @@ class AllowanceControllerTest extends ControllerTest {
 			.andExpect(jsonPath("$.sender_name").value(allowance.getSender().getUser().getUsername()))
 			.andExpect(jsonPath("$.amount").value(allowance.getAmount()));
 
+	}
+
+	@Test
+	@DisplayName("allowance-thanks-test")
+	void createAllowanceThanksTest() throws Exception{
+		doNothing().when(alarmHandler).sendUserAlarm(any(SendAlarmDto.class));
+
+		SendAllowanceRequest request = new SendAllowanceRequest(3L, 5000L, "용돈 잘 쓰렴");
+		MockMultipartFile data = new MockMultipartFile(
+			"data",
+			"",
+			"application/json",
+			objectMapper.writeValueAsString(request).getBytes(StandardCharsets.UTF_8)
+		);
+		String api = "/api/allowances";
+		ResultActions resultActions = mockMvc.perform(multipart(api)
+				.file(data)
+				.contentType(MediaType.MULTIPART_FORM_DATA)
+				.header("Authorization", "Bearer " + accessToken))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.message").value("송금을 완료했습니다."));
+
+		SendAllowanceResponse sendAllowanceResponse = objectMapper.readValue(
+			resultActions.andReturn().getResponse().getContentAsString(), SendAllowanceResponse.class);
+		Long allowanceId = sendAllowanceResponse.allowanceId();
+		api = "/api/allowances/" + allowanceId + "/thanks";
+		SendThanksRequest sendThanksRequest = SendThanksRequest.builder().message("감사합니다!").build();
+		data = new MockMultipartFile(
+			"data",
+			"",
+			"application/json",
+			objectMapper.writeValueAsString(sendThanksRequest).getBytes(StandardCharsets.UTF_8)
+		);
+		mockMvc.perform(multipart(api)
+				.file(data)
+				.contentType(MediaType.MULTIPART_FORM_DATA)
+				.header("Authorization", "Bearer " + accessToken))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.message").value("감사 메시지를 전송했습니다."));
 
 	}
 }

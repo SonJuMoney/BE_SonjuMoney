@@ -16,7 +16,6 @@ import com.hana4.sonjumoney.domain.FeedContent;
 import com.hana4.sonjumoney.domain.Member;
 import com.hana4.sonjumoney.domain.enums.ContentType;
 import com.hana4.sonjumoney.domain.enums.FeedType;
-import com.hana4.sonjumoney.dto.CreateAllowanceDto;
 import com.hana4.sonjumoney.dto.FeedContentCommentDto;
 import com.hana4.sonjumoney.dto.FeedContentContentDto;
 import com.hana4.sonjumoney.dto.FeedContentDto;

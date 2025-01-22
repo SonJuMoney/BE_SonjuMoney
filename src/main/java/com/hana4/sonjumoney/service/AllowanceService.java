@@ -49,15 +49,15 @@ public class AllowanceService {
 		accountService.makeTransferByUserId(AllowanceDto.of(sender.getUser().getId(), receiver.getUser().getId(),
 			sendAllowanceRequest.amount()));
 
-		Allowance allowance = allowanceRepository.save(
+		Allowance savedAllowance = allowanceRepository.save(
 			new Allowance(sender,receiver,sendAllowanceRequest.amount())
 		);
 		Long feedId = feedService.saveAllowanceFeed(
-			CreateAllowanceThanksDto.of(allowance, image, sendAllowanceRequest.message()));
+			CreateAllowanceThanksDto.of(savedAllowance, image, sendAllowanceRequest.message()));
 
 		alarmService.createOneOffAlarm(
 			CreateAlarmDto.of(receiver.getUser().getId(), sender.getId(), feedId, AlarmType.ALLOWANCE));
-		return SendAllowanceResponse.of("송금을 완료했습니다.");
+		return SendAllowanceResponse.of(200, "송금을 완료했습니다.", savedAllowance.getId());
 	}
 
 	public SendThanksResponse sendThanks(MultipartFile image, Long userId, Long allowanceId,SendThanksRequest sendThanksRequest) {
@@ -69,7 +69,7 @@ public class AllowanceService {
 		Long feedId = feedService.saveThanksFeed(CreateAllowanceThanksDto.of(allowance, image, thanksMessage));
 		alarmService.createOneOffAlarm(
 			CreateAlarmDto.of(receiver.getUser().getId(), sender.getId(), feedId, AlarmType.THANKS));
-		return SendThanksResponse.of(200, "감사메시지를 전송했습니다.");
+		return SendThanksResponse.of(200, "감사 메시지를 전송했습니다.");
 	}
 
 	public AllowanceInfoResponse getAllowanceById(Long allowanceId) {
