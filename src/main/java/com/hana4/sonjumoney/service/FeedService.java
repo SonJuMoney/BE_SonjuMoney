@@ -35,7 +35,9 @@ import com.hana4.sonjumoney.repository.MemberRepository;
 import com.hana4.sonjumoney.util.ContentUtil;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FeedService {
@@ -58,11 +60,12 @@ public class FeedService {
 		} else {
 			contentExist = true;
 		}
-
+		log.info("contents: " + contentExist);
 		Feed savedFeed = feedRepository.save(
 			new Feed(writer, null, null, contentExist, 0, feedMessage, FeedType.NORMAL));
 
 		if (contentExist) {
+			log.info("컨텐츠 업로드 진입");
 			List<MultipartFile> images = new ArrayList<>();
 			List<MultipartFile> videos = new ArrayList<>();
 			for (MultipartFile file : files) {
@@ -70,6 +73,7 @@ public class FeedService {
 					continue;
 				}
 				String contentType = file.getContentType();
+				log.info("컨텐츠: " + contentType);
 				if (contentType != null) {
 					if (contentType.startsWith("image/")) {
 						images.add(file);
@@ -81,6 +85,7 @@ public class FeedService {
 			List<String> contentsUrl = s3Service.uploadImagesToS3(images, ContentPrefix.FEED, savedFeed.getId());
 			contentsUrl.addAll(videoService.uploadVideos(videos, ContentPrefix.FEED, savedFeed.getId()));
 			for (String contentUrl : contentsUrl) {
+				log.info("컨텐츠 url: " + contentUrl);
 				feedContentRepository.save(
 					new FeedContent(savedFeed, contentUrl));
 			}

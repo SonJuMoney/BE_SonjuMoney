@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.hana4.sonjumoney.dto.ContentExtension;
 import com.hana4.sonjumoney.dto.ContentPrefix;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
@@ -48,6 +49,7 @@ public class VideoService {
 		Path filePath = Paths.get(directoryPath, fileName);
 		try (OutputStream os = Files.newOutputStream(filePath)) {
 			os.write(video.getBytes());
+			log.info(filePath.toString());
 			return filePath.toString();
 		} catch (IOException e) {
 			log.error("file upload failed", e);
@@ -75,7 +77,7 @@ public class VideoService {
 	}
 
 	private void checkFileType(String extension) {
-		if (!extension.equals(".mp4")) {
+		if (!extension.equals(ContentExtension.MP4.getUploadExtension())) {
 			throw new CommonException(ErrorCode.WRONG_FILE_TYPE);
 		}
 	}
