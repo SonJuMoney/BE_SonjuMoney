@@ -45,6 +45,9 @@ public class Account {
 	@Column(name = "holder_resident_num", length = 14, nullable = false)
 	private String holderResidentNum;
 
+	@Column(name = "deputy_resident_num", length = 14, nullable = false)
+	private String deputyResidentNum;
+
 	@Column(name = "account_num", length = 20, nullable = false)
 	private String accountNum;
 
@@ -55,12 +58,14 @@ public class Account {
 	private Long balance;
 
 	@Builder
-	public Account(AccountType accountType, User user, Bank bank, String holderResidentNum, String accountNum,
+	public Account(AccountType accountType, User user, Bank bank, String holderResidentNum, String deputyResidentNum,
+		String accountNum,
 		String accountPassword, Long balance) {
 		this.accountType = accountType;
 		this.user = user;
 		this.bank = bank;
 		this.holderResidentNum = holderResidentNum;
+		this.deputyResidentNum = deputyResidentNum;
 		this.accountNum = accountNum;
 		this.accountPassword = accountPassword;
 		this.balance = balance;

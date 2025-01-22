@@ -1,8 +1,10 @@
 package com.hana4.sonjumoney.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.hana4.sonjumoney.domain.Account;
@@ -19,4 +21,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 	Optional<Account> findByHolderResidentNum(String residentNum);
 
 	Long user(User user);
+
+	@Query("select acc from Account acc join fetch User u on u.residentNum = acc.deputyResidentNum where u.id = :userId")
+	Optional<List<Account>> findSavingAccountsByUserId(Long userId);
 }

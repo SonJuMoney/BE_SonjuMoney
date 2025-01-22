@@ -1,5 +1,6 @@
 package com.hana4.sonjumoney.service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -19,6 +20,7 @@ import com.hana4.sonjumoney.dto.request.CreateSavingAccountRequest;
 import com.hana4.sonjumoney.dto.response.AccountInfoResponse;
 import com.hana4.sonjumoney.dto.response.CreateAccountResponse;
 import com.hana4.sonjumoney.dto.response.CreateSavingAccountResponse;
+import com.hana4.sonjumoney.dto.response.SavingAccountInfoResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.AccountRepository;
@@ -140,6 +142,16 @@ public class AccountService {
 
 		accountRepository.save(account);
 		return CreateSavingAccountResponse.of(200, "적금계좌 개설 완료");
+	}
+
+	public List<SavingAccountInfoResponse> findSavingAccounts(Long userId) {
+		List<Account> accounts = accountRepository.findSavingAccountsByUserId(userId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+
+		return accounts.stream()
+			.map(account -> SavingAccountInfoResponse.of(account.getId(),
+				account.getAccountType().getAccountProduct().getName(), Bank.HANA, account.getAccountNum(),
+				account.getBalance())).toList();
 	}
 
 	private String makeRandomAccountNum() {

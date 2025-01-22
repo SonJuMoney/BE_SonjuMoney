@@ -73,4 +73,16 @@ public class AccountControllerTest extends ControllerTest {
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk());
 	}
+
+	@Test
+	@DisplayName("적금 계좌(들) 조회 테스트")
+	void findSavingAccountsTest() throws Exception {
+		String api = "/api/accounts/savings";
+
+		mockMvc.perform(get(api)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
 }
