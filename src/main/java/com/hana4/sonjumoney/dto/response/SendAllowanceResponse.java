@@ -1,14 +1,21 @@
 package com.hana4.sonjumoney.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Builder;
 
 @Builder
 public record SendAllowanceResponse(
-        String message
+    Integer code,
+    String message,
+    @JsonProperty("allowance_id")
+    Long allowanceId
 ) {
-    public static SendAllowanceResponse of(String message) {
+    public static SendAllowanceResponse of(Integer code, String message, Long allowanceId) {
         return SendAllowanceResponse.builder()
-                .message(message)
-                .build();
+            .code(code)
+            .message(message)
+            .allowanceId(allowanceId)
+            .build();
     }
 }
