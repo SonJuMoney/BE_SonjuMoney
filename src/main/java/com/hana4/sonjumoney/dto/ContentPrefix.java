@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum ImagePrefix {
+public enum ContentPrefix {
 	ALLOWANCE("allowance/"),
 	THANKS("thanks/"),
 	FEED("feed/"),

@@ -12,9 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.hana4.sonjumoney.dto.ImagePrefix;
+import com.hana4.sonjumoney.dto.ContentPrefix;
 import com.hana4.sonjumoney.exception.CommonException;
-import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.util.ContentUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,7 @@ public class S3Service {
 	@Value("${spring.cloud.aws.s3.cloudfront.baseurl}")
 	private String baseUrl;
 
-	public List<String> uploadImagesToS3(MultipartFile[] images, ImagePrefix prefix, Long feedId) {
+	public List<String> uploadImagesToS3(List<MultipartFile> images, ContentPrefix prefix, Long feedId) {
 		List<String> urlList = new ArrayList<>();
 		for (MultipartFile image : images) {
 			String contentUrl = uploadImageToS3(image, prefix, feedId);
@@ -46,10 +45,10 @@ public class S3Service {
 		return urlList;
 	}
 
-	public String uploadImageToS3(MultipartFile image, ImagePrefix prefix, Long feedId) {
+	public String uploadImageToS3(MultipartFile image, ContentPrefix prefix, Long feedId) {
 		String originalFilename = image.getOriginalFilename();
 		if (originalFilename == null) {
-			throw new IllegalArgumentException("파일이름은 null 일 수 없습니다.");
+			throw new CommonException(WRONG_FILE_NAME);
 		}
 		String extension = ContentUtil.getExtension(originalFilename);
 		String s3FileName = prefix.getPrefix() + feedId + "/" + createFileName(originalFilename);

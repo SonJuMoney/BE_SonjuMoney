@@ -18,6 +18,9 @@ public enum ErrorCode {
 	DIFFERENT_FAMILY(40005, HttpStatus.BAD_REQUEST, "같은 가족이 아닙니다."),
 	BAD_URL_FROM(40006, HttpStatus.BAD_REQUEST, "잘못된 url 형식입니다."),
 	WRONG_ALARM_TYPE(40007, HttpStatus.BAD_REQUEST, "알림타입이 잘못되었습니다."),
+	WRONG_FILE_NAME(40008, HttpStatus.BAD_REQUEST, "파일 이름은 null일 수 없습니다."),
+	WRONG_FILE_TYPE(40009, HttpStatus.BAD_REQUEST, "잘못된 확장자입니다."),
+	EXCESSIVE_SIZE(40010, HttpStatus.BAD_REQUEST, "비디오 크기는 10GB를 넘을 수 없습니다."),
 
 	//401
 	UNAUTHORIZED(40100, HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),
@@ -44,6 +47,7 @@ public enum ErrorCode {
 	S3_PROCESS_FAILED(50001, HttpStatus.INTERNAL_SERVER_ERROR, "컨텐츠 작업에 실패했습니다."),
 	TRANSACTION_FAILED(50002, HttpStatus.INTERNAL_SERVER_ERROR, "거래가 실패했습니다."),
 	ALARM_SEND_FAILED(50003, HttpStatus.INTERNAL_SERVER_ERROR, "알림 전송에 실패했습니다."),
+	VIDEO_UPLOAD_FAILED(50004, HttpStatus.INTERNAL_SERVER_ERROR, "비디오 업로드에 실패했습니다."),
 	;
 	private final Integer code;
 	private final HttpStatus httpStatus;
