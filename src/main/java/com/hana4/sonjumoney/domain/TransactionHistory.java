@@ -33,9 +33,9 @@ public class TransactionHistory extends BaseEntity {
 	private Account account;
 
 	@Column(nullable = false)
-	private Integer amount;
+	private Long amount;
 
-	@Column(length = 20, nullable = false)
+	@Column(length = 300, nullable = false)
 	private String message;
 
 	@Column(name = "transaction_type", nullable = false)
@@ -45,14 +45,18 @@ public class TransactionHistory extends BaseEntity {
 	@Column(name = "after_balance", nullable = false)
 	private Long afterBalance;
 
+	@Column(name = "opponent_account_id", nullable = false)
+	private Long opponentAccountId;
+
 	@Builder
-	public TransactionHistory(Account account, Integer amount, String message, TransactionType transactionType,
-		Long afterBalance) {
+	public TransactionHistory(Account account, Long amount, String message, TransactionType transactionType,
+		Long afterBalance, Long opponentAccountId) {
 		this.account = account;
 		this.amount = amount;
 		this.message = message;
 		this.transactionType = transactionType;
 		this.afterBalance = afterBalance;
+		this.opponentAccountId = opponentAccountId;
 	}
 
 }
