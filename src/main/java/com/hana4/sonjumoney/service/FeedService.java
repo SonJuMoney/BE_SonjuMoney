@@ -24,6 +24,7 @@ import com.hana4.sonjumoney.dto.FeedResultDto;
 import com.hana4.sonjumoney.dto.ImagePrefix;
 import com.hana4.sonjumoney.dto.request.CreateFeedRequest;
 import com.hana4.sonjumoney.dto.response.CreateFeedResponse;
+import com.hana4.sonjumoney.dto.response.FeedLikeResponse;
 import com.hana4.sonjumoney.dto.response.FeedResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
@@ -202,5 +203,18 @@ public class FeedService {
 		} catch (Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
 		}
+	}
+
+	public FeedLikeResponse postFeedLike(Long feedId) {
+		Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		try {
+			feed.plusLike();
+			feedRepository.save(feed);
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+
+		return FeedLikeResponse.of(200, "요청 성공");
+
 	}
 }

@@ -64,4 +64,8 @@ public class Feed extends BaseEntity {
 		this.feedMessage = feedMessage;
 		this.feedType = feedType;
 	}
+
+	public void plusLike() {
+		this.likes += 1;
+	}
 }
