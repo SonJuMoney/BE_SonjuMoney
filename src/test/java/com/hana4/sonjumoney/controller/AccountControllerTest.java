@@ -130,4 +130,15 @@ public class AccountControllerTest extends ControllerTest {
 		assertThat(afterSenderBalance).isEqualTo(beforeSenderBalance - amount);
 		assertThat(afterRecieverBalance).isEqualTo(beforeRecieverBalance + amount);
 	}
+
+	@Test
+	@Transactional
+	@DisplayName("특정 적금계좌 이체내역 조회")
+	void getSavingAccountTransactionTest() throws Exception {
+		mockMvc.perform(get("/api/accounts/savings/{account_id}", 2)
+				.header("Authorization", "Bearer " + accessToken)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
 }
