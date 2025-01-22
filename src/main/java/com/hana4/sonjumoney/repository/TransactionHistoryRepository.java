@@ -13,19 +13,33 @@ import com.hana4.sonjumoney.domain.TransactionHistory;
 
 @Repository
 public interface TransactionHistoryRepository extends JpaRepository<TransactionHistory, Long> {
-	List<TransactionHistory> findByAccountIdAndOpponentAccountIdOOrderByCreatedAtDesc(Long AccountId,
-		Long OpponentAccountId,
-		Pageable pageable);
 
-	Boolean hasNext(@Param("account_id") Long accountId, @Param("opponent_account_id") Long opponentAccountId,
-		@Param("last_id") Long lastId);
-
-	@Query("SELECT DISTINCT DATE(th.createdAt) FROM TransactionHistory th " +
+	@Query("SELECT CASE WHEN COUNT(th) > 0 THEN true ELSE false END " +
+		"FROM TransactionHistory th " +
 		"WHERE th.account.id = :accountId AND th.opponentAccountId = :opponentAccountId " +
-		"ORDER BY th.createdAt DESC")
-	List<LocalDate> findDistinctDates(@Param("accountId") Long accountId,
+		"AND th.id < :lastTransactionId")
+	Boolean hasNext(@Param("accountId") Long accountId,
 		@Param("opponentAccountId") Long opponentAccountId,
-		Pageable pageable);
+		@Param("lastTransactionId") Long lastTransactionId);
+
+	/*@Query("SELECT CASE WHEN COUNT(th) > 0 THEN true ELSE false END " +
+		"FROM TransactionHistory th " +
+		"WHERE th.account.id = :accountId AND th.opponentAccountId = :opponentAccountId " +
+		"AND th.createdAt < :lastTransactionDate")
+	Boolean hasNext(@Param("accountId") Long accountId,
+		@Param("opponentAccountId") Long opponentAccountId,
+		@Param("lastTransactionDate") LocalDateTime lastTransactionDate);*/
+
+	@Query("SELECT DISTINCT DATE(th.createdAt) " +
+		"FROM TransactionHistory th " +
+		"WHERE th.account.id = :accountId AND th.opponentAccountId = :opponentAccountId " +
+		"GROUP BY DATE(th.createdAt) " +
+		"ORDER BY MAX(th.createdAt) DESC")
+	List<Object[]> findDistinctDatesAsObjects(
+		@Param("accountId") Long accountId,
+		@Param("opponentAccountId") Long opponentAccountId,
+		Pageable pageable
+	);
 
 	@Query("SELECT th FROM TransactionHistory th " +
 		"WHERE th.account.id = :accountId " +

@@ -1,5 +1,7 @@
 package com.hana4.sonjumoney.dto.response;
 
+import com.hana4.sonjumoney.dto.SavingAccountResultDto;
+
 import lombok.Builder;
 
 @Builder

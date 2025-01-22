@@ -1,8 +1,6 @@
-package com.hana4.sonjumoney.dto.response;
+package com.hana4.sonjumoney.dto;
 
 import java.util.List;
-
-import com.hana4.sonjumoney.dto.SavingAccountContentDto;
 
 import lombok.Builder;
 

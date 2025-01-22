@@ -3,8 +3,6 @@ package com.hana4.sonjumoney.dto;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.hana4.sonjumoney.dto.response.SavingAccountTransactionDto;
-
 import lombok.Builder;
 
 @Builder

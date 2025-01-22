@@ -1,4 +1,4 @@
-package com.hana4.sonjumoney.dto.response;
+package com.hana4.sonjumoney.dto;
 
 import java.time.LocalDateTime;
 
