@@ -127,6 +127,8 @@ public class AccountService {
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 		AccountType accountType = accountTypeRepository.findById(accountTypeId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		User parent = userRepository.findById(parentId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 
 		String randomAccountNum = makeRandomAccountNum();
 
@@ -135,6 +137,7 @@ public class AccountService {
 			.user(user)
 			.bank(Bank.HANA)
 			.holderResidentNum(user.getResidentNum())
+			.deputyResidentNum(parent.getResidentNum())
 			.accountNum(randomAccountNum)
 			.accountPassword(request.accountPassword())
 			.balance(0L)
