@@ -1,5 +1,6 @@
 package com.hana4.sonjumoney.controller;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -7,19 +8,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hana4.sonjumoney.ControllerTest;
+import com.hana4.sonjumoney.domain.Account;
 import com.hana4.sonjumoney.dto.request.CreateAccountRequest;
 import com.hana4.sonjumoney.dto.request.CreateSavingAccountRequest;
+import com.hana4.sonjumoney.dto.request.SendMoneyRequest;
+import com.hana4.sonjumoney.repository.AccountRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class AccountControllerTest extends ControllerTest {
+
+	@Autowired
+	AccountRepository accountRepository;
 
 	@Test
 	@Transactional
@@ -84,5 +92,42 @@ public class AccountControllerTest extends ControllerTest {
 				.header("Authorization", "Bearer " + accessToken))
 			.andExpect(status().isOk())
 			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("적금 계좌 송금 테스트 user1 -> user3 (account1 -> account2)")
+	void sendMoneyToSavingAccountTest() throws Exception {
+		String accountId = "2";
+		String api = "/api/accounts/savings/" + accountId + "/transfer";
+
+		Account senderAccount = accountRepository.findByUserId(1L).get();
+		Account recieverAccount = accountRepository.findById(Long.parseLong(accountId)).get();
+		Long beforeSenderBalance = senderAccount.getBalance();
+		Long beforeRecieverBalance = recieverAccount.getBalance();
+		Long amount = 1000L;
+		System.out.println(beforeSenderBalance);
+		System.out.println(beforeRecieverBalance);
+
+		SendMoneyRequest request = SendMoneyRequest.builder()
+			.amount(amount)
+			.password("123456")
+			.message("돈 보낸다")
+			.build();
+
+		String requestBody = objectMapper.writeValueAsString(request);
+		mockMvc.perform(post(api)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + accessToken)
+				.content(requestBody))
+			.andExpect(status().isOk())
+			.andDo(print());
+
+		Long afterSenderBalance = senderAccount.getBalance();
+		Long afterRecieverBalance = recieverAccount.getBalance();
+		System.out.println(afterSenderBalance);
+		System.out.println(afterRecieverBalance);
+
+		assertThat(afterSenderBalance).isEqualTo(beforeSenderBalance - amount);
+		assertThat(afterRecieverBalance).isEqualTo(beforeRecieverBalance + amount);
 	}
 }
