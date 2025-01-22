@@ -64,7 +64,7 @@ class AllowanceControllerTest extends ControllerTest {
 		doNothing().when(alarmHandler).sendUserAlarm(any(SendAlarmDto.class));
 		SendAllowanceRequest request = new SendAllowanceRequest(3L, 5000L, "용돈 잘 쓰렴");
 		MockMultipartFile image = new MockMultipartFile(
-			"image",
+			"file",
 			"test-image.png",
 			MediaType.IMAGE_PNG_VALUE,
 			new byte[] {}

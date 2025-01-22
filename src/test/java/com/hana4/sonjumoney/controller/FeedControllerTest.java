@@ -1,10 +1,14 @@
 package com.hana4.sonjumoney.controller;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
@@ -22,9 +26,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hana4.sonjumoney.ControllerTest;
 import com.hana4.sonjumoney.domain.Feed;
+import com.hana4.sonjumoney.domain.FeedContent;
 import com.hana4.sonjumoney.domain.enums.FeedType;
 import com.hana4.sonjumoney.dto.request.CreateFeedRequest;
 import com.hana4.sonjumoney.dto.response.CreateFeedResponse;
+import com.hana4.sonjumoney.exception.CommonException;
+import com.hana4.sonjumoney.exception.ErrorCode;
+import com.hana4.sonjumoney.repository.FeedContentRepository;
 import com.hana4.sonjumoney.repository.FeedRepository;
 import com.hana4.sonjumoney.repository.MemberRepository;
 
@@ -38,6 +46,8 @@ class FeedControllerTest extends ControllerTest {
 	@Autowired
 	private FeedRepository feedRepository;
 
+	@Autowired
+	private FeedContentRepository feedContentRepository;
 	private Long feedId;
 	@Autowired
 	private MemberRepository memberRepository;
@@ -48,16 +58,22 @@ class FeedControllerTest extends ControllerTest {
 		// given
 		CreateFeedRequest request = new CreateFeedRequest(1L, "즐거운 여행~");
 		MockMultipartFile image1 = new MockMultipartFile(
-			"images",
+			"files",
 			"feed-test-image1.png",
 			MediaType.IMAGE_PNG_VALUE,
-			new byte[] {}
+			new byte[] {1}
 		);
 		MockMultipartFile image2 = new MockMultipartFile(
-			"images",
+			"files",
 			"feed-test-image2.png",
 			MediaType.IMAGE_PNG_VALUE,
-			new byte[] {}
+			new byte[] {2}
+		);
+		MockMultipartFile video3 = new MockMultipartFile(
+			"files",
+			"feed-test-video3.mp4",
+			"video/mp4",
+			new byte[] {3}
 		);
 		MockMultipartFile data = new MockMultipartFile(
 			"data",
@@ -70,6 +86,7 @@ class FeedControllerTest extends ControllerTest {
 		ResultActions resultActions = mockMvc.perform(multipart(api)
 				.file(image1)
 				.file(image2)
+				.file(video3)
 				.file(data)
 				.contentType(MediaType.MULTIPART_FORM_DATA)
 				.header("Authorization", "Bearer " + accessToken))
@@ -79,6 +96,14 @@ class FeedControllerTest extends ControllerTest {
 		CreateFeedResponse createFeedResponse = objectMapper.readValue(
 			resultActions.andReturn().getResponse().getContentAsString(), CreateFeedResponse.class);
 		feedId = createFeedResponse.feedId();
+		Feed savedFeed = feedRepository.findById(feedId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		List<FeedContent> feedContents = feedContentRepository.findAllByFeed(savedFeed);
+		List<String> urls = feedContents.stream().map(FeedContent::getContentUrl).toList();
+		for (FeedContent content : feedContents) {
+			assertNotNull(content.getContentUrl(),"URL should not be null");
+		}
+		Files.delete(Paths.get(urls.get(2)));
 	}
 
 	@Test
@@ -90,13 +115,13 @@ class FeedControllerTest extends ControllerTest {
 			"images",
 			"feed-test-image1.png",
 			MediaType.IMAGE_PNG_VALUE,
-			new byte[] {}
+			new byte[] {1}
 		);
 		MockMultipartFile image2 = new MockMultipartFile(
 			"images",
 			"feed-test-image2.png",
 			MediaType.IMAGE_PNG_VALUE,
-			new byte[] {}
+			new byte[] {2}
 		);
 		MockMultipartFile data = new MockMultipartFile(
 			"data",

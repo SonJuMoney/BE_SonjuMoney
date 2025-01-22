@@ -21,7 +21,8 @@ import com.hana4.sonjumoney.dto.FeedContentCommentDto;
 import com.hana4.sonjumoney.dto.FeedContentContentDto;
 import com.hana4.sonjumoney.dto.FeedContentDto;
 import com.hana4.sonjumoney.dto.FeedResultDto;
-import com.hana4.sonjumoney.dto.ImagePrefix;
+import com.hana4.sonjumoney.dto.CreateAllowanceThanksDto;
+import com.hana4.sonjumoney.dto.ContentPrefix;
 import com.hana4.sonjumoney.dto.request.CreateFeedRequest;
 import com.hana4.sonjumoney.dto.response.CreateFeedResponse;
 import com.hana4.sonjumoney.dto.response.FeedLikeResponse;
@@ -35,7 +36,9 @@ import com.hana4.sonjumoney.repository.MemberRepository;
 import com.hana4.sonjumoney.util.ContentUtil;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FeedService {
@@ -43,27 +46,47 @@ public class FeedService {
 	private final FeedRepository feedRepository;
 	private final FeedContentRepository feedContentRepository;
 	private final S3Service s3Service;
+	private final VideoService videoService;
 	private static final int PAGE_SIZE = 30;
 	private final CommentRepository commentRepository;
 
 	@Transactional
-	public CreateFeedResponse saveNormalFeed(Long userId, MultipartFile[] images, CreateFeedRequest createFeedRequest) {
+	public CreateFeedResponse saveNormalFeed(Long userId, MultipartFile[] files, CreateFeedRequest createFeedRequest) {
 		Member writer = memberRepository.findByUserIdAndFamilyId(userId, createFeedRequest.familyId())
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		String feedMessage = createFeedRequest.message();
 		boolean contentExist;
-		if (images == null || images.length == 0) {
+		if (files == null || files.length == 0) {
 			contentExist = false;
 		} else {
 			contentExist = true;
 		}
-
+		log.info("contents: " + contentExist);
 		Feed savedFeed = feedRepository.save(
 			new Feed(writer, null, null, contentExist, 0, feedMessage, FeedType.NORMAL));
 
 		if (contentExist) {
-			List<String> contentsUrl = s3Service.uploadImagesToS3(images, ImagePrefix.FEED, savedFeed.getId());
+			log.info("컨텐츠 업로드 진입");
+			List<MultipartFile> images = new ArrayList<>();
+			List<MultipartFile> videos = new ArrayList<>();
+			for (MultipartFile file : files) {
+				if (file.isEmpty()) {
+					continue;
+				}
+				String contentType = file.getContentType();
+				log.info("컨텐츠: " + contentType);
+				if (contentType != null) {
+					if (contentType.startsWith("image/")) {
+						images.add(file);
+					}else if (contentType.startsWith("video/")) {
+						videos.add(file);
+					}
+				}
+			}
+			List<String> contentsUrl = s3Service.uploadImagesToS3(images, ContentPrefix.FEED, savedFeed.getId());
+			contentsUrl.addAll(videoService.uploadVideos(videos, ContentPrefix.FEED, savedFeed.getId()));
 			for (String contentUrl : contentsUrl) {
+				log.info("컨텐츠 url: " + contentUrl);
 				feedContentRepository.save(
 					new FeedContent(savedFeed, contentUrl));
 			}
@@ -86,7 +109,7 @@ public class FeedService {
 			new Feed(sender, allowance, receiver.getId(), contentExist, 0, message, FeedType.ALLOWANCE));
 
 		if (contentExist) {
-			String contentUrl = s3Service.uploadImageToS3(createAllowanceThanksDto.image(), ImagePrefix.ALLOWANCE,
+			String contentUrl = s3Service.uploadImageToS3(createAllowanceThanksDto.image(), ContentPrefix.ALLOWANCE,
 				savedFeed.getId());
 
 			feedContentRepository.save(new FeedContent(savedFeed, contentUrl));
@@ -106,7 +129,7 @@ public class FeedService {
 			new Feed(sender, allowance, receiver.getId(), contentExist, 0, message, FeedType.THANKS));
 
 		if (contentExist) {
-			String contentUrl = s3Service.uploadImageToS3(createAllowanceThanksDto.image(), ImagePrefix.THANKS,
+			String contentUrl = s3Service.uploadImageToS3(createAllowanceThanksDto.image(), ContentPrefix.THANKS,
 				savedFeed.getId());
 
 			feedContentRepository.save(new FeedContent(savedFeed, contentUrl));
