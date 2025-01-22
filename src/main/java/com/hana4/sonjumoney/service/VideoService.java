@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class VideoService {
-	private static final long MAX_FILE_SIZE = 1024L * 1024L * 1024L * 10L;
+	private static final long MAX_FILE_SIZE = 1024L * 1024L * 1024L * 5L;
 
 	public List<String> uploadVideos(List<MultipartFile> videos, ContentPrefix prefix, Long feedId) {
 		List<String> contentList = new ArrayList<>();
