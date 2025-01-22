@@ -26,6 +26,7 @@ import com.hana4.sonjumoney.dto.ContentPrefix;
 import com.hana4.sonjumoney.dto.request.CreateFeedRequest;
 import com.hana4.sonjumoney.dto.response.CreateFeedResponse;
 import com.hana4.sonjumoney.dto.response.FeedLikeResponse;
+import com.hana4.sonjumoney.dto.response.DeleteFeedResponse;
 import com.hana4.sonjumoney.dto.response.FeedResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
@@ -138,7 +139,7 @@ public class FeedService {
 	}
 
 	@Transactional
-	public void deleteFeedById(Long userId, Long feedId) {
+	public DeleteFeedResponse deleteFeedById(Long userId, Long feedId) {
 		Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		if (!userId.equals(feed.getMember().getUser().getId())) {
 			throw new CommonException(ErrorCode.UNAUTHORIZED);
@@ -148,6 +149,8 @@ public class FeedService {
 			s3Service.deleteImage(feedContent.getContentUrl());
 		}
 		feedContentRepository.deleteFeedContentsByFeedId(feedId);
+		feedRepository.delete(feed);
+		return DeleteFeedResponse.of(200, "삭제가 완료되었습니다.");
 	}
 
 	public FeedResponse getFeeds(Long userId, Long familyId, Integer page) {
