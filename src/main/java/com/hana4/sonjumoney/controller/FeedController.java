@@ -75,11 +75,11 @@ public class FeedController {
 		return ResponseEntity.ok().body(response);
 	}
 
-	@DeleteMapping("/{feed_id}/comments/{comment_id}")
+	@DeleteMapping("/comments/{comment_id}")
 	public ResponseEntity<DeleteFeedCommentResponse> deleteFeedComment(Authentication authentication,
-		@PathVariable(value = "feed_id") Long feedId, @PathVariable(value = "comment_id") Long commentId) {
+		@PathVariable(value = "comment_id") Long commentId) {
 		Long userId = AuthenticationUtil.getUserId(authentication);
-		DeleteFeedCommentResponse response = feedService.deleteFeedComment(userId, feedId, commentId);
+		DeleteFeedCommentResponse response = feedService.deleteFeedComment(userId, commentId);
 		return ResponseEntity.ok().body(response);
 	}
 }

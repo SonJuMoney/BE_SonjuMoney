@@ -28,6 +28,7 @@ import com.hana4.sonjumoney.ControllerTest;
 import com.hana4.sonjumoney.domain.Comment;
 import com.hana4.sonjumoney.domain.Feed;
 import com.hana4.sonjumoney.domain.FeedContent;
+import com.hana4.sonjumoney.domain.Member;
 import com.hana4.sonjumoney.domain.enums.FeedType;
 import com.hana4.sonjumoney.dto.request.CreateFeedRequest;
 import com.hana4.sonjumoney.dto.request.PostFeedCommentRequest;
@@ -229,5 +230,34 @@ class FeedControllerTest extends ControllerTest {
 			.andExpect(status().isOk());
 		Comment inserted = commentRepository.findAllByFeed(result).get(0);
 		Assertions.assertThat(inserted.getMessage()).isEqualTo(comment);
+	}
+
+	@Test
+	@Order(6)
+	void DeleteCommentTest() throws Exception {
+		Member member = memberRepository.findByUserIdAndFamilyId(1L, 1L).orElseThrow();
+		String commentMessage = "ㅠㅠ";
+		Feed feed = Feed.builder()
+			.member(member)
+			.allowance(null)
+			.receiverId(null)
+			.contentExist(true)
+			.likes(0)
+			.feedMessage("ㅋㅋ")
+			.feedType(FeedType.NORMAL)
+			.build();
+		Feed insertedFeed = feedRepository.saveAndFlush(feed);
+		Comment comment = Comment.builder()
+			.feed(insertedFeed)
+			.member(member)
+			.message(commentMessage)
+			.build();
+		Comment insertedComment = commentRepository.saveAndFlush(comment);
+
+		String api = "/api/feeds/comments/" + insertedComment.getId();
+		mockMvc.perform(delete(api).header("Authorization", "Bearer " + accessToken)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk());
+		Assertions.assertThat(commentRepository.findById(insertedComment.getId()).isEmpty());
 	}
 }

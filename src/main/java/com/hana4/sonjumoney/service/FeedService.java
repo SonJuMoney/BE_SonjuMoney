@@ -276,14 +276,13 @@ public class FeedService {
 			.build();
 	}
 
-	public DeleteFeedCommentResponse deleteFeedComment(Long userId, Long feedId, Long commentId) {
-		Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
-		Long familyId = feed.getMember().getFamily().getId();
+	public DeleteFeedCommentResponse deleteFeedComment(Long userId, Long commentId) {
 		try {
-			Member member = memberRepository.findByUserIdAndFamilyId(userId, familyId)
-				.orElseThrow(() -> new CommonException(ErrorCode.FORBIDDEN));
 			Comment comment = commentRepository.findById(commentId)
 				.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+			Long familyId = comment.getMember().getFamily().getId();
+			Member member = memberRepository.findByUserIdAndFamilyId(userId, familyId)
+				.orElseThrow(() -> new CommonException(ErrorCode.FORBIDDEN));
 			if (!comment.getMember().equals(member)) {
 				throw new CommonException(ErrorCode.FORBIDDEN);
 			}
