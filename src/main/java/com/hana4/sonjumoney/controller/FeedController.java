@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.hana4.sonjumoney.dto.request.CreateFeedRequest;
 import com.hana4.sonjumoney.dto.response.CreateFeedResponse;
 import com.hana4.sonjumoney.dto.response.FeedLikeResponse;
+import com.hana4.sonjumoney.dto.response.DeleteFeedResponse;
 import com.hana4.sonjumoney.dto.response.FeedResponse;
 import com.hana4.sonjumoney.service.FeedService;
 import com.hana4.sonjumoney.util.AuthenticationUtil;
@@ -39,10 +40,10 @@ public class FeedController {
 	}
 
 	@DeleteMapping("/{feed_id}")
-	public ResponseEntity<Void> deleteFeed(Authentication authentication,
+	public ResponseEntity<DeleteFeedResponse> deleteFeed(Authentication authentication,
 		@PathVariable(value = "feed_id") Long feedId) {
-		feedService.deleteFeedById(AuthenticationUtil.getUserId(authentication), feedId);
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok().body(
+			feedService.deleteFeedById(AuthenticationUtil.getUserId(authentication), feedId));
 	}
 
 	@GetMapping
