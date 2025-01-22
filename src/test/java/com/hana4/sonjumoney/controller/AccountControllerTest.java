@@ -54,7 +54,7 @@ public class AccountControllerTest extends ControllerTest {
 
 	@Test
 	@Transactional
-	@DisplayName("적금 계좌 생성시 동일 입출금 계좌 예외 테스트")
+	@DisplayName("적금 계좌 생성 테스트")
 	void createSavingAccountTest() throws Exception {
 		String api = "/api/accounts/savings";
 
