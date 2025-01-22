@@ -19,6 +19,7 @@ import com.hana4.sonjumoney.domain.Family;
 import com.hana4.sonjumoney.domain.Member;
 import com.hana4.sonjumoney.dto.request.AddEventRequest;
 import com.hana4.sonjumoney.dto.request.UpdateEventRequest;
+import com.hana4.sonjumoney.dto.response.DeleteEventResponse;
 import com.hana4.sonjumoney.dto.response.EventParticipantResponse;
 import com.hana4.sonjumoney.dto.response.EventResponse;
 import com.hana4.sonjumoney.exception.CommonException;
@@ -210,12 +211,13 @@ public class EventService {
 	}
 
 	@Transactional
-	public void deleteEvent(Long userId, Long eventId) {
+	public DeleteEventResponse deleteEvent(Long userId, Long eventId) {
 		Event event = eventRepository.findById(eventId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		validateUserMember(userId, event.getFamily().getId());
 		eventRepository.delete(event);
 		eventParticipantRepository.deleteByEventId(eventId);
+		return DeleteEventResponse.of(200, "삭제 성공");
 	}
 
 	//사용자확인 메서드
