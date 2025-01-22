@@ -11,22 +11,28 @@ import com.hana4.sonjumoney.domain.Account;
 import com.hana4.sonjumoney.domain.AccountType;
 import com.hana4.sonjumoney.domain.AutoTransfer;
 import com.hana4.sonjumoney.domain.MockAccount;
+import com.hana4.sonjumoney.domain.TransactionHistory;
 import com.hana4.sonjumoney.domain.User;
 import com.hana4.sonjumoney.domain.enums.AccountProduct;
 import com.hana4.sonjumoney.domain.enums.Bank;
+import com.hana4.sonjumoney.domain.enums.TransactionType;
 import com.hana4.sonjumoney.dto.AllowanceDto;
+import com.hana4.sonjumoney.dto.TransactionHistoryDto;
 import com.hana4.sonjumoney.dto.TransferDto;
 import com.hana4.sonjumoney.dto.request.CreateSavingAccountRequest;
+import com.hana4.sonjumoney.dto.request.SendMoneyRequest;
 import com.hana4.sonjumoney.dto.response.AccountInfoResponse;
 import com.hana4.sonjumoney.dto.response.CreateAccountResponse;
 import com.hana4.sonjumoney.dto.response.CreateSavingAccountResponse;
 import com.hana4.sonjumoney.dto.response.SavingAccountInfoResponse;
+import com.hana4.sonjumoney.dto.response.TransferResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.AccountRepository;
 import com.hana4.sonjumoney.repository.AccountTypeRepository;
 import com.hana4.sonjumoney.repository.AutoTransferRepository;
 import com.hana4.sonjumoney.repository.MockAccountRepository;
+import com.hana4.sonjumoney.repository.TransactionHistoryRepository;
 import com.hana4.sonjumoney.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -39,6 +45,7 @@ public class AccountService {
 	private final UserRepository userRepository;
 	private final AccountTypeRepository accountTypeRepository;
 	private final AutoTransferRepository autoTransferRepository;
+	private final TransactionHistoryRepository transactionHistoryRepository;
 
 	@Transactional
 	public void makeTransferByUserId(AllowanceDto allowanceDto) {
@@ -48,22 +55,6 @@ public class AccountService {
 			AccountProduct.FREE_DEPOSIT).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		Long amount = allowanceDto.amount();
 		transfer(TransferDto.of(sender, receiver, amount));
-	}
-
-	@Transactional
-	protected void transfer(TransferDto transferDto) {
-		try {
-			Account sender = transferDto.sender();
-			Account receiver = transferDto.receiver();
-
-			sender.withdraw(transferDto.amount());
-			receiver.deposit(transferDto.amount());
-		} catch (CommonException e) {
-			throw new CommonException(ErrorCode.TRANSACTION_FAILED);
-		} catch (Exception e) {
-			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
-		}
-
 	}
 
 	public CreateAccountResponse makeAccount(Long userId, Long mockaccId) {
@@ -155,6 +146,75 @@ public class AccountService {
 			.map(account -> SavingAccountInfoResponse.of(account.getId(),
 				account.getAccountType().getAccountProduct().getName(), Bank.HANA, account.getAccountNum(),
 				account.getBalance())).toList();
+	}
+
+	@Transactional
+	public TransferResponse sendMoneyProcess(Long accountId, SendMoneyRequest request, Long userId) {
+		/* userId로 간편 비밀번호 인증이 되어야 다음 프로세스 수행 */
+		User user = userRepository.findById(userId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+		if (!request.password().equals(user.getPin())) {
+			throw new CommonException(ErrorCode.INVALID_PIN);
+		}
+
+		Account senderAccount = accountRepository.findByUserId(userId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		Account recieverAccount = accountRepository.findById(accountId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+
+		transfer(TransferDto.of(senderAccount, recieverAccount, request.amount()));
+
+		TransactionHistoryDto senderHistoryDto = TransactionHistoryDto.builder()
+			.account(senderAccount)
+			.amount(request.amount())
+			.message(request.message())
+			.afterBalance(senderAccount.getBalance())
+			.transactionType(TransactionType.WITHDRAW)
+			.opponentAccountId(recieverAccount.getId())
+			.build();
+
+		TransactionHistoryDto recieverHistoryDto = TransactionHistoryDto.builder()
+			.account(recieverAccount)
+			.amount(request.amount())
+			.message(request.message())
+			.afterBalance(recieverAccount.getBalance())
+			.transactionType(TransactionType.WITHDRAW)
+			.opponentAccountId(senderAccount.getId())
+			.build();
+
+		makeTransactionHistory(senderHistoryDto);
+		makeTransactionHistory(recieverHistoryDto);
+		return TransferResponse.of(201, "입,출금 완료");
+	}
+
+	@Transactional
+	protected void transfer(TransferDto transferDto) {
+		try {
+			Account sender = transferDto.sender();
+			Account receiver = transferDto.receiver();
+
+			sender.withdraw(transferDto.amount());
+			receiver.deposit(transferDto.amount());
+		} catch (CommonException e) {
+			throw new CommonException(ErrorCode.TRANSACTION_FAILED);
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+
+	}
+
+	@Transactional
+	protected void makeTransactionHistory(TransactionHistoryDto dto) {
+		/* 한번의 송금으로 2개의 거래내역 생성 */
+		TransactionHistory history = TransactionHistory.builder()
+			.account(dto.account())
+			.amount(dto.amount())
+			.message(dto.message())
+			.afterBalance(dto.afterBalance())
+			.transactionType(dto.transactionType())
+			.opponentAccountId(dto.opponentAccountId())
+			.build();
+
+		transactionHistoryRepository.save(history);
 	}
 
 	private String makeRandomAccountNum() {
