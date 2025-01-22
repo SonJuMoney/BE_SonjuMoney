@@ -54,8 +54,10 @@ public class FeedController {
 	}
 
 	@PostMapping("/{feed_id}/likes")
-	public ResponseEntity<FeedLikeResponse> postFeedLike(@PathVariable(value = "feed_id") Long feedId) {
-		FeedLikeResponse response = feedService.postFeedLike(feedId);
+	public ResponseEntity<FeedLikeResponse> postFeedLike(Authentication authentication,
+		@PathVariable(value = "feed_id") Long feedId) {
+		Long userId = AuthenticationUtil.getUserId(authentication);
+		FeedLikeResponse response = feedService.postFeedLike(userId, feedId);
 		return ResponseEntity.ok().body(response);
 
 	}

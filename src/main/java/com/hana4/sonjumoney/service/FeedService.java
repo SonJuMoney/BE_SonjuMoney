@@ -205,8 +205,12 @@ public class FeedService {
 		}
 	}
 
-	public FeedLikeResponse postFeedLike(Long feedId) {
+	public FeedLikeResponse postFeedLike(Long userId, Long feedId) {
 		Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		Long familyId = feed.getMember().getFamily().getId();
+		if (!memberRepository.existsByUserIdAndFamilyId(userId, familyId)) {
+			throw new CommonException(ErrorCode.FORBIDDEN);
+		}
 		try {
 			feed.plusLike();
 			feedRepository.save(feed);
