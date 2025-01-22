@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hana4.sonjumoney.dto.request.AddEventRequest;
 import com.hana4.sonjumoney.dto.request.UpdateEventRequest;
+import com.hana4.sonjumoney.dto.response.DeleteEventResponse;
 import com.hana4.sonjumoney.dto.response.EventResponse;
 import com.hana4.sonjumoney.service.EventService;
 import com.hana4.sonjumoney.util.AuthenticationUtil;
@@ -71,11 +72,10 @@ public class EventController {
 	}
 
 	@DeleteMapping("/{event_id}")
-	public ResponseEntity<Void> deleteEvent(Authentication authentication,
+	public ResponseEntity<DeleteEventResponse> deleteEvent(Authentication authentication,
 		@PathVariable(value = "event_id") Long eventId) {
 		Long userId = AuthenticationUtil.getUserId(authentication);
-		eventService.deleteEvent(userId, eventId);
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok().body(eventService.deleteEvent(userId, eventId));
 	}
 
 }
