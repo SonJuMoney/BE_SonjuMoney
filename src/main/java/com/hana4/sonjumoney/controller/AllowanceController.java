@@ -1,5 +1,6 @@
 package com.hana4.sonjumoney.controller;
 
+import com.hana4.sonjumoney.dto.request.SendThanksRequest;
 import com.hana4.sonjumoney.dto.response.AllowanceInfoResponse;
 import com.hana4.sonjumoney.dto.response.SendAllowanceResponse;
 
@@ -42,5 +43,17 @@ public class AllowanceController {
 	@GetMapping("/{allowance_id}")
 	public ResponseEntity<AllowanceInfoResponse> getAllowance(@PathVariable(value = "allowance_id") Long allowanceId) {
 		return ResponseEntity.ok().body(allowanceService.getAllowanceById(allowanceId));
+	}
+
+	@PostMapping("/{allowance_id}/thanks")
+	public ResponseEntity<?> sendThanks(Authentication authentication,
+		@PathVariable(value = "allowance_id") Long allowanceId,
+		@RequestPart(value = "image", required = false) MultipartFile image,
+		@RequestPart(value = "data") SendThanksRequest sendThanksRequest
+	) {
+
+		return ResponseEntity.ok()
+			.body(allowanceService.sendThanks(image, AuthenticationUtil.getUserId(authentication), allowanceId,
+				sendThanksRequest));
 	}
 }

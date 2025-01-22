@@ -8,14 +8,14 @@ import jakarta.annotation.Nullable;
 import lombok.Builder;
 
 @Builder
-public record CreateAllowanceDto(
+public record CreateAllowanceThanksDto(
 	Allowance allowance,
 	@Nullable
 	MultipartFile image,
 	String message
 ) {
-	public static CreateAllowanceDto of(Allowance allowance, MultipartFile image, String message) {
-		return CreateAllowanceDto.builder()
+	public static CreateAllowanceThanksDto of(Allowance allowance, MultipartFile image, String message) {
+		return CreateAllowanceThanksDto.builder()
 			.allowance(allowance)
 			.image(image)
 			.message(message)
