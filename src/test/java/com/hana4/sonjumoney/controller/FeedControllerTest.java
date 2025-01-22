@@ -25,13 +25,16 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hana4.sonjumoney.ControllerTest;
+import com.hana4.sonjumoney.domain.Comment;
 import com.hana4.sonjumoney.domain.Feed;
 import com.hana4.sonjumoney.domain.FeedContent;
 import com.hana4.sonjumoney.domain.enums.FeedType;
 import com.hana4.sonjumoney.dto.request.CreateFeedRequest;
+import com.hana4.sonjumoney.dto.request.PostFeedCommentRequest;
 import com.hana4.sonjumoney.dto.response.CreateFeedResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
+import com.hana4.sonjumoney.repository.CommentRepository;
 import com.hana4.sonjumoney.repository.FeedContentRepository;
 import com.hana4.sonjumoney.repository.FeedRepository;
 import com.hana4.sonjumoney.repository.MemberRepository;
@@ -51,6 +54,8 @@ class FeedControllerTest extends ControllerTest {
 	private Long feedId;
 	@Autowired
 	private MemberRepository memberRepository;
+	@Autowired
+	private CommentRepository commentRepository;
 
 	@Test
 	@Order(1)
@@ -101,7 +106,7 @@ class FeedControllerTest extends ControllerTest {
 		List<FeedContent> feedContents = feedContentRepository.findAllByFeed(savedFeed);
 		List<String> urls = feedContents.stream().map(FeedContent::getContentUrl).toList();
 		for (FeedContent content : feedContents) {
-			assertNotNull(content.getContentUrl(),"URL should not be null");
+			assertNotNull(content.getContentUrl(), "URL should not be null");
 		}
 		Files.delete(Paths.get(urls.get(2)));
 	}
@@ -175,8 +180,6 @@ class FeedControllerTest extends ControllerTest {
 				.param("page", "0"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.result.contents").isNotEmpty());
-
-		feedRepository.delete(feed);
 	}
 
 	@Test
@@ -201,7 +204,30 @@ class FeedControllerTest extends ControllerTest {
 
 		Feed updated = feedRepository.findById(feedId).orElseThrow();
 		Assertions.assertThat(updated.getLikes()).isEqualTo(1);
+	}
 
-		feedRepository.delete(feed);
+	@Test
+	@Order(5)
+	void postFeedCommentTest() throws Exception {
+		Feed feed = Feed.builder()
+			.member(memberRepository.findByUserIdAndFamilyId(1L, 1L).orElseThrow())
+			.allowance(null)
+			.receiverId(null)
+			.contentExist(true)
+			.likes(0)
+			.feedMessage("ㅋㅋ")
+			.feedType(FeedType.NORMAL)
+			.build();
+		Feed result = feedRepository.saveAndFlush(feed);
+		Long feedId = result.getId();
+		String api = "/api/feeds/" + feedId + "/comments";
+		String comment = "댓글ㅋㅋ";
+		PostFeedCommentRequest request = new PostFeedCommentRequest(comment);
+		mockMvc.perform(post(api).header("Authorization", "Bearer " + accessToken)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isOk());
+		Comment inserted = commentRepository.findAllByFeed(result).get(0);
+		Assertions.assertThat(inserted.getMessage()).isEqualTo(comment);
 	}
 }
