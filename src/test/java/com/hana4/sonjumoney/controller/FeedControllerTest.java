@@ -153,4 +153,30 @@ class FeedControllerTest extends ControllerTest {
 
 		feedRepository.delete(feed);
 	}
+
+	@Test
+	@Order(4)
+	void postFeedLikeTest() throws Exception {
+		Feed feed = Feed.builder()
+			.member(memberRepository.findByUserIdAndFamilyId(1L, 1L).orElseThrow())
+			.allowance(null)
+			.receiverId(null)
+			.contentExist(true)
+			.likes(0)
+			.feedMessage("ㅋㅋ")
+			.feedType(FeedType.NORMAL)
+			.build();
+		Feed result = feedRepository.saveAndFlush(feed);
+		Long feedId = result.getId();
+		String api = "/api/feeds/" + feedId + "/likes";
+
+		mockMvc.perform(post(api).header("Authorization", "Bearer " + accessToken)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk());
+
+		Feed updated = feedRepository.findById(feedId).orElseThrow();
+		Assertions.assertThat(updated.getLikes()).isEqualTo(1);
+
+		feedRepository.delete(feed);
+	}
 }
