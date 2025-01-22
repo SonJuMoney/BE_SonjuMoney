@@ -42,12 +42,17 @@ public class TransactionHistory extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private TransactionType transactionType;
 
+	@Column(name = "after_balance", nullable = false)
+	private Long afterBalance;
+
 	@Builder
-	public TransactionHistory(Account account, Integer amount, String message, TransactionType transactionType) {
+	public TransactionHistory(Account account, Integer amount, String message, TransactionType transactionType,
+		Long afterBalance) {
 		this.account = account;
 		this.amount = amount;
 		this.message = message;
 		this.transactionType = transactionType;
+		this.afterBalance = afterBalance;
 	}
 
 }
