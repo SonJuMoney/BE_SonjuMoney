@@ -1,5 +1,7 @@
 package com.hana4.sonjumoney.dto.response;
 
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Builder;
@@ -14,7 +16,7 @@ public record GetSavingAccountResponse(
 	String profileLink,
 
 	@JsonProperty("created_at")
-	String createdAt,
+	LocalDateTime createdAt,
 
 	String message,
 
@@ -24,7 +26,8 @@ public record GetSavingAccountResponse(
 	Long afterBalance
 
 ) {
-	public static GetSavingAccountResponse of(String userName, String profileLink, String createdAt, String message,
+	public static GetSavingAccountResponse of(String userName, String profileLink, LocalDateTime createdAt,
+		String message,
 		Long amount, Long afterBalance) {
 		return GetSavingAccountResponse.builder()
 			.userName(userName)

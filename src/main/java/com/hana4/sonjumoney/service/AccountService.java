@@ -24,6 +24,7 @@ import com.hana4.sonjumoney.dto.request.SendMoneyRequest;
 import com.hana4.sonjumoney.dto.response.AccountInfoResponse;
 import com.hana4.sonjumoney.dto.response.CreateAccountResponse;
 import com.hana4.sonjumoney.dto.response.CreateSavingAccountResponse;
+import com.hana4.sonjumoney.dto.response.GetSavingAccountResponse;
 import com.hana4.sonjumoney.dto.response.SavingAccountInfoResponse;
 import com.hana4.sonjumoney.dto.response.TransferResponse;
 import com.hana4.sonjumoney.exception.CommonException;
@@ -228,5 +229,23 @@ public class AccountService {
 			if (account.isEmpty())
 				return randomAccountNum;
 		}
+	}
+
+	public List<GetSavingAccountResponse> getSavingAccount(Long userId, Long opponentAccountId) {
+		Account userAccount = accountRepository.findByUserId(userId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		Account opponentAccount = accountRepository.findById(opponentAccountId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		List<TransactionHistory> transactionHistories = transactionHistoryRepository.findByAccountIdAndOpponentAccountId(
+			userAccount.getId(), opponentAccountId);
+		return transactionHistories.stream()
+			.map(transactionHistory -> GetSavingAccountResponse.of(
+				opponentAccount.getUser().getUsername(),
+				opponentAccount.getUser().getProfileLink(),
+				transactionHistory.getCreatedAt(),
+				transactionHistory.getMessage(),
+				transactionHistory.getAmount(),
+				transactionHistory.getAfterBalance()
+			)).toList();
 	}
 }
