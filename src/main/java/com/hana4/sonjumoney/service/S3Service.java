@@ -17,12 +17,14 @@ import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.util.ContentUtil;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.utils.IoUtils;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class S3Service {
@@ -92,6 +94,7 @@ public class S3Service {
 	private String getKeyFromUrl(String url) {
 		String domain = "https://" + baseUrl + "/";
 		if (!url.startsWith(domain)) {
+			log.error("Domain Error!! Expected: " + url + " Actual: " + domain);
 			throw new CommonException(BAD_REQUEST);
 		}
 		return url.substring(domain.length());
