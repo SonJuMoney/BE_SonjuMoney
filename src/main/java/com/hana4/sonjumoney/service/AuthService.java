@@ -1,6 +1,8 @@
 package com.hana4.sonjumoney.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,9 +13,11 @@ import org.springframework.stereotype.Service;
 import com.hana4.sonjumoney.domain.Relationship;
 import com.hana4.sonjumoney.domain.User;
 import com.hana4.sonjumoney.domain.enums.Gender;
+import com.hana4.sonjumoney.domain.enums.Role;
 import com.hana4.sonjumoney.dto.request.AuthPinRequest;
 import com.hana4.sonjumoney.dto.request.SignUpChildRequest;
 import com.hana4.sonjumoney.dto.request.SignUpRequest;
+import com.hana4.sonjumoney.dto.response.AuthListResponse;
 import com.hana4.sonjumoney.dto.response.DuplicationResponse;
 import com.hana4.sonjumoney.dto.response.PinValidResponse;
 import com.hana4.sonjumoney.dto.response.ReissueResponse;
@@ -198,5 +202,28 @@ public class AuthService implements UserDetailsService {
 			.code(200)
 			.message("요청을 성공했습니다.")
 			.build();
+	}
+
+	public List<AuthListResponse> getAuthList(Long userId) {
+		List<AuthListResponse> result = new ArrayList<>();
+		List<Relationship> relationships = relationshipRepository.findAllByUserId(userId);
+		if (relationships.isEmpty()) {
+			result.add(AuthListResponse.of(userId, Role.INDIVIDUAL, userRepository.findById(userId)
+				.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER))
+				.getUsername()));
+			return result;
+		}
+		try {
+			result.add(AuthListResponse.of(relationships.get(0).getParent().getId(), Role.PARENT,
+				relationships.get(0).getParent().getUsername()));
+
+			for (Relationship relationship : relationships) {
+				result.add(AuthListResponse.of(relationship.getChild().getId(), Role.CHILD,
+					relationship.getChild().getUsername()));
+			}
+			return result;
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
 	}
 }
