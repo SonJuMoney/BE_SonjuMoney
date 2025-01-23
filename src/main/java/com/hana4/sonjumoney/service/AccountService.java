@@ -300,12 +300,9 @@ public class AccountService {
 			List<SavingAccountTransactionDto> transactions = transactionHistories.stream()
 				.filter(transaction -> transaction.getCreatedAt().toLocalDate().equals(localDate))
 				.map(transaction -> SavingAccountTransactionDto.of(
-					opponentAccount.getUser().getUsername(),
-					opponentAccount.getUser().getProfileLink(),
 					transaction.getCreatedAt(),
 					transaction.getMessage(),
-					transaction.getAmount(),
-					transaction.getAfterBalance()))
+					transaction.getAmount()))
 				.collect(Collectors.toList());
 
 			contents.add(SavingAccountContentDto.of(localDate, transactions));
