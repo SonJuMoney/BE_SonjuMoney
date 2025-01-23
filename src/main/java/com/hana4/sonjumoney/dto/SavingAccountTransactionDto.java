@@ -9,33 +9,21 @@ import lombok.Builder;
 @Builder
 public record SavingAccountTransactionDto(
 
-	@JsonProperty("user_name")
-	String userName,
-
-	@JsonProperty("profile_link")
-	String profileLink,
-
 	@JsonProperty("created_at")
 	LocalDateTime createdAt,
 
 	String message,
 
-	Long amount,
-
-	@JsonProperty("after_balance")
-	Long afterBalance
+	Long amount
 
 ) {
-	public static SavingAccountTransactionDto of(String userName, String profileLink, LocalDateTime createdAt,
+	public static SavingAccountTransactionDto of(LocalDateTime createdAt,
 		String message,
-		Long amount, Long afterBalance) {
+		Long amount) {
 		return SavingAccountTransactionDto.builder()
-			.userName(userName)
-			.profileLink(profileLink)
 			.createdAt(createdAt)
 			.message(message)
 			.amount(amount)
-			.afterBalance(afterBalance)
 			.build();
 	}
 }
