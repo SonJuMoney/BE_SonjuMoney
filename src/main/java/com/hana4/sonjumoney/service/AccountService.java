@@ -2,6 +2,8 @@ package com.hana4.sonjumoney.service;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +36,7 @@ import com.hana4.sonjumoney.dto.request.SendMoneyRequest;
 import com.hana4.sonjumoney.dto.response.AccountInfoResponse;
 import com.hana4.sonjumoney.dto.response.CreateAccountResponse;
 import com.hana4.sonjumoney.dto.response.CreateSavingAccountResponse;
+import com.hana4.sonjumoney.dto.response.GetSavingAccountLimitResponse;
 import com.hana4.sonjumoney.dto.response.GetSavingAccountResponse;
 import com.hana4.sonjumoney.dto.response.SavingAccountInfoResponse;
 import com.hana4.sonjumoney.dto.response.SavingAccountResponse;
@@ -172,7 +175,7 @@ public class AccountService {
 				account.getAccountType().getAccountProduct().getName(), account.getUser().getUsername(), Bank.HANA,
 				account.getAccountNum(),
 				account.getBalance())).toList();
-		
+
 		return SavingAccountResponse.of(false, response);
 	}
 
@@ -320,6 +323,37 @@ public class AccountService {
 
 		SavingAccountResultDto result = SavingAccountResultDto.of(hasNext, page, contents);
 		return GetSavingAccountResponse.of(true, 200, "요청 성공", result);
+	}
+
+	public GetSavingAccountLimitResponse getSavingAccountLimit(Long userId, Long opponentAccountId) {
+		Account userAccount = accountRepository.findByUserId(userId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		Account opponentAccount = accountRepository.findById(opponentAccountId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		Long totalPayment;
+		Integer monthPayment;
+		LocalDateTime startOfDay = YearMonth.now().atDay(1).atStartOfDay();
+		LocalDateTime endOfDay = YearMonth.now().atEndOfMonth().atTime(23, 59, 59);
+		try {
+			totalPayment = transactionHistoryRepository.getTotalPayment(userAccount.getId(), opponentAccountId);
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+		try {
+			monthPayment = transactionHistoryRepository.getCurrentMonthPayment(userAccount.getId(), opponentAccountId,
+				startOfDay, endOfDay);
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+		Integer availableAmount = Math.max(500000 - monthPayment, 0);
+
+		return GetSavingAccountLimitResponse.of(
+			opponentAccount.getUser().getUsername(),
+			totalPayment,
+			monthPayment,
+			availableAmount
+		);
+
 	}
 
 }

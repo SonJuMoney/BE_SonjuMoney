@@ -1,6 +1,7 @@
 package com.hana4.sonjumoney.repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
@@ -52,4 +53,22 @@ public interface TransactionHistoryRepository extends JpaRepository<TransactionH
 		@Param("dates") List<LocalDate> dates
 	);
 
+	@Query("SELECT SUM(t.amount) " +
+		"FROM TransactionHistory t " +
+		"WHERE t.account.id = :accountId " +
+		"AND t.transactionType = 'WTIHDRAW'" +
+		"AND t.opponentAccountId = :opponentAccountId")
+	Long getTotalPayment(@Param("accountId") Long accountId, @Param("opponentAccountId") Long opponentAccountId);
+
+	@Query("SELECT SUM(t.amount) " +
+		"FROM TransactionHistory t " +
+		"WHERE t.account.id = :accountId " +
+		"AND t.transactionType = 'WTIHDRAW' " +
+		"AND t.createdAt BETWEEN :startOfMonth AND :endOfMonth "
+		+ "AND t.opponentAccountId = :opponentAccountId")
+	Integer getCurrentMonthPayment(
+		@Param("accountId") Long accountId,
+		@Param("opponentAccountId") Long opponentAccountId,
+		@Param("startOfMonth") LocalDateTime startOfMonth,
+		@Param("endOfMonth") LocalDateTime endOfMonth);
 }

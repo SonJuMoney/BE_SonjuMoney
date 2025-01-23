@@ -16,6 +16,7 @@ import com.hana4.sonjumoney.dto.request.SendMoneyRequest;
 import com.hana4.sonjumoney.dto.response.AccountInfoResponse;
 import com.hana4.sonjumoney.dto.response.CreateAccountResponse;
 import com.hana4.sonjumoney.dto.response.CreateSavingAccountResponse;
+import com.hana4.sonjumoney.dto.response.GetSavingAccountLimitResponse;
 import com.hana4.sonjumoney.dto.response.GetSavingAccountResponse;
 import com.hana4.sonjumoney.dto.response.SavingAccountResponse;
 import com.hana4.sonjumoney.dto.response.TransferResponse;
@@ -82,5 +83,12 @@ public class AccountController {
 		@PathVariable(value = "account_id") Long accountId) {
 		Long userId = AuthenticationUtil.getUserId(authentication);
 		return ResponseEntity.ok().body(accountService.getSavingAccount(userId, accountId, page));
+	}
+
+	@GetMapping("/savings/{account_id}/limit")
+	public ResponseEntity<GetSavingAccountLimitResponse> getLimit(Authentication authentication,
+		@PathVariable(value = "account_id") Long accountId) {
+		Long userId = AuthenticationUtil.getUserId(authentication);
+		return ResponseEntity.ok().body(accountService.getSavingAccountLimit(userId, accountId));
 	}
 }
