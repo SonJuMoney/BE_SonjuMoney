@@ -114,7 +114,7 @@ public class AccountControllerTest extends ControllerTest {
 
 		SendMoneyRequest request = SendMoneyRequest.builder()
 			.amount(amount)
-			.status(true)
+			.pin("123456")
 			.message("돈 보낸다")
 			.build();
 
@@ -144,7 +144,7 @@ public class AccountControllerTest extends ControllerTest {
 
 		SendMoneyRequest request = SendMoneyRequest.builder()
 			.amount(amount)
-			.status(false)
+			.pin("010101")
 			.message("돈 보낸다")
 			.build();
 
