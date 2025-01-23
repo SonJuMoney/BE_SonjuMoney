@@ -93,9 +93,9 @@ public class AlarmHandler extends TextWebSocketHandler {
 		sessions.add(session);
 		UriComponents uriComponents =
 			UriComponentsBuilder.fromUriString(Objects.requireNonNull(session.getUri()).toString()).build();
-		log.info("session id: " + session.getId() + " session uri: " + session.getUri() + " uid: "
-			+ uriComponents.getQueryParams().getFirst("uid"));
 		Long userId = (Long)session.getAttributes().get("userId");
+		log.info("session id: " + session.getId() + " session uri: " + session.getUri() + " userId: "
+			+ userId);
 		userAlarmSessionMap.put(userId, session);
 		List<Member> members = memberRepository.findAllByUserId(userId);
 		for (Member member : members) {
