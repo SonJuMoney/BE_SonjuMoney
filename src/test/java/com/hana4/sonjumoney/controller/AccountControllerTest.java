@@ -100,6 +100,7 @@ public class AccountControllerTest extends ControllerTest {
 	}
 
 	@Test
+	@Transactional
 	@DisplayName("적금 계좌 송금 테스트 user1 -> user3 (account1 -> account2)")
 	void sendMoneyToSavingAccountTest() throws Exception {
 		String accountId = "2";
@@ -110,12 +111,10 @@ public class AccountControllerTest extends ControllerTest {
 		Long beforeSenderBalance = senderAccount.getBalance();
 		Long beforeRecieverBalance = recieverAccount.getBalance();
 		Long amount = 1000L;
-		System.out.println(beforeSenderBalance);
-		System.out.println(beforeRecieverBalance);
 
 		SendMoneyRequest request = SendMoneyRequest.builder()
 			.amount(amount)
-			.password("123456")
+			.status(true)
 			.message("돈 보낸다")
 			.build();
 
@@ -129,11 +128,33 @@ public class AccountControllerTest extends ControllerTest {
 
 		Long afterSenderBalance = senderAccount.getBalance();
 		Long afterRecieverBalance = recieverAccount.getBalance();
-		System.out.println(afterSenderBalance);
-		System.out.println(afterRecieverBalance);
 
 		assertThat(afterSenderBalance).isEqualTo(beforeSenderBalance - amount);
 		assertThat(afterRecieverBalance).isEqualTo(beforeRecieverBalance + amount);
+	}
+
+	@Test
+	@Transactional
+	@DisplayName("무인증 적금 계좌 송금 요청에 대한 예외 테스트")
+	void statusFalseTransferTest() throws Exception {
+		String accountId = "2";
+		String api = "/api/accounts/savings/" + accountId + "/transfer";
+
+		Long amount = 1000L;
+
+		SendMoneyRequest request = SendMoneyRequest.builder()
+			.amount(amount)
+			.status(false)
+			.message("돈 보낸다")
+			.build();
+
+		String requestBody = objectMapper.writeValueAsString(request);
+		mockMvc.perform(post(api)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + accessToken)
+				.content(requestBody))
+			.andExpect(status().is4xxClientError())
+			.andDo(print());
 	}
 
 	@Test
