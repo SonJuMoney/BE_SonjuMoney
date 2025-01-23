@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hana4.sonjumoney.domain.Account;
 import com.hana4.sonjumoney.domain.AccountType;
 import com.hana4.sonjumoney.domain.AutoTransfer;
+import com.hana4.sonjumoney.domain.Member;
 import com.hana4.sonjumoney.domain.MockAccount;
 import com.hana4.sonjumoney.domain.TransactionHistory;
 import com.hana4.sonjumoney.domain.User;
@@ -35,12 +36,14 @@ import com.hana4.sonjumoney.dto.response.CreateAccountResponse;
 import com.hana4.sonjumoney.dto.response.CreateSavingAccountResponse;
 import com.hana4.sonjumoney.dto.response.GetSavingAccountResponse;
 import com.hana4.sonjumoney.dto.response.SavingAccountInfoResponse;
+import com.hana4.sonjumoney.dto.response.SavingAccountResponse;
 import com.hana4.sonjumoney.dto.response.TransferResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.AccountRepository;
 import com.hana4.sonjumoney.repository.AccountTypeRepository;
 import com.hana4.sonjumoney.repository.AutoTransferRepository;
+import com.hana4.sonjumoney.repository.MemberRepository;
 import com.hana4.sonjumoney.repository.MockAccountRepository;
 import com.hana4.sonjumoney.repository.TransactionHistoryRepository;
 import com.hana4.sonjumoney.repository.UserRepository;
@@ -58,6 +61,7 @@ public class AccountService {
 	private final AccountTypeRepository accountTypeRepository;
 	private final AutoTransferRepository autoTransferRepository;
 	private final TransactionHistoryRepository transactionHistoryRepository;
+	private final MemberRepository memberRepository;
 
 	private final AuthService authService;
 
@@ -154,15 +158,22 @@ public class AccountService {
 		return CreateSavingAccountResponse.of(200, "적금계좌 개설 완료");
 	}
 
-	public List<SavingAccountInfoResponse> findSavingAccounts(Long userId) {
+	public SavingAccountResponse findSavingAccounts(Long userId) {
+		List<Member> members = memberRepository.findMemberByMemberRoleAndUserId(userId);
+		if (!members.isEmpty()) {
+			return SavingAccountResponse.of(true, null);
+		}
+
 		List<Account> accounts = accountRepository.findSavingAccountsByUserId(userId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 
-		return accounts.stream()
+		List<SavingAccountInfoResponse> response = accounts.stream()
 			.map(account -> SavingAccountInfoResponse.of(account.getId(),
 				account.getAccountType().getAccountProduct().getName(), account.getUser().getUsername(), Bank.HANA,
 				account.getAccountNum(),
 				account.getBalance())).toList();
+		
+		return SavingAccountResponse.of(false, response);
 	}
 
 	@Transactional
