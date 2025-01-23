@@ -13,6 +13,9 @@ public record EventParticipantResponse(
 	@JsonProperty("member_id")
 	Long memberId,
 
+	@JsonProperty("member_role")
+	String memberRole,
+
 	@JsonProperty("user_name")
 	String userName,
 
@@ -24,6 +27,7 @@ public record EventParticipantResponse(
 		return EventParticipantResponse.builder()
 			.participationId(participant.getId())
 			.memberId(participant.getMember().getId())
+			.memberRole(participant.getMember().getMemberRole().getValue())
 			.userName(participant.getMember().getUser().getUsername())
 			.profileLink(participant.getMember().getUser().getProfileLink())
 			.build();
