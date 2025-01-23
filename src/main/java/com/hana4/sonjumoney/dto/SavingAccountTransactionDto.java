@@ -8,6 +8,8 @@ import lombok.Builder;
 
 @Builder
 public record SavingAccountTransactionDto(
+	@JsonProperty("user_name")
+	String userName,
 
 	@JsonProperty("created_at")
 	LocalDateTime createdAt,
@@ -17,10 +19,11 @@ public record SavingAccountTransactionDto(
 	Long amount
 
 ) {
-	public static SavingAccountTransactionDto of(LocalDateTime createdAt,
+	public static SavingAccountTransactionDto of(String userName, LocalDateTime createdAt,
 		String message,
 		Long amount) {
 		return SavingAccountTransactionDto.builder()
+			.userName(userName)
 			.createdAt(createdAt)
 			.message(message)
 			.amount(amount)

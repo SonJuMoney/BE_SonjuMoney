@@ -251,8 +251,6 @@ public class AccountService {
 		PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE);
 		Account userAccount = accountRepository.findByUserId(userId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
-		Account opponentAccount = accountRepository.findById(opponentAccountId)
-			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 
 		List<LocalDate> dateList;
 		try {
@@ -300,6 +298,7 @@ public class AccountService {
 			List<SavingAccountTransactionDto> transactions = transactionHistories.stream()
 				.filter(transaction -> transaction.getCreatedAt().toLocalDate().equals(localDate))
 				.map(transaction -> SavingAccountTransactionDto.of(
+					userAccount.getUser().getUsername(),
 					transaction.getCreatedAt(),
 					transaction.getMessage(),
 					transaction.getAmount()))
