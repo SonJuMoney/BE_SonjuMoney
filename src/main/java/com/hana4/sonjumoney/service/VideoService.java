@@ -2,7 +2,6 @@ package com.hana4.sonjumoney.service;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.http.HttpHeaders;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,9 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.http.*;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourceRegion;
+import org.springframework.http.HttpRange;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +23,7 @@ import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.util.ContentUtil;
 
+import io.jsonwebtoken.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -67,10 +69,27 @@ public class VideoService {
 			Resource resource = new FileSystemResource(path);
 			long chunkSize = 1024 * 1024;
 			long contentLength = resource.contentLength();
+			Assert.isTrue(contentLength > 0, "리소스 컨텐츠 길이는 0보다 커야합니다.");
 			ResourceRegion resourceRegion;
+			try {
+				HttpRange httpRange;
+				if (httpHeaders.getRange().stream().findFirst().isPresent()) {
+					httpRange = httpHeaders.getRange().stream().findFirst().get();
+					long start = httpRange.getRangeStart(contentLength);
+					long end = httpRange.getRangeEnd(contentLength);
+					long rangeLength = Long.min(chunkSize, end - start + 1);
 
-		} catch (Exception e) {
-			throw new CommonException(ErrorCode.VIDEO_STREAM_FAILED);
+					resourceRegion = new ResourceRegion(resource, start, rangeLength);
+				} else {
+					resourceRegion = new ResourceRegion(resource, 0, Long.min(chunkSize, resource.contentLength()));
+				}
+			} catch (Exception e) {
+				long rangeLength = Long.min(chunkSize, resource.contentLength());
+				resourceRegion = new ResourceRegion(resource, 0, rangeLength);
+			}
+
+		} catch (IOException e) {
+			throw new IllegalArgumentException("리소스의 컨텐츠 링크를 가져오지 못했습니다.", e);
 		}
 	}
 
