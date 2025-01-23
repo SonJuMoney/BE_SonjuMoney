@@ -23,8 +23,8 @@ public class WebsocketInterceptor implements HandshakeInterceptor {
 	public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
 		Map<String, Object> attributes) throws Exception {
 		HttpHeaders httpHeaders = request.getHeaders();
-		String token = httpHeaders.get("Authorization").toString();
-		token = token.substring(1, token.length() - 1);
+		String token = httpHeaders.get("Authorization").get(0);
+		token = token.substring(7);
 		// TODO 여기서 jwt 인증할 방법 찾기
 		Long userId = jwtUtil.getUserId(token);
 		attributes.put("userId", userId);
