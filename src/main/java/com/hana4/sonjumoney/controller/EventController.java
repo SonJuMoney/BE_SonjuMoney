@@ -77,5 +77,5 @@ public class EventController {
 		Long userId = AuthenticationUtil.getUserId(authentication);
 		return ResponseEntity.ok().body(eventService.deleteEvent(userId, eventId));
 	}
-
+	
 }
