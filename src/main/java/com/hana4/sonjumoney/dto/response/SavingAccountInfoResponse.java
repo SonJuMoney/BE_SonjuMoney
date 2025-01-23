@@ -11,6 +11,8 @@ public record SavingAccountInfoResponse(
 	Long accountId,
 	@JsonProperty("account_name")
 	String accountName,
+	@JsonProperty("user_name")
+	String userName,
 	@JsonProperty("bank")
 	Bank bank,
 	@JsonProperty("account_num")
@@ -18,11 +20,13 @@ public record SavingAccountInfoResponse(
 	@JsonProperty("balance")
 	Long balance
 ) {
-	public static SavingAccountInfoResponse of(Long accountId, String accountName, Bank bank, String accountNum,
+	public static SavingAccountInfoResponse of(Long accountId, String accountName, String userName, Bank bank,
+		String accountNum,
 		Long balance) {
 		return SavingAccountInfoResponse.builder()
 			.accountId(accountId)
 			.accountName(accountName)
+			.userName(userName)
 			.bank(bank)
 			.accountNum(accountNum)
 			.balance(balance)

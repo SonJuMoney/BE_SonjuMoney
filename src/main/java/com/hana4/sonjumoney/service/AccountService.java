@@ -144,7 +144,8 @@ public class AccountService {
 
 		return accounts.stream()
 			.map(account -> SavingAccountInfoResponse.of(account.getId(),
-				account.getAccountType().getAccountProduct().getName(), Bank.HANA, account.getAccountNum(),
+				account.getAccountType().getAccountProduct().getName(), account.getUser().getUsername(), Bank.HANA,
+				account.getAccountNum(),
 				account.getBalance())).toList();
 	}
 

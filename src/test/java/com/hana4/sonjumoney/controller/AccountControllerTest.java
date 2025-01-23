@@ -91,6 +91,11 @@ public class AccountControllerTest extends ControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer " + accessToken))
 			.andExpect(status().isOk())
+			.andExpect(jsonPath("$[0].account_name").exists())
+			.andExpect(jsonPath("$[0].user_name").exists())
+			.andExpect(jsonPath("$[0].bank").exists())
+			.andExpect(jsonPath("$[0].account_num").exists())
+			.andExpect(jsonPath("$[0].balance").exists())
 			.andDo(print());
 	}
 
