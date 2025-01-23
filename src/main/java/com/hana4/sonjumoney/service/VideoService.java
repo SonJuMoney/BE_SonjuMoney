@@ -2,6 +2,7 @@ package com.hana4.sonjumoney.service;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.http.HttpHeaders;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -9,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -56,6 +60,20 @@ public class VideoService {
 			throw new CommonException(ErrorCode.VIDEO_UPLOAD_FAILED);
 		}
 	}
+
+	public void streamingVideo(HttpHeaders httpHeaders, String pathStr) {
+		try {
+			Path path = Paths.get(pathStr);
+			Resource resource = new FileSystemResource(path);
+			long chunkSize = 1024 * 1024;
+			long contentLength = resource.contentLength();
+			ResourceRegion resourceRegion;
+
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.VIDEO_STREAM_FAILED);
+		}
+	}
+
 
 	private String getDirectoryPath(ContentPrefix prefix,Long feedId) {
 		String directory = "src/main/resources/static/video/" + prefix.getPrefix() + feedId;
