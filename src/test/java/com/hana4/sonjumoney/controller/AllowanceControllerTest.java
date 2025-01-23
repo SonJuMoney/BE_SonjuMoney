@@ -1,5 +1,6 @@
 package com.hana4.sonjumoney.controller;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -21,8 +22,11 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hana4.sonjumoney.ControllerTest;
+import com.hana4.sonjumoney.domain.Alarm;
 import com.hana4.sonjumoney.domain.Allowance;
 import com.hana4.sonjumoney.domain.Member;
+import com.hana4.sonjumoney.domain.enums.AlarmStatus;
+import com.hana4.sonjumoney.domain.enums.AlarmType;
 import com.hana4.sonjumoney.dto.SendAlarmDto;
 import com.hana4.sonjumoney.dto.request.SendAllowanceRequest;
 import com.hana4.sonjumoney.dto.request.SendThanksRequest;
@@ -79,10 +83,10 @@ class AllowanceControllerTest extends ControllerTest {
 			.andDo(print())
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.message").value("송금을 완료했습니다."));
-		// Alarm alarm = alarmRepository.findLatestAlarmByUserIdAndAlarmStatus(3L, AlarmStatus.RECEIVED)
-		// 	.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
-		// assertThat(alarm.getAlarmType().equals(AlarmType.ALLOWANCE));
-		// assertThat(alarm.getUser().getId().equals(3L));
+		Alarm alarm = alarmRepository.findLatestAlarmByUserIdAndAlarmStatus(3L, AlarmStatus.RECEIVED)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		assertThat(alarm.getAlarmType().equals(AlarmType.ALLOWANCE));
+		assertThat(alarm.getUser().getId().equals(3L));
 	}
 
 	@Test
