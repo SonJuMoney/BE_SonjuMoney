@@ -157,16 +157,16 @@ public class AccountService {
 
 		return accounts.stream()
 			.map(account -> SavingAccountInfoResponse.of(account.getId(),
-				account.getAccountType().getAccountProduct().getName(), Bank.HANA, account.getAccountNum(),
+				account.getAccountType().getAccountProduct().getName(), account.getUser().getUsername(), Bank.HANA,
+				account.getAccountNum(),
 				account.getBalance())).toList();
 	}
 
 	@Transactional
 	public TransferResponse sendMoneyProcess(Long accountId, SendMoneyRequest request, Long userId) {
-		/* userId로 간편 비밀번호 인증이 되어야 다음 프로세스 수행 */
-		User user = userRepository.findById(userId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-		if (!request.password().equals(user.getPin())) {
-			throw new CommonException(ErrorCode.INVALID_PIN);
+		/* 비밀번호 인증 여부가 false면 송금 process를 수행하지 않음 */
+		if (!request.status()) {
+			throw new CommonException(ErrorCode.FORBIDDEN);
 		}
 
 		Account senderAccount = accountRepository.findByUserId(userId)
