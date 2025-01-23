@@ -16,6 +16,7 @@ import com.hana4.sonjumoney.domain.FeedContent;
 import com.hana4.sonjumoney.domain.Member;
 import com.hana4.sonjumoney.domain.enums.ContentType;
 import com.hana4.sonjumoney.domain.enums.FeedType;
+import com.hana4.sonjumoney.domain.enums.MemberRole;
 import com.hana4.sonjumoney.dto.ContentPrefix;
 import com.hana4.sonjumoney.dto.CreateAllowanceThanksDto;
 import com.hana4.sonjumoney.dto.FeedContentCommentDto;
@@ -178,6 +179,7 @@ public class FeedService {
 				Long feedId = feed.getId();
 				Long writerId = feed.getMember().getUser().getId();
 				String writerName = feed.getMember().getUser().getUsername();
+				MemberRole memberRole = feed.getMember().getMemberRole();
 				Boolean isMine = userId.equals(writerId);
 				String writerImage = feed.getMember().getUser().getProfileLink();
 				FeedType feedType = feed.getFeedType();
@@ -203,6 +205,7 @@ public class FeedService {
 						comment.getId(),
 						comment.getMember().getUser().getId(),
 						comment.getMember().getUser().getUsername(),
+						comment.getMember().getMemberRole(),
 						comment.getMember().getUser().getId().equals(userId),
 						comment.getMember().getUser().getProfileLink(),
 						comment.getMessage(),
@@ -215,6 +218,7 @@ public class FeedService {
 					feedId,
 					writerId,
 					writerName,
+					memberRole,
 					isMine,
 					writerImage,
 					feedType,
