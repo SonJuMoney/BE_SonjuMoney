@@ -7,11 +7,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.hana4.sonjumoney.domain.Alarm;
-import com.hana4.sonjumoney.domain.enums.AlarmStatus;
 import com.hana4.sonjumoney.domain.Event;
 import com.hana4.sonjumoney.domain.Family;
 import com.hana4.sonjumoney.domain.Member;
 import com.hana4.sonjumoney.domain.User;
+import com.hana4.sonjumoney.domain.enums.AlarmStatus;
 import com.hana4.sonjumoney.domain.enums.AlarmType;
 import com.hana4.sonjumoney.dto.AlarmContentDto;
 import com.hana4.sonjumoney.dto.AlarmResultDto;
@@ -67,6 +67,7 @@ public class AlarmService {
 				contents.add(AlarmContentDto.of(
 					alarm.getId(),
 					alarm.getAlarmStatus(),
+					alarm.getAlarmType(),
 					alarm.getMessage(),
 					alarm.getLinkId(),
 					alarm.getCreatedAt()
@@ -113,6 +114,7 @@ public class AlarmService {
 		boolean result = !alarms.isEmpty();
 		return AlarmStatusResponse.of(result);
 	}
+
 	public void createOneOffAlarm(CreateAlarmDto createAlarmDto) {
 		AlarmType alarmType = createAlarmDto.alarmType();
 		Member sender = memberRepository.findById(createAlarmDto.senderId())
@@ -147,11 +149,13 @@ public class AlarmService {
 			}
 		}
 	}
+
 	private String makeEventAlarmMessage(Long eventId) {
 		Event event = eventRepository.findById(eventId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		return event.getNotifyStatus().getMessage() + event.getEventName() + "가 있어요.";
 	}
+
 	// ---------------아래 부분은 추후 추가 구현 예정----------------//
 	// TODO: 이건 개별적으로 안하고 한번에 보내게 바꾸기
 	public void createEventAlarm(CreateAlarmDto createAlarmDto) {
@@ -163,7 +167,7 @@ public class AlarmService {
 		String alarmMessage = makeEventAlarmMessage(createAlarmDto.linkId());
 
 		switch (alarmType) {
-			case BIRTHDAY:{
+			case BIRTHDAY: {
 				Family family = familyRepository.findById(event.getId())
 					.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 				List<Member> members = memberRepository.findByFamilyId(family.getId());
@@ -174,7 +178,7 @@ public class AlarmService {
 				}
 				break;
 			}
-			case TRAVEL, DINING, MEMORIAL, OTHERS:{
+			case TRAVEL, DINING, MEMORIAL, OTHERS: {
 				List<Member> participants = eventParticipantRepository.findMembersByEventId(event.getId());
 				participants.remove(sender);
 				for (Member participant : participants) {
@@ -182,7 +186,7 @@ public class AlarmService {
 						new Alarm(participant.getUser(), alarmType, createAlarmDto.linkId(), alarmMessage));
 				}
 			}
-			default:{
+			default: {
 				throw new CommonException(ErrorCode.WRONG_ALARM_TYPE);
 			}
 		}
