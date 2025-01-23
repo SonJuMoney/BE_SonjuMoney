@@ -1,5 +1,7 @@
 package com.hana4.sonjumoney.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hana4.sonjumoney.dto.request.AuthPinRequest;
 import com.hana4.sonjumoney.dto.request.SignUpChildRequest;
 import com.hana4.sonjumoney.dto.request.SignUpRequest;
+import com.hana4.sonjumoney.dto.response.AuthListResponse;
 import com.hana4.sonjumoney.dto.response.DuplicationResponse;
 import com.hana4.sonjumoney.dto.response.PinValidResponse;
 import com.hana4.sonjumoney.dto.response.ReissueResponse;
@@ -63,5 +66,12 @@ public class AuthController {
 		Long userId = AuthenticationUtil.getUserId(authentication);
 		PinValidResponse pinValidResponse = authService.validatePin(pinRequest, userId);
 		return ResponseEntity.ok().body(pinValidResponse);
+	}
+
+	@GetMapping("/list")
+	public ResponseEntity<List<AuthListResponse>> getAuthList(Authentication authentication) {
+		Long userId = AuthenticationUtil.getUserId(authentication);
+		List<AuthListResponse> response = authService.getAuthList(userId);
+		return ResponseEntity.ok().body(response);
 	}
 }

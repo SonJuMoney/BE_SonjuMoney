@@ -70,4 +70,17 @@ public class AuthWithTokenControllerTest extends ControllerTest {
 		relationshipRepository.delete(relationship);
 		userRepository.delete(child);
 	}
+
+	@Test
+	void getAuthListTest() throws Exception {
+		String api = "/api/auth/list";
+
+		mockMvc.perform(
+				get(api)
+					.contentType(MediaType.APPLICATION_JSON)
+					.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$[0]").isNotEmpty())
+		;
+	}
 }
