@@ -27,7 +27,6 @@ public class WebsocketInterceptor implements HandshakeInterceptor {
 		try {
 			HttpHeaders httpHeaders = request.getHeaders();
 			String token = httpHeaders.get("Sec-WebSocket-Protocol").get(0);
-			token = token.substring(7);
 			// TODO 여기서 jwt 인증할 방법 찾기
 			Long userId = jwtUtil.getUserId(token);
 			attributes.put("userId", userId);
