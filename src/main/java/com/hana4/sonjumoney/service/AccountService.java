@@ -27,6 +27,7 @@ import com.hana4.sonjumoney.dto.SavingAccountResultDto;
 import com.hana4.sonjumoney.dto.SavingAccountTransactionDto;
 import com.hana4.sonjumoney.dto.TransactionHistoryDto;
 import com.hana4.sonjumoney.dto.TransferDto;
+import com.hana4.sonjumoney.dto.request.AuthPinRequest;
 import com.hana4.sonjumoney.dto.request.CreateSavingAccountRequest;
 import com.hana4.sonjumoney.dto.request.SendMoneyRequest;
 import com.hana4.sonjumoney.dto.response.AccountInfoResponse;
@@ -57,6 +58,8 @@ public class AccountService {
 	private final AccountTypeRepository accountTypeRepository;
 	private final AutoTransferRepository autoTransferRepository;
 	private final TransactionHistoryRepository transactionHistoryRepository;
+
+	private final AuthService authService;
 
 	private final Integer PAGE_SIZE = 20;
 
@@ -165,8 +168,8 @@ public class AccountService {
 	@Transactional
 	public TransferResponse sendMoneyProcess(Long accountId, SendMoneyRequest request, Long userId) {
 		/* 비밀번호 인증 여부가 false면 송금 process를 수행하지 않음 */
-		if (!request.status()) {
-			throw new CommonException(ErrorCode.FORBIDDEN);
+		if (authService.validatePin(new AuthPinRequest(request.pin()), userId).code() != 200) {
+			throw new CommonException(ErrorCode.INVALID_PIN);
 		}
 
 		Account senderAccount = accountRepository.findByUserId(userId)

@@ -6,6 +6,6 @@ import lombok.Builder;
 public record SendMoneyRequest(
 	Long amount,
 	String message,
-	boolean status
+	String pin
 ) {
 }
