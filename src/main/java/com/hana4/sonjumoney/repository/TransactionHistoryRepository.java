@@ -63,4 +63,7 @@ public interface TransactionHistoryRepository extends JpaRepository<TransactionH
 		@Param("opponentAccountId") Long opponentAccountId,
 		@Param("startOfMonth") LocalDateTime startOfMonth,
 		@Param("endOfMonth") LocalDateTime endOfMonth);
+
+	@Query("SELECT t FROM TransactionHistory t where t.account.id = :accountId")
+	List<TransactionHistory> findAllByAccountId(@Param("accountId") Long accountId);
 }

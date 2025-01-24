@@ -39,6 +39,7 @@ import com.hana4.sonjumoney.dto.response.CreateAccountResponse;
 import com.hana4.sonjumoney.dto.response.CreateSavingAccountResponse;
 import com.hana4.sonjumoney.dto.response.GetSavingAccountLimitResponse;
 import com.hana4.sonjumoney.dto.response.GetSavingAccountResponse;
+import com.hana4.sonjumoney.dto.response.GetTransactionHistoryResponse;
 import com.hana4.sonjumoney.dto.response.SavingAccountInfoResponse;
 import com.hana4.sonjumoney.dto.response.SavingAccountResponse;
 import com.hana4.sonjumoney.dto.response.TransferResponse;
@@ -366,4 +367,24 @@ public class AccountService {
 
 	}
 
+	public List<GetTransactionHistoryResponse> getTransactions(Long userId) {
+		User user = userRepository.findById(userId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		Account account = accountRepository.findByUserId(userId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		List<TransactionHistory> myTransactions;
+		try {
+			myTransactions = transactionHistoryRepository.findAllByAccountId(account.getId());
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+		return myTransactions.stream()
+			.map(transaction -> GetTransactionHistoryResponse.of(
+				user.getUsername(),
+				transaction.getMessage(),
+				transaction.getTransactionType(),
+				transaction.getAfterBalance(),
+				transaction.getCreatedAt(),
+				transaction.getAmount()
+			)).toList();
+	}
 }

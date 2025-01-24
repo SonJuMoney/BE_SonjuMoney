@@ -25,10 +25,10 @@ public record GetTransactionHistoryResponse(
 	LocalDateTime createdAt,
 
 	@JsonProperty("amount")
-	String amount
+	Long amount
 ) {
 	public static GetTransactionHistoryResponse of(String userName, String message, TransactionType transactionType,
-		Long afterBalance, LocalDateTime createdAt, String amount) {
+		Long afterBalance, LocalDateTime createdAt, Long amount) {
 		return GetTransactionHistoryResponse.builder()
 			.userName(userName)
 			.message(message)
