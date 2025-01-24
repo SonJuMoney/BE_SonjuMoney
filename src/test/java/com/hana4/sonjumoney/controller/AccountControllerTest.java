@@ -168,4 +168,15 @@ public class AccountControllerTest extends ControllerTest {
 
 	}
 
+	@Test
+	@Transactional
+	@DisplayName("적금 납입 한도 조회")
+	void getSavingAccountLimitTest() throws Exception {
+		mockMvc.perform(get("/api/accounts/savings/{account_id}/limit", 2)
+				.header("Authorization", "Bearer " + accessToken)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
+
 }
