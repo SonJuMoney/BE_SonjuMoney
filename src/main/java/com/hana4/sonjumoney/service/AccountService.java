@@ -416,7 +416,6 @@ public class AccountService {
 			List<TransactionHistoryContentsDto> contents = myTransactions.stream()
 				.filter(content -> content.getCreatedAt().toLocalDate().equals(localDate))
 				.map(content -> TransactionHistoryContentsDto.of(
-					user.getUsername(),
 					content.getMessage(),
 					content.getTransactionType(),
 					content.getAfterBalance(),

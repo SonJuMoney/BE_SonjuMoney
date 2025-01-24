@@ -9,9 +9,6 @@ import lombok.Builder;
 
 @Builder
 public record TransactionHistoryContentsDto(
-	@JsonProperty("user_name")
-	String userName,
-
 	@JsonProperty("message")
 	String message,
 
@@ -27,10 +24,9 @@ public record TransactionHistoryContentsDto(
 	@JsonProperty("amount")
 	Long amount
 ) {
-	public static TransactionHistoryContentsDto of(String userName, String message, TransactionType transactionType,
+	public static TransactionHistoryContentsDto of(String message, TransactionType transactionType,
 		Long afterBalance, LocalDateTime createdAt, Long amount) {
 		return TransactionHistoryContentsDto.builder()
-			.userName(userName)
 			.message(message)
 			.transactionType(transactionType.getValue())
 			.amount(amount)
