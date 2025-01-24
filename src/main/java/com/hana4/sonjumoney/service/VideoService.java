@@ -63,7 +63,7 @@ public class VideoService {
 		}
 	}
 
-	public void streamingVideo(HttpHeaders httpHeaders, String pathStr) {
+	public ResponseEntity<ResourceRegion> streamingVideo(HttpHeaders httpHeaders, String pathStr) {
 		try {
 			Path path = Paths.get(pathStr);
 			Resource resource = new FileSystemResource(path);
@@ -87,6 +87,7 @@ public class VideoService {
 				long rangeLength = Long.min(chunkSize, resource.contentLength());
 				resourceRegion = new ResourceRegion(resource, 0, rangeLength);
 			}
+			return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT);
 
 		} catch (IOException e) {
 			throw new IllegalArgumentException("리소스의 컨텐츠 링크를 가져오지 못했습니다.", e);
