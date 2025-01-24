@@ -18,17 +18,19 @@ public interface TransactionHistoryRepository extends JpaRepository<TransactionH
 	@Query("SELECT CASE WHEN COUNT(th) > 0 THEN true ELSE false END " +
 		"FROM TransactionHistory th " +
 		"WHERE th.account.id = :accountId AND th.opponentAccountId = :opponentAccountId " +
+		"AND th.transactionType = 'WITHDRAW'" +
 		"AND th.id < :lastTransactionId")
-	Boolean hasNext(@Param("accountId") Long accountId,
+	Boolean hasNextSavings(@Param("accountId") Long accountId,
 		@Param("opponentAccountId") Long opponentAccountId,
 		@Param("lastTransactionId") Long lastTransactionId);
 
 	@Query("SELECT DISTINCT DATE(th.createdAt) " +
 		"FROM TransactionHistory th " +
 		"WHERE th.account.id = :accountId AND th.opponentAccountId = :opponentAccountId " +
+		"AND th.transactionType = 'WITHDRAW'" +
 		"GROUP BY DATE(th.createdAt) " +
 		"ORDER BY MAX(th.createdAt) DESC")
-	List<Object[]> findDistinctDatesAsObjects(
+	List<Object[]> findDistinctSavingsDatesAsObjects(
 		@Param("accountId") Long accountId,
 		@Param("opponentAccountId") Long opponentAccountId,
 		Pageable pageable
@@ -37,9 +39,10 @@ public interface TransactionHistoryRepository extends JpaRepository<TransactionH
 	@Query("SELECT th FROM TransactionHistory th " +
 		"WHERE th.account.id = :accountId " +
 		"AND th.opponentAccountId = :opponentAccountId " +
+		"AND th.transactionType = 'WITHDRAW'" +
 		"AND DATE(th.createdAt) IN :dates " +
 		"ORDER BY th.createdAt DESC")
-	List<TransactionHistory> findByDates(
+	List<TransactionHistory> findSavingsByDates(
 		@Param("accountId") Long accountId,
 		@Param("opponentAccountId") Long opponentAccountId,
 		@Param("dates") List<LocalDate> dates
@@ -63,4 +66,31 @@ public interface TransactionHistoryRepository extends JpaRepository<TransactionH
 		@Param("opponentAccountId") Long opponentAccountId,
 		@Param("startOfMonth") LocalDateTime startOfMonth,
 		@Param("endOfMonth") LocalDateTime endOfMonth);
+
+	@Query("SELECT DISTINCT DATE(th.createdAt) " +
+		"FROM TransactionHistory th " +
+		"WHERE th.account.id = :accountId " +
+		"GROUP BY DATE(th.createdAt) " +
+		"ORDER BY MAX(th.createdAt) DESC")
+	List<Object[]> findDistinctDatesAsObjects(
+		@Param("accountId") Long accountId,
+		Pageable pageable
+	);
+
+	@Query("SELECT CASE WHEN COUNT(th) > 0 THEN true ELSE false END " +
+		"FROM TransactionHistory th " +
+		"WHERE th.account.id = :accountId " +
+		"AND th.id < :lastTransactionId")
+	Boolean hasNext(@Param("accountId") Long accountId,
+		@Param("lastTransactionId") Long lastTransactionId);
+
+	@Query("SELECT th FROM TransactionHistory th " +
+		"WHERE th.account.id = :accountId " +
+		"AND DATE(th.createdAt) IN :dates " +
+		"ORDER BY th.createdAt DESC")
+	List<TransactionHistory> findByDates(
+		@Param("accountId") Long accountId,
+		@Param("dates") List<LocalDate> dates
+	);
+
 }

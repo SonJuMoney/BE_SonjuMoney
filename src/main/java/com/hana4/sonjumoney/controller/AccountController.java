@@ -18,6 +18,7 @@ import com.hana4.sonjumoney.dto.response.CreateAccountResponse;
 import com.hana4.sonjumoney.dto.response.CreateSavingAccountResponse;
 import com.hana4.sonjumoney.dto.response.GetSavingAccountLimitResponse;
 import com.hana4.sonjumoney.dto.response.GetSavingAccountResponse;
+import com.hana4.sonjumoney.dto.response.GetTransactionHistoryResponse;
 import com.hana4.sonjumoney.dto.response.SavingAccountResponse;
 import com.hana4.sonjumoney.dto.response.TransferResponse;
 import com.hana4.sonjumoney.service.AccountService;
@@ -55,6 +56,14 @@ public class AccountController {
 		return ResponseEntity.ok().body(accountService.getAccountByUserId(userId));
 	}
 
+	/*내 계좌 이체내역 조회*/
+	@GetMapping("/transactions")
+	public ResponseEntity<GetTransactionHistoryResponse> getTransactionHistory(@RequestParam Integer page,
+		Authentication authentication) {
+		Long userId = AuthenticationUtil.getUserId(authentication);
+		return ResponseEntity.ok().body(accountService.getTransactions(userId, page));
+	}
+
 	@PostMapping("/savings")
 	public ResponseEntity<CreateSavingAccountResponse> createSavingAccount(
 		@RequestBody CreateSavingAccountRequest request, Authentication authentication) {
@@ -76,7 +85,7 @@ public class AccountController {
 		return ResponseEntity.ok().body(accountService.sendMoneyProcess(accountId, request, userId));
 	}
 
-	/*특정 적금계좌 이체내역 조회*/
+	/*특정 적금 납입내역 조회*/
 	@GetMapping("/savings/{account_id}")
 	public ResponseEntity<GetSavingAccountResponse> getSavingAccountTransaction(@RequestParam Integer page,
 		Authentication authentication,

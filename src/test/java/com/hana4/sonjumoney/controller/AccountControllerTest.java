@@ -179,4 +179,16 @@ public class AccountControllerTest extends ControllerTest {
 			.andDo(print());
 	}
 
+	@Test
+	@Transactional
+	@DisplayName("내 계좌 이체 내역 조회")
+	void getTransactionsTest() throws Exception {
+		Integer page = 0;
+
+		mockMvc.perform(get("/api/accounts/transactions?page=" + page)
+				.header("Authorization", "Bearer " + accessToken)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
 }
