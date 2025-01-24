@@ -239,10 +239,10 @@ public class AuthService implements UserDetailsService {
 		}
 		boolean hasRelationship = false;
 		for (Relationship relationship : relationships) {
-			if (relationship.getParent().getId().equals(userId) && relationship.getChild().getId().equals(targetId)) {
+			if (relationship.getParent().getId().equals(targetId)) {
 				hasRelationship = true;
 			}
-			if (relationship.getChild().getId().equals(userId) && relationship.getParent().getId().equals(targetId)) {
+			if (relationship.getChild().getId().equals(targetId)) {
 				hasRelationship = true;
 			}
 		}
