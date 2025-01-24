@@ -48,7 +48,7 @@ public class AllowanceController {
 	@PostMapping("/{allowance_id}/thanks")
 	public ResponseEntity<?> sendThanks(Authentication authentication,
 		@PathVariable(value = "allowance_id") Long allowanceId,
-		@RequestPart(value = "image", required = false) MultipartFile image,
+		@RequestPart(value = "file", required = false) MultipartFile image,
 		@RequestPart(value = "data") SendThanksRequest sendThanksRequest
 	) {
 

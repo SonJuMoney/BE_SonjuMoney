@@ -85,17 +85,22 @@ public class AlarmHandler extends TextWebSocketHandler {
 	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 		String payload = message.getPayload();
 		log.info("payload {}", payload);
-		session.sendMessage(message);
+		for (WebSocketSession session1 : sessions) {
+			session1.sendMessage(message);
+		}
 	}
 
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session)throws Exception {
 		sessions.add(session);
+		for (WebSocketSession session1 : sessions) {
+			log.info("session: " + session1.getId() + " " + session1.getAttributes().get("userId"));
+		}
 		UriComponents uriComponents =
 			UriComponentsBuilder.fromUriString(Objects.requireNonNull(session.getUri()).toString()).build();
-		log.info("session id: " + session.getId() + " session uri: " + session.getUri() + " uid: "
-			+ uriComponents.getQueryParams().getFirst("uid"));
 		Long userId = (Long)session.getAttributes().get("userId");
+		log.info("session id: " + session.getId() + " session uri: " + session.getUri() + " userId: "
+			+ userId);
 		userAlarmSessionMap.put(userId, session);
 		List<Member> members = memberRepository.findAllByUserId(userId);
 		for (Member member : members) {
