@@ -36,7 +36,9 @@ import com.hana4.sonjumoney.util.CommonUtil;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService implements UserDetailsService {
@@ -233,7 +235,19 @@ public class AuthService implements UserDetailsService {
 		Long targetId = switchAccountRequest.targetId();
 		List<Relationship> relationships = relationshipRepository.findAllByUserId(userId);
 		if (relationships.isEmpty()) {
-			throw new CommonException(ErrorCode.BAD_REQUEST);
+			throw new CommonException(ErrorCode.FORBIDDEN);
+		}
+		boolean hasRelationship = false;
+		for (Relationship relationship : relationships) {
+			if (relationship.getParent().getId().equals(userId) && relationship.getChild().getId().equals(targetId)) {
+				hasRelationship = true;
+			}
+			if (relationship.getChild().getId().equals(userId) && relationship.getParent().getId().equals(targetId)) {
+				hasRelationship = true;
+			}
+		}
+		if (!hasRelationship) {
+			throw new CommonException(ErrorCode.FORBIDDEN);
 		}
 		try {
 			User target = userRepository.findById(targetId)
