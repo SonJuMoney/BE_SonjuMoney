@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.http.*;
 import org.springframework.core.io.FileSystemResource;
@@ -87,8 +88,11 @@ public class VideoService {
 				long rangeLength = Long.min(chunkSize, resource.contentLength());
 				resourceRegion = new ResourceRegion(resource, 0, rangeLength);
 			}
-			return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT);
-
+			return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
+				.cacheControl(CacheControl.maxAge(10, TimeUnit.MINUTES))
+				.contentType(MediaTypeFactory.getMediaType(resource).orElse(MediaType.APPLICATION_OCTET_STREAM))
+				.header(HttpHeaders.ACCEPT_RANGES,"bytes")
+				.body(resourceRegion);
 		} catch (IOException e) {
 			throw new IllegalArgumentException("리소스의 컨텐츠 링크를 가져오지 못했습니다.", e);
 		}
