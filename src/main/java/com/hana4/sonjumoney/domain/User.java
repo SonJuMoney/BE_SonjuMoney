@@ -29,13 +29,13 @@ public class User {
 	@Column(name = "user_name", length = 20, nullable = false)
 	private String username;
 
-	@Column(name = "auth_id", length = 100, nullable = false)
+	@Column(name = "auth_id", length = 100, nullable = false, unique = true)
 	private String authId;
 
 	@Column(length = 100, nullable = false)
 	private String password;
 
-	@Column(length = 11, nullable = false)
+	@Column(length = 11)
 	private String phone;
 
 	@Column(name = "resident_num", length = 14, nullable = false)
@@ -48,7 +48,7 @@ public class User {
 	@Enumerated(EnumType.STRING)
 	private Gender gender;
 
-	@Column(name = "profile_link", length = 500, nullable = false)
+	@Column(name = "profile_link", length = 500)
 	private String profileLink;
 
 	@Builder

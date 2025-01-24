@@ -25,17 +25,38 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+//    spring boot
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.hibernate:hibernate-core:6.3.2.Final'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
-    compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mockito:mockito-core:5.5.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.5.0'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+//    security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+
+//    database
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.hibernate:hibernate-core:6.3.2.Final'
+
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+//    spring cloud
+    implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.0")
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
 }
 
 test {

@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import com.hana4.sonjumoney.domain.Family;
 
 @Repository
-public interface FamilyRepository extends JpaRepository<Family,Long> {
+public interface FamilyRepository extends JpaRepository<Family, Long> {
 }
