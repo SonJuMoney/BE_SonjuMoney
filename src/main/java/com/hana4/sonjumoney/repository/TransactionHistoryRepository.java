@@ -23,14 +23,6 @@ public interface TransactionHistoryRepository extends JpaRepository<TransactionH
 		@Param("opponentAccountId") Long opponentAccountId,
 		@Param("lastTransactionId") Long lastTransactionId);
 
-	/*@Query("SELECT CASE WHEN COUNT(th) > 0 THEN true ELSE false END " +
-		"FROM TransactionHistory th " +
-		"WHERE th.account.id = :accountId AND th.opponentAccountId = :opponentAccountId " +
-		"AND th.createdAt < :lastTransactionDate")
-	Boolean hasNext(@Param("accountId") Long accountId,
-		@Param("opponentAccountId") Long opponentAccountId,
-		@Param("lastTransactionDate") LocalDateTime lastTransactionDate);*/
-
 	@Query("SELECT DISTINCT DATE(th.createdAt) " +
 		"FROM TransactionHistory th " +
 		"WHERE th.account.id = :accountId AND th.opponentAccountId = :opponentAccountId " +

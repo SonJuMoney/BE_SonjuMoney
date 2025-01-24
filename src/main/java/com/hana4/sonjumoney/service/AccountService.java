@@ -340,12 +340,18 @@ public class AccountService {
 
 		try {
 			totalPayment = transactionHistoryRepository.getTotalPayment(userAccount.getId(), opponentAccountId);
+			if (totalPayment == null) {
+				totalPayment = 0L;
+			}
 		} catch (Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
 		}
 		try {
 			monthPayment = transactionHistoryRepository.getCurrentMonthPayment(userAccount.getId(), opponentAccountId,
 				startOfDay, endOfDay);
+			if (monthPayment == null) {
+				monthPayment = 0;
+			}
 		} catch (Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
 		}
