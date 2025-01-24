@@ -59,7 +59,7 @@ dependencies {
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
 
 //    redis
-    implementation 'org.springframework.boot:spring-boot-starter-date-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }
 
 test {
