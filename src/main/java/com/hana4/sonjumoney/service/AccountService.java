@@ -29,7 +29,10 @@ import com.hana4.sonjumoney.dto.AllowanceDto;
 import com.hana4.sonjumoney.dto.SavingAccountContentDto;
 import com.hana4.sonjumoney.dto.SavingAccountResultDto;
 import com.hana4.sonjumoney.dto.SavingAccountTransactionDto;
+import com.hana4.sonjumoney.dto.TransactionHistoryContentsDto;
+import com.hana4.sonjumoney.dto.TransactionHistoryDatesDto;
 import com.hana4.sonjumoney.dto.TransactionHistoryDto;
+import com.hana4.sonjumoney.dto.TransactionHistoryResultDto;
 import com.hana4.sonjumoney.dto.TransferDto;
 import com.hana4.sonjumoney.dto.request.AuthPinRequest;
 import com.hana4.sonjumoney.dto.request.CreateSavingAccountRequest;
@@ -270,7 +273,7 @@ public class AccountService {
 
 		List<LocalDate> dateList;
 		try {
-			dateList = transactionHistoryRepository.findDistinctDatesAsObjects(userAccount.getId(),
+			dateList = transactionHistoryRepository.findDistinctSavingsDatesAsObjects(userAccount.getId(),
 					opponentAccountId, pageRequest)
 				.stream()
 				.map(result -> ((Date)result[0]).toLocalDate())
@@ -281,7 +284,7 @@ public class AccountService {
 
 		List<TransactionHistory> transactionHistories;
 		try {
-			transactionHistories = transactionHistoryRepository.findByDates(
+			transactionHistories = transactionHistoryRepository.findSavingsByDates(
 				userAccount.getId(), opponentAccountId, dateList);
 		} catch (Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
@@ -304,7 +307,7 @@ public class AccountService {
 
 		Boolean hasNext;
 		try {
-			hasNext = transactionHistoryRepository.hasNext(userAccount.getId(), opponentAccountId,
+			hasNext = transactionHistoryRepository.hasNextSavings(userAccount.getId(), opponentAccountId,
 				transactionHistories.get(transactionHistories.size() - 1).getId());
 		} catch (Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
@@ -367,24 +370,65 @@ public class AccountService {
 
 	}
 
-	public List<GetTransactionHistoryResponse> getTransactions(Long userId) {
+	public GetTransactionHistoryResponse getTransactions(Long userId, Integer page) {
+		PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE);
 		User user = userRepository.findById(userId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		Account account = accountRepository.findByUserId(userId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
-		List<TransactionHistory> myTransactions;
+		List<LocalDate> dateList;
 		try {
-			myTransactions = transactionHistoryRepository.findAllByAccountId(account.getId());
+			dateList = transactionHistoryRepository.findDistinctDatesAsObjects(account.getId(),
+					pageRequest)
+				.stream()
+				.map(result -> ((Date)result[0]).toLocalDate())
+				.collect(Collectors.toList());
 		} catch (Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
 		}
-		return myTransactions.stream()
-			.map(transaction -> GetTransactionHistoryResponse.of(
-				user.getUsername(),
-				transaction.getMessage(),
-				transaction.getTransactionType(),
-				transaction.getAfterBalance(),
-				transaction.getCreatedAt(),
-				transaction.getAmount()
-			)).toList();
+
+		List<TransactionHistory> myTransactions;
+		try {
+			myTransactions = transactionHistoryRepository.findByDates(account.getId(), dateList);
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+		if (myTransactions.isEmpty()) {
+			return GetTransactionHistoryResponse.builder()
+				.isSuccess(true)
+				.code(200)
+				.message("요청 성공")
+				.result(TransactionHistoryResultDto.builder()
+					.hasNext(false)
+					.page(page)
+					.dates(new ArrayList<>())
+					.build())
+				.build();
+		}
+		List<TransactionHistoryDatesDto> dates = new ArrayList<>();
+		Boolean hasNext;
+		try {
+			hasNext = transactionHistoryRepository.hasNext(account.getId(),
+				myTransactions.get(myTransactions.size() - 1).getId());
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+		for (LocalDate localDate : dateList) {
+			List<TransactionHistoryContentsDto> contents = myTransactions.stream()
+				.filter(content -> content.getCreatedAt().toLocalDate().equals(localDate))
+				.map(content -> TransactionHistoryContentsDto.of(
+					user.getUsername(),
+					content.getMessage(),
+					content.getTransactionType(),
+					content.getAfterBalance(),
+					content.getCreatedAt(),
+					content.getAmount()))
+				.collect(Collectors.toList());
+
+			dates.add(TransactionHistoryDatesDto.of(localDate, contents));
+		}
+		dates.sort(Comparator.comparing(TransactionHistoryDatesDto::date).reversed());
+		TransactionHistoryResultDto result = TransactionHistoryResultDto.of(hasNext, page, dates);
+		return GetTransactionHistoryResponse.of(true, 200, "요청 성공", result);
+
 	}
 }

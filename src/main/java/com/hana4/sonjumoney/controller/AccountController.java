@@ -1,7 +1,5 @@
 package com.hana4.sonjumoney.controller;
 
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,9 +58,10 @@ public class AccountController {
 
 	/*내 계좌 이체내역 조회*/
 	@GetMapping("/transactions")
-	public ResponseEntity<List<GetTransactionHistoryResponse>> getTransactionHistory(Authentication authentication) {
+	public ResponseEntity<GetTransactionHistoryResponse> getTransactionHistory(@RequestParam Integer page,
+		Authentication authentication) {
 		Long userId = AuthenticationUtil.getUserId(authentication);
-		return ResponseEntity.ok().body(accountService.getTransactions(userId));
+		return ResponseEntity.ok().body(accountService.getTransactions(userId, page));
 	}
 
 	@PostMapping("/savings")
