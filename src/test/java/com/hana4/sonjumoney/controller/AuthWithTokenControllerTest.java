@@ -13,8 +13,10 @@ import org.springframework.http.MediaType;
 import com.hana4.sonjumoney.ControllerTest;
 import com.hana4.sonjumoney.domain.Relationship;
 import com.hana4.sonjumoney.domain.User;
+import com.hana4.sonjumoney.domain.enums.Gender;
 import com.hana4.sonjumoney.dto.request.AuthPinRequest;
 import com.hana4.sonjumoney.dto.request.SignUpChildRequest;
+import com.hana4.sonjumoney.dto.request.SwitchAccountRequest;
 import com.hana4.sonjumoney.repository.RelationshipRepository;
 import com.hana4.sonjumoney.repository.UserRepository;
 import com.hana4.sonjumoney.security.util.JwtUtil;
@@ -83,4 +85,29 @@ public class AuthWithTokenControllerTest extends ControllerTest {
 			.andExpect(jsonPath("$[0]").isNotEmpty())
 		;
 	}
+
+	@Test
+	void switchAccountTest() throws Exception {
+
+		String api = "/api/auth/switch-account";
+		User child = new User("테스트자식", "test0", "1234", null, "241231-4123123", "123456", Gender.FEMALE, null);
+		child = userRepository.save(child);
+		Relationship childRelationship = new Relationship(
+			userRepository.findById(jwtUtil.getUserId(accessToken)).orElseThrow(), child);
+		relationshipRepository.save(childRelationship);
+		SwitchAccountRequest request = new SwitchAccountRequest(child.getId());
+		mockMvc.perform(post(api)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + accessToken)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isOk())
+			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.access_token").isNotEmpty())
+			.andExpect(jsonPath("$.refresh_token").isNotEmpty())
+		;
+
+		relationshipRepository.delete(childRelationship);
+		userRepository.delete(child);
+	}
+
 }

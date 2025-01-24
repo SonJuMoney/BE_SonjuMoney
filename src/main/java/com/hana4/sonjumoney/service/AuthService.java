@@ -14,9 +14,11 @@ import com.hana4.sonjumoney.domain.Relationship;
 import com.hana4.sonjumoney.domain.User;
 import com.hana4.sonjumoney.domain.enums.Gender;
 import com.hana4.sonjumoney.domain.enums.Role;
+import com.hana4.sonjumoney.dto.JwtTokenDto;
 import com.hana4.sonjumoney.dto.request.AuthPinRequest;
 import com.hana4.sonjumoney.dto.request.SignUpChildRequest;
 import com.hana4.sonjumoney.dto.request.SignUpRequest;
+import com.hana4.sonjumoney.dto.request.SwitchAccountRequest;
 import com.hana4.sonjumoney.dto.response.AuthListResponse;
 import com.hana4.sonjumoney.dto.response.DuplicationResponse;
 import com.hana4.sonjumoney.dto.response.PinValidResponse;
@@ -222,6 +224,24 @@ public class AuthService implements UserDetailsService {
 					relationship.getChild().getUsername()));
 			}
 			return result;
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	public JwtTokenDto switchAccount(Long userId, SwitchAccountRequest switchAccountRequest) {
+		Long targetId = switchAccountRequest.targetId();
+		List<Relationship> relationships = relationshipRepository.findAllByUserId(userId);
+		if (relationships.isEmpty()) {
+			throw new CommonException(ErrorCode.BAD_REQUEST);
+		}
+		try {
+			User target = userRepository.findById(targetId)
+				.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+			String targetAccessToken = jwtUtil.generateAccessToken(target.getAuthId(), target.getId());
+			String targetRefreshToken = jwtUtil.generateRefreshToken(target.getAuthId(), target.getId());
+			return JwtTokenDto.of(targetAccessToken, targetRefreshToken, target.getId(), target.getUsername(),
+				target.getProfileLink(), target.getGender(), target.getResidentNum().substring(0, 6));
 		} catch (Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
 		}

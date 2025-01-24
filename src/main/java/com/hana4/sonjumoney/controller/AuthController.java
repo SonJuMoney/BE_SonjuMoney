@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hana4.sonjumoney.dto.JwtTokenDto;
 import com.hana4.sonjumoney.dto.request.AuthPinRequest;
 import com.hana4.sonjumoney.dto.request.SignUpChildRequest;
 import com.hana4.sonjumoney.dto.request.SignUpRequest;
+import com.hana4.sonjumoney.dto.request.SwitchAccountRequest;
 import com.hana4.sonjumoney.dto.response.AuthListResponse;
 import com.hana4.sonjumoney.dto.response.DuplicationResponse;
 import com.hana4.sonjumoney.dto.response.PinValidResponse;
@@ -72,6 +74,14 @@ public class AuthController {
 	public ResponseEntity<List<AuthListResponse>> getAuthList(Authentication authentication) {
 		Long userId = AuthenticationUtil.getUserId(authentication);
 		List<AuthListResponse> response = authService.getAuthList(userId);
+		return ResponseEntity.ok().body(response);
+	}
+
+	@PostMapping("/switch-account")
+	public ResponseEntity<JwtTokenDto> switchAccount(Authentication authentication,
+		@RequestBody SwitchAccountRequest switchAccountRequest) {
+		Long userId = AuthenticationUtil.getUserId(authentication);
+		JwtTokenDto response = authService.switchAccount(userId, switchAccountRequest);
 		return ResponseEntity.ok().body(response);
 	}
 }
