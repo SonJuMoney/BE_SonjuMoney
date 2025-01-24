@@ -372,7 +372,6 @@ public class AccountService {
 
 	public GetTransactionHistoryResponse getTransactions(Long userId, Integer page) {
 		PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE);
-		User user = userRepository.findById(userId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		Account account = accountRepository.findByUserId(userId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		List<LocalDate> dateList;
