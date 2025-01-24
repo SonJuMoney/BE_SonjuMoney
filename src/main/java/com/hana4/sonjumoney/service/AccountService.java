@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -320,20 +321,23 @@ public class AccountService {
 
 			contents.add(SavingAccountContentDto.of(localDate, transactions));
 		}
+		contents.sort(Comparator.comparing(SavingAccountContentDto::date).reversed());
 
 		SavingAccountResultDto result = SavingAccountResultDto.of(hasNext, page, contents);
 		return GetSavingAccountResponse.of(true, 200, "요청 성공", result);
 	}
 
 	public GetSavingAccountLimitResponse getSavingAccountLimit(Long userId, Long opponentAccountId) {
-		Account userAccount = accountRepository.findByUserId(userId)
-			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
-		Account opponentAccount = accountRepository.findById(opponentAccountId)
-			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		Long totalPayment;
 		Integer monthPayment;
 		LocalDateTime startOfDay = YearMonth.now().atDay(1).atStartOfDay();
 		LocalDateTime endOfDay = YearMonth.now().atEndOfMonth().atTime(23, 59, 59);
+
+		Account userAccount = accountRepository.findByUserId(userId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		Account opponentAccount = accountRepository.findById(opponentAccountId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+
 		try {
 			totalPayment = transactionHistoryRepository.getTotalPayment(userAccount.getId(), opponentAccountId);
 		} catch (Exception e) {

@@ -85,6 +85,7 @@ public class AccountController {
 		return ResponseEntity.ok().body(accountService.getSavingAccount(userId, accountId, page));
 	}
 
+	/* 적금 납입 한도 조회*/
 	@GetMapping("/savings/{account_id}/limit")
 	public ResponseEntity<GetSavingAccountLimitResponse> getLimit(Authentication authentication,
 		@PathVariable(value = "account_id") Long accountId) {

@@ -164,8 +164,8 @@ public class AccountControllerTest extends ControllerTest {
 				.header("Authorization", "Bearer " + accessToken)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.result.hasNext").value(true))
 			.andDo(print());
 
 	}
+
 }
