@@ -127,7 +127,8 @@ public class AlarmService {
 				String message = sender.getMemberRole().getValue() + "님이 " + alarmType.getMessage();
 
 				Alarm alarm = alarmRepository.save(
-					new Alarm(receiver.getUser(), alarmType, createAlarmDto.linkId(), message));
+					new Alarm(receiver.getUser(), alarmType, createAlarmDto.linkId(), createAlarmDto.familyId(),
+						message));
 				alarmHandler.sendUserAlarm(SendAlarmDto.from(alarm));
 				break;
 			}
@@ -139,7 +140,8 @@ public class AlarmService {
 
 				for (Member member : members) {
 					Alarm alarm = alarmRepository.save(
-						new Alarm(member.getUser(), alarmType, createAlarmDto.linkId(), message));
+						new Alarm(member.getUser(), alarmType, createAlarmDto.linkId(), createAlarmDto.familyId(),
+							message));
 					alarmHandler.sendUserAlarm(SendAlarmDto.from(alarm));
 				}
 				break;
@@ -174,7 +176,8 @@ public class AlarmService {
 
 				for (Member member : members) {
 					alarmRepository.save(
-						new Alarm(member.getUser(), alarmType, createAlarmDto.linkId(), alarmMessage));
+						new Alarm(member.getUser(), alarmType, createAlarmDto.linkId(), createAlarmDto.familyId(),
+							alarmMessage));
 				}
 				break;
 			}
@@ -183,7 +186,8 @@ public class AlarmService {
 				participants.remove(sender);
 				for (Member participant : participants) {
 					alarmRepository.save(
-						new Alarm(participant.getUser(), alarmType, createAlarmDto.linkId(), alarmMessage));
+						new Alarm(participant.getUser(), alarmType, createAlarmDto.linkId(), createAlarmDto.familyId(),
+							alarmMessage));
 				}
 			}
 			default: {
@@ -202,7 +206,8 @@ public class AlarmService {
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 		String alarmMessage = "내일은 " + alarmType.getMessage();
 		alarmRepository.save(
-			new Alarm(user, alarmType, createAlarmDto.linkId(), alarmMessage));
+			new Alarm(user, alarmType, createAlarmDto.linkId(), createAlarmDto.familyId(), alarmMessage));
+
 	}
 
 }

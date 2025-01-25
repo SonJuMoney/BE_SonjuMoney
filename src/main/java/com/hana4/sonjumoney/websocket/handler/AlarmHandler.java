@@ -75,7 +75,7 @@ public class AlarmHandler extends TextWebSocketHandler {
 		try {
 			TextMessage alarmMessage = new TextMessage(objectMapper.writeValueAsString(
 				AlarmMessageDto.of(sendAlarmDto.alarmId(), sendAlarmDto.alarmStatus(), sendAlarmDto.alarmType(),
-					sendAlarmDto.message(), sendAlarmDto.linkId(), sendAlarmDto.createdAt())));
+					sendAlarmDto.message(), sendAlarmDto.linkId(), sendAlarmDto.familyId(), sendAlarmDto.createdAt())));
 			log.info(alarmMessage.getPayload());
 			session.sendMessage(alarmMessage);
 		} catch (Exception e) {
