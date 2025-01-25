@@ -17,6 +17,7 @@ public record SendAlarmDto(
 	AlarmType alarmType,
 	String message,
 	Long linkId,
+	Long familyId,
 	LocalDateTime createdAt
 
 ) {
@@ -28,6 +29,7 @@ public record SendAlarmDto(
 			.alarmType(alarm.getAlarmType())
 			.message(alarm.getMessage())
 			.linkId(alarm.getLinkId())
+			.familyId(alarm.getFamilyId())
 			.createdAt(alarm.getCreatedAt())
 			.build();
 	}
