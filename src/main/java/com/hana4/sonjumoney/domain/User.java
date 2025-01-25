@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -48,6 +49,7 @@ public class User {
 	@Enumerated(EnumType.STRING)
 	private Gender gender;
 
+	@Setter
 	@Column(name = "profile_link", length = 500)
 	private String profileLink;
 
@@ -63,4 +65,5 @@ public class User {
 		this.gender = gender;
 		this.profileLink = profileLink;
 	}
+
 }
