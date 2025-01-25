@@ -2,6 +2,7 @@ package com.hana4.sonjumoney.service;
 
 import com.hana4.sonjumoney.domain.enums.AlarmType;
 import com.hana4.sonjumoney.dto.CreateAlarmDto;
+import com.hana4.sonjumoney.dto.TransactionHistoryDto;
 import com.hana4.sonjumoney.dto.request.SendThanksRequest;
 import com.hana4.sonjumoney.dto.response.AllowanceInfoResponse;
 import com.hana4.sonjumoney.dto.response.SendAllowanceResponse;
@@ -22,6 +23,7 @@ import com.hana4.sonjumoney.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 @Slf4j
 @Service
@@ -46,16 +48,18 @@ public class AllowanceService {
 			throw new CommonException(ErrorCode.DIFFERENT_FAMILY);
 		}
 
-		accountService.makeTransferByUserId(AllowanceDto.of(sender.getUser().getId(), receiver.getUser().getId(),
-			sendAllowanceRequest.amount()));
+		String message = sendAllowanceRequest.message();
+		accountService.makeTransferByUserId(
+			AllowanceDto.of(sender.getUser().getId(), receiver.getUser().getId(), sendAllowanceRequest.amount(),
+				message != null ? message : ""));
 
 		Allowance savedAllowance = allowanceRepository.save(
 			new Allowance(sender,receiver,sendAllowanceRequest.amount())
 		);
 
-		if (sendAllowanceRequest.message() != null) {
+		if (message != null) {
 			feedService.saveAllowanceFeed(
-				CreateAllowanceThanksDto.of(savedAllowance, image, sendAllowanceRequest.message()));
+				CreateAllowanceThanksDto.of(savedAllowance, image, message));
 		}
 
 		alarmService.createOneOffAlarm(
