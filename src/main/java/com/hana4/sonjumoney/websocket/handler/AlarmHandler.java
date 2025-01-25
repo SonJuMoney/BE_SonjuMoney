@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.aspectj.bridge.Message;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -20,7 +21,7 @@ import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.FamilyRepository;
 import com.hana4.sonjumoney.repository.MemberRepository;
-import com.hana4.sonjumoney.websocket.dto.MessageDto;
+import com.hana4.sonjumoney.websocket.dto.AlarmMessageDto;
 import com.hana4.sonjumoney.dto.SendAlarmDto;
 
 import lombok.RequiredArgsConstructor;
@@ -72,10 +73,11 @@ public class AlarmHandler extends TextWebSocketHandler {
 		Long userAlarmSessionId = sendAlarmDto.alarmSessionId();
 		WebSocketSession session = userAlarmSessionMap.get(userAlarmSessionId);
 		try {
-			log.info(objectMapper.writeValueAsString(
-				MessageDto.of(sendAlarmDto.alarmType().getValue(), sendAlarmDto.message())));
-			session.sendMessage(new TextMessage(objectMapper.writeValueAsString(
-				MessageDto.of(sendAlarmDto.alarmType().getValue(), sendAlarmDto.message()))));
+			TextMessage alarmMessage = new TextMessage(objectMapper.writeValueAsString(
+				AlarmMessageDto.of(sendAlarmDto.alarmId(), sendAlarmDto.alarmStatus(), sendAlarmDto.alarmType(),
+					sendAlarmDto.message(), sendAlarmDto.linkId(), sendAlarmDto.createdAt())));
+			log.info(alarmMessage.getPayload());
+			session.sendMessage(alarmMessage);
 		} catch (Exception e) {
 			throw new CommonException(ErrorCode.ALARM_SEND_FAILED);
 		}
