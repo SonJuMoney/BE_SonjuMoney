@@ -56,7 +56,8 @@ public class AllowanceService {
 			CreateAllowanceThanksDto.of(savedAllowance, image, sendAllowanceRequest.message()));
 
 		alarmService.createOneOffAlarm(
-			CreateAlarmDto.of(receiver.getUser().getId(), sender.getId(), feedId, AlarmType.ALLOWANCE));
+			CreateAlarmDto.of(receiver.getUser().getId(), sender.getId(), feedId, receiver.getFamily().getId(),
+				AlarmType.ALLOWANCE));
 		return SendAllowanceResponse.of(200, "송금을 완료했습니다.", savedAllowance.getId());
 	}
 
@@ -68,7 +69,8 @@ public class AllowanceService {
 		String thanksMessage = sendThanksRequest.message();
 		Long feedId = feedService.saveThanksFeed(CreateAllowanceThanksDto.of(allowance, image, thanksMessage));
 		alarmService.createOneOffAlarm(
-			CreateAlarmDto.of(receiver.getUser().getId(), sender.getId(), feedId, AlarmType.THANKS));
+			CreateAlarmDto.of(receiver.getUser().getId(), sender.getId(), feedId, receiver.getFamily().getId(),
+				AlarmType.THANKS));
 		return SendThanksResponse.of(200, "감사 메시지를 전송했습니다.");
 	}
 

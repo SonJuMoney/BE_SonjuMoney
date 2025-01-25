@@ -9,13 +9,16 @@ public record CreateAlarmDto(
 	Long alarmSessionId,
 	Long senderId,
 	Long linkId,
+	Long familyId,
 	AlarmType alarmType
 ) {
-	public static CreateAlarmDto of(Long alarmSessionId, Long senderId, Long linkId, AlarmType alarmType) {
+	public static CreateAlarmDto of(Long alarmSessionId, Long senderId, Long linkId, Long familyId,
+		AlarmType alarmType) {
 		return CreateAlarmDto.builder()
 			.alarmSessionId(alarmSessionId)
 			.senderId(senderId)
 			.linkId(linkId)
+			.familyId(familyId)
 			.alarmType(alarmType)
 			.build();
 	}
