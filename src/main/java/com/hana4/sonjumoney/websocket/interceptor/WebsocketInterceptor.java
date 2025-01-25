@@ -33,8 +33,10 @@ public class WebsocketInterceptor implements HandshakeInterceptor {
 	@Override
 	public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
 		Map<String, Object> attributes) {
-		String str = request.getURI().getQuery();
-		log.info("str" + str);
+		ServletServerHttpRequest servletServerHttpRequest = (ServletServerHttpRequest)request;
+		Long userId = Long.valueOf(servletServerHttpRequest.getServletRequest().getParameter("userId"));
+		log.info("str" + userId);
+		attributes.put("userId", userId);
 		// log.info("length=" + request.getHeaders().get("cookie").size());
 		// String cookie = String.valueOf(request.getHeaders().get("cookie"));
 		// System.out.println(cookie);
