@@ -20,7 +20,7 @@ public class WebsocketConfig implements WebSocketConfigurer {
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 		registry.addHandler(alarmHandler, "/ws/alarms")
-			.setAllowedOrigins("*");
-			// .addInterceptors(websocketInterceptor);
+			.setAllowedOrigins("*")
+			.addInterceptors(websocketInterceptor);
 	}
 }
