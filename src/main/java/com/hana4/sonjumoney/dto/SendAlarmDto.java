@@ -22,6 +22,7 @@ public record SendAlarmDto(
 ) {
 	public static SendAlarmDto from(Alarm alarm) {
 		return SendAlarmDto.builder()
+			.alarmId(alarm.getId())
 			.alarmSessionId(alarm.getUser().getId())
 			.alarmStatus(alarm.getAlarmStatus())
 			.alarmType(alarm.getAlarmType())
@@ -30,6 +31,7 @@ public record SendAlarmDto(
 			.createdAt(alarm.getCreatedAt())
 			.build();
 	}
+
 	public static SendAlarmDto of(Long alarmSessionId, Long linkId, String message,
 		AlarmType alarmType) {
 		return SendAlarmDto.builder()
