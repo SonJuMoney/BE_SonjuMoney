@@ -49,8 +49,8 @@ public class User {
 	@Enumerated(EnumType.STRING)
 	private Gender gender;
 
+	@Setter
 	@Column(name = "profile_link", length = 500)
-	@Setter(AccessLevel.PUBLIC)
 	private String profileLink;
 
 	@Builder
@@ -65,4 +65,5 @@ public class User {
 		this.gender = gender;
 		this.profileLink = profileLink;
 	}
+
 }
