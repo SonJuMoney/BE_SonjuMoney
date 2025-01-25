@@ -52,11 +52,14 @@ public class AllowanceService {
 		Allowance savedAllowance = allowanceRepository.save(
 			new Allowance(sender,receiver,sendAllowanceRequest.amount())
 		);
-		Long feedId = feedService.saveAllowanceFeed(
-			CreateAllowanceThanksDto.of(savedAllowance, image, sendAllowanceRequest.message()));
+
+		if (sendAllowanceRequest.message() != null) {
+			feedService.saveAllowanceFeed(
+				CreateAllowanceThanksDto.of(savedAllowance, image, sendAllowanceRequest.message()));
+		}
 
 		alarmService.createOneOffAlarm(
-			CreateAlarmDto.of(receiver.getUser().getId(), sender.getId(), feedId, receiver.getFamily().getId(),
+			CreateAlarmDto.of(receiver.getUser().getId(), sender.getId(), savedAllowance.getId(), receiver.getFamily().getId(),
 				AlarmType.ALLOWANCE));
 		return SendAllowanceResponse.of(200, "송금을 완료했습니다.", savedAllowance.getId());
 	}
