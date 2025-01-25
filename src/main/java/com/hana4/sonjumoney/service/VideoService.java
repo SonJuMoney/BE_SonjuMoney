@@ -51,7 +51,7 @@ public class VideoService {
 		String extension = ContentUtil.getExtension(originalFileName);
 		checkFileType(extension);
 
-		String fileName = UUID.randomUUID() + extension;
+		String fileName = UUID.randomUUID() + originalFileName;
 		String directoryPath = getDirectoryPath(prefix, feedId);
 		Path filePath = Paths.get(directoryPath, fileName);
 		try (OutputStream os = Files.newOutputStream(filePath)) {

@@ -94,7 +94,7 @@ public class S3Service {
 	private String getKeyFromUrl(String url) {
 		String domain = "https://" + baseUrl + "/";
 		if (!url.startsWith(domain)) {
-			log.error("Domain Error!! Expected: " + url + " Actual: " + domain);
+			log.error("Domain Error!! Expected: " + domain + " Actual: " + url);
 			throw new CommonException(BAD_REQUEST);
 		}
 		return url.substring(domain.length());
