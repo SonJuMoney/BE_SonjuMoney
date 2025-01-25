@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -49,6 +50,7 @@ public class User {
 	private Gender gender;
 
 	@Column(name = "profile_link", length = 500)
+	@Setter(AccessLevel.PUBLIC)
 	private String profileLink;
 
 	@Builder
