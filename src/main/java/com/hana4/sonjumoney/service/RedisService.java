@@ -11,11 +11,11 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class RedisService {
-	private final RedisTemplate<String, Object> redisTemplate;
+	private final RedisTemplate<String, String> redisTemplate;
 
 	/*적금 메세지 생성*/
 	public String createSavingsMessage(Long withdrawalAccountId, Long autoTransferId, String message) {
-		String key = "withdrawalAccountId:" + withdrawalAccountId + "autoTransferId:" + autoTransferId;
+		String key = "withdrawalAccountId:" + withdrawalAccountId + ":autoTransferId:" + autoTransferId;
 		try {
 			redisTemplate.opsForValue().set(key, message);
 		} catch (Exception e) {
