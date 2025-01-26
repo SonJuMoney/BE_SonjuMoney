@@ -70,8 +70,10 @@ public class AlarmHandler extends TextWebSocketHandler {
 	}
 
 	public void sendUserAlarm(SendAlarmDto sendAlarmDto) {
+		log.info("유저별 알림 전송 진입");
 		Long userAlarmSessionId = sendAlarmDto.alarmSessionId();
 		WebSocketSession session = userAlarmSessionMap.get(userAlarmSessionId);
+		log.info("toId: " + userAlarmSessionId + " session: " + session.getId());
 		try {
 			TextMessage alarmMessage = new TextMessage(objectMapper.writeValueAsString(
 				AlarmMessageDto.of(sendAlarmDto.alarmId(), sendAlarmDto.alarmStatus(), sendAlarmDto.alarmType(),
@@ -97,8 +99,7 @@ public class AlarmHandler extends TextWebSocketHandler {
 		sessions.add(session);
 
 		Long userId = (Long)session.getAttributes().get("userId");
-		log.info("session id: " + session.getId() + " session uri: " + session.getUri() + " userId: "
-			+ userId);
+		log.info("userId: " + userId + " session id: " + session.getId() + " session uri: " + session.getUri());
 		try {
 			userAlarmSessionMap.put(userId, session);
 			List<Member> members = memberRepository.findAllByUserId(userId);

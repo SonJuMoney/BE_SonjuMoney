@@ -83,6 +83,21 @@ public class AccountService {
 			AccountProduct.FREE_DEPOSIT).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		Long amount = allowanceDto.amount();
 		transfer(TransferDto.of(sender, receiver, amount));
+
+		makeTransactionHistory(TransactionHistoryDto.builder()
+			.account(sender)
+			.afterBalance(sender.getBalance())
+			.opponentAccountId(receiver.getId())
+			.message(allowanceDto.message())
+			.transactionType(TransactionType.WITHDRAW)
+			.build());
+		makeTransactionHistory(TransactionHistoryDto.builder()
+			.account(receiver)
+			.afterBalance(sender.getBalance())
+			.opponentAccountId(sender.getId())
+			.message(allowanceDto.message())
+			.transactionType(TransactionType.DEPOSIT)
+			.build());
 	}
 
 	public CreateAccountResponse makeAccount(Long userId, Long mockaccId) {
@@ -193,10 +208,10 @@ public class AccountService {
 
 		Account senderAccount = accountRepository.findByUserId(userId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
-		Account recieverAccount = accountRepository.findById(accountId)
+		Account receiverAccount = accountRepository.findById(accountId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 
-		transfer(TransferDto.of(senderAccount, recieverAccount, request.amount()));
+		transfer(TransferDto.of(senderAccount, receiverAccount, request.amount()));
 
 		TransactionHistoryDto senderHistoryDto = TransactionHistoryDto.builder()
 			.account(senderAccount)
@@ -204,20 +219,20 @@ public class AccountService {
 			.message(request.message())
 			.afterBalance(senderAccount.getBalance())
 			.transactionType(TransactionType.WITHDRAW)
-			.opponentAccountId(recieverAccount.getId())
+			.opponentAccountId(receiverAccount.getId())
 			.build();
 
-		TransactionHistoryDto recieverHistoryDto = TransactionHistoryDto.builder()
-			.account(recieverAccount)
+		TransactionHistoryDto receiverHistoryDto = TransactionHistoryDto.builder()
+			.account(receiverAccount)
 			.amount(request.amount())
 			.message(request.message())
-			.afterBalance(recieverAccount.getBalance())
-			.transactionType(TransactionType.WITHDRAW)
+			.afterBalance(receiverAccount.getBalance())
+			.transactionType(TransactionType.DEPOSIT)
 			.opponentAccountId(senderAccount.getId())
 			.build();
 
 		makeTransactionHistory(senderHistoryDto);
-		makeTransactionHistory(recieverHistoryDto);
+		makeTransactionHistory(receiverHistoryDto);
 		return TransferResponse.of(201, "입,출금 완료");
 	}
 
