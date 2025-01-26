@@ -1,5 +1,6 @@
 package com.hana4.sonjumoney.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,10 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hana4.sonjumoney.dto.request.CreateAccountRequest;
 import com.hana4.sonjumoney.dto.request.CreateSavingAccountRequest;
+import com.hana4.sonjumoney.dto.request.CreateSavingsMessageRequest;
 import com.hana4.sonjumoney.dto.request.SendMoneyRequest;
 import com.hana4.sonjumoney.dto.response.AccountInfoResponse;
 import com.hana4.sonjumoney.dto.response.CreateAccountResponse;
 import com.hana4.sonjumoney.dto.response.CreateSavingAccountResponse;
+import com.hana4.sonjumoney.dto.response.CreateSavingsMessageResponse;
 import com.hana4.sonjumoney.dto.response.GetSavingAccountLimitResponse;
 import com.hana4.sonjumoney.dto.response.GetSavingAccountResponse;
 import com.hana4.sonjumoney.dto.response.GetTransactionHistoryResponse;
@@ -100,5 +103,14 @@ public class AccountController {
 		@PathVariable(value = "account_id") Long accountId) {
 		Long userId = AuthenticationUtil.getUserId(authentication);
 		return ResponseEntity.ok().body(accountService.getSavingAccountLimit(userId, accountId));
+	}
+
+	@PostMapping("/savings/{auto_transfer_id}/message")
+	public ResponseEntity<CreateSavingsMessageResponse> createSavingsMessage(Authentication authentication,
+		@PathVariable(value = "auto_transfer_id") Long autoTransferId,
+		@RequestBody CreateSavingsMessageRequest request) {
+		Long userId = AuthenticationUtil.getUserId(authentication);
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(accountService.createSavingsMessage(userId, autoTransferId, request));
 	}
 }

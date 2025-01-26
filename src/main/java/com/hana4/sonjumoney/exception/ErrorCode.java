@@ -49,7 +49,10 @@ public enum ErrorCode {
 	TRANSACTION_FAILED(50002, HttpStatus.INTERNAL_SERVER_ERROR, "거래가 실패했습니다."),
 	ALARM_SEND_FAILED(50003, HttpStatus.INTERNAL_SERVER_ERROR, "알림 전송에 실패했습니다."),
 	VIDEO_UPLOAD_FAILED(50004, HttpStatus.INTERNAL_SERVER_ERROR, "비디오 업로드에 실패했습니다."),
-	;
+	REDIS_OPERATION_FAILED(50005, HttpStatus.INTERNAL_SERVER_ERROR, "REDIS 작업에 실패했습니다."),
+
+	//503
+	REDIS_CONNECTION_FAILED(50300, HttpStatus.SERVICE_UNAVAILABLE, "REDIS 연결에 실패했습니다.");
 	private final Integer code;
 	private final HttpStatus httpStatus;
 	private final String message;

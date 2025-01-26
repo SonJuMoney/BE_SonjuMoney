@@ -36,10 +36,12 @@ import com.hana4.sonjumoney.dto.TransactionHistoryResultDto;
 import com.hana4.sonjumoney.dto.TransferDto;
 import com.hana4.sonjumoney.dto.request.AuthPinRequest;
 import com.hana4.sonjumoney.dto.request.CreateSavingAccountRequest;
+import com.hana4.sonjumoney.dto.request.CreateSavingsMessageRequest;
 import com.hana4.sonjumoney.dto.request.SendMoneyRequest;
 import com.hana4.sonjumoney.dto.response.AccountInfoResponse;
 import com.hana4.sonjumoney.dto.response.CreateAccountResponse;
 import com.hana4.sonjumoney.dto.response.CreateSavingAccountResponse;
+import com.hana4.sonjumoney.dto.response.CreateSavingsMessageResponse;
 import com.hana4.sonjumoney.dto.response.GetSavingAccountLimitResponse;
 import com.hana4.sonjumoney.dto.response.GetSavingAccountResponse;
 import com.hana4.sonjumoney.dto.response.GetTransactionHistoryResponse;
@@ -74,6 +76,7 @@ public class AccountService {
 	private final AuthService authService;
 
 	private final Integer PAGE_SIZE = 20;
+	private final RedisService redisService;
 
 	@Transactional
 	public void makeTransferByUserId(AllowanceDto allowanceDto) {
@@ -446,5 +449,21 @@ public class AccountService {
 		TransactionHistoryResultDto result = TransactionHistoryResultDto.of(hasNext, page, dates);
 		return GetTransactionHistoryResponse.of(true, 200, "요청 성공", result);
 
+	}
+
+	public CreateSavingsMessageResponse createSavingsMessage(Long userId, Long autoTransferId,
+		CreateSavingsMessageRequest messageRequest) {
+		Account account = accountRepository.findByUserId(userId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+
+		AutoTransfer autoTransfer = autoTransferRepository.findByIdAndWithdrawalAccountId(autoTransferId,
+				account.getId())
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+
+		String savedMessage = redisService.createSavingsMessage(account.getId(), autoTransferId,
+			messageRequest.Message());
+
+		return CreateSavingsMessageResponse.of(201,
+			savedMessage);
 	}
 }
