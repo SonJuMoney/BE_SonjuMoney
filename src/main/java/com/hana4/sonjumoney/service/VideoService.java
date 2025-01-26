@@ -98,6 +98,15 @@ public class VideoService {
 		}
 	}
 
+	public void deleteVideo(String pathStr) {
+		Path path = Paths.get(pathStr);
+		try {
+			Files.deleteIfExists(path);
+		} catch (IOException e) {
+			throw new CommonException(ErrorCode.VIDEO_DELETE_FAILED);
+		}
+
+	}
 
 	private String getDirectoryPath(ContentPrefix prefix,Long feedId) {
 		String directory = "src/main/resources/static/video/" + prefix.getPrefix() + feedId;

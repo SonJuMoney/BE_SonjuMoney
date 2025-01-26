@@ -63,11 +63,7 @@ public class FeedService {
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		String feedMessage = createFeedRequest.message();
 		boolean contentExist;
-		if (files == null || files.length == 0) {
-			contentExist = false;
-		} else {
-			contentExist = true;
-		}
+		contentExist = files != null && files.length != 0;
 		log.info("contents: " + contentExist);
 		Feed savedFeed = feedRepository.save(
 			new Feed(writer, null, null, contentExist, 0, feedMessage, FeedType.NORMAL));
@@ -153,7 +149,13 @@ public class FeedService {
 		}
 		List<FeedContent> feedContents = feedContentRepository.findAllByFeed(feed);
 		for (FeedContent feedContent : feedContents) {
-			s3Service.deleteImage(feedContent.getContentUrl());
+			String pathStr = feedContent.getContentUrl();
+			String extension = ContentUtil.getExtension(pathStr);
+			if (ContentUtil.classifyContentType(extension).equals(ContentType.IMAGE)) {
+				s3Service.deleteImage(pathStr);
+			} else {
+				videoService.deleteVideo(pathStr);
+			}
 		}
 		feedContentRepository.deleteFeedContentsByFeedId(feedId);
 		feedRepository.delete(feed);
