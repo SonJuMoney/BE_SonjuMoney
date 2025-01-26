@@ -36,6 +36,7 @@ public enum ErrorCode {
 	NOT_FOUND_USER(40400, HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."),
 	NOT_FOUND_MEMBER(40401, HttpStatus.NOT_FOUND, "존재하지 않는 멤버입니다."),
 	NOT_FOUND_DATA(40402, HttpStatus.NOT_FOUND, "해당 데이터를 찾을 수 없습니다."),
+	NOT_FOUND_OPPONENET(40403, HttpStatus.NOT_FOUND, "상대방이 존재하지 않습니다.(개발용 에러)"),
 
 	// 409
 	CONFLICT_ID(40901, HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),
