@@ -81,7 +81,7 @@ public class AlarmHandler extends TextWebSocketHandler {
 			log.info(alarmMessage.getPayload());
 			session.sendMessage(alarmMessage);
 		} catch (NullPointerException e) {
-			throw new CommonException(ErrorCode.NOT_FOUND_OPPONENET);
+			log.error(ErrorCode.NOT_FOUND_OPPONENET.getMessage());
 		} catch (Exception e) {
 			throw new CommonException(ErrorCode.ALARM_SEND_FAILED);
 		}
