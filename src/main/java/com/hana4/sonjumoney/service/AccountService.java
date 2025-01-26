@@ -90,13 +90,16 @@ public class AccountService {
 			.opponentAccountId(receiver.getId())
 			.message(allowanceDto.message())
 			.transactionType(TransactionType.WITHDRAW)
+			.amount(allowanceDto.amount())
 			.build());
+
 		makeTransactionHistory(TransactionHistoryDto.builder()
 			.account(receiver)
 			.afterBalance(sender.getBalance())
 			.opponentAccountId(sender.getId())
 			.message(allowanceDto.message())
 			.transactionType(TransactionType.DEPOSIT)
+			.amount(allowanceDto.amount())
 			.build());
 	}
 

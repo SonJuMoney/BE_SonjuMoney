@@ -70,16 +70,18 @@ public class AlarmHandler extends TextWebSocketHandler {
 	}
 
 	public void sendUserAlarm(SendAlarmDto sendAlarmDto) {
-		log.info("유저별 알림 전송 진입");
-		Long userAlarmSessionId = sendAlarmDto.alarmSessionId();
-		WebSocketSession session = userAlarmSessionMap.get(userAlarmSessionId);
-		log.info("toId: " + userAlarmSessionId + " session: " + session.getId());
 		try {
+			log.info("유저별 알림 전송 진입");
+			Long userAlarmSessionId = sendAlarmDto.alarmSessionId();
+			WebSocketSession session = userAlarmSessionMap.get(userAlarmSessionId);
+			log.info("toId: " + userAlarmSessionId + " session: " + session.getId());
 			TextMessage alarmMessage = new TextMessage(objectMapper.writeValueAsString(
 				AlarmMessageDto.of(sendAlarmDto.alarmId(), sendAlarmDto.alarmStatus(), sendAlarmDto.alarmType(),
 					sendAlarmDto.message(), sendAlarmDto.linkId(), sendAlarmDto.familyId(), sendAlarmDto.createdAt())));
 			log.info(alarmMessage.getPayload());
 			session.sendMessage(alarmMessage);
+		} catch (NullPointerException e) {
+			throw new CommonException(ErrorCode.NOT_FOUND_OPPONENET);
 		} catch (Exception e) {
 			throw new CommonException(ErrorCode.ALARM_SEND_FAILED);
 		}
