@@ -51,6 +51,7 @@ public class UserService {
 		return UpdateProfileResponse.builder()
 			.code(200)
 			.message("이미지 변경이 완료되었습니다.")
+			.url(user.getProfileLink())
 			.build();
 	}
 
