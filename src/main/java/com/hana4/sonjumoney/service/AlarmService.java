@@ -139,6 +139,9 @@ public class AlarmService {
 				List<Member> members = memberRepository.findByFamilyId(family.getId());
 
 				for (Member member : members) {
+					if (member.getId().equals(createAlarmDto.senderId())) {
+						continue;
+					}
 					Alarm alarm = alarmRepository.save(
 						new Alarm(member.getUser(), alarmType, createAlarmDto.linkId(), createAlarmDto.familyId(),
 							message));

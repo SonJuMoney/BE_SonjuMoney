@@ -14,10 +14,12 @@ import com.hana4.sonjumoney.domain.Comment;
 import com.hana4.sonjumoney.domain.Feed;
 import com.hana4.sonjumoney.domain.FeedContent;
 import com.hana4.sonjumoney.domain.Member;
+import com.hana4.sonjumoney.domain.enums.AlarmType;
 import com.hana4.sonjumoney.domain.enums.ContentType;
 import com.hana4.sonjumoney.domain.enums.FeedType;
 import com.hana4.sonjumoney.domain.enums.MemberRole;
 import com.hana4.sonjumoney.dto.ContentPrefix;
+import com.hana4.sonjumoney.dto.CreateAlarmDto;
 import com.hana4.sonjumoney.dto.CreateAllowanceThanksDto;
 import com.hana4.sonjumoney.dto.FeedContentCommentDto;
 import com.hana4.sonjumoney.dto.FeedContentContentDto;
@@ -51,8 +53,9 @@ public class FeedService {
 	private final FeedContentRepository feedContentRepository;
 	private final S3Service s3Service;
 	private final VideoService videoService;
-	private static final int PAGE_SIZE = 30;
+	private final AlarmService alarmService;
 	private final CommentRepository commentRepository;
+	private static final int PAGE_SIZE = 30;
 
 	@Transactional
 	public CreateFeedResponse saveNormalFeed(Long userId, MultipartFile[] files, CreateFeedRequest createFeedRequest) {
@@ -96,8 +99,9 @@ public class FeedService {
 			}
 		}
 		// TODO: 웹소켓 알림 전송
-		// alarmService.createOneOffAlarm(CreateAlarmDto.of(writer.getFamily().getId(), writer.getId(), savedFeed.getId(),
-		// 	AlarmType.FEED));
+		alarmService.createOneOffAlarm(
+			CreateAlarmDto.of(writer.getFamily().getId(), writer.getId(), savedFeed.getId(), writer.getFamily().getId(),
+				AlarmType.FEED));
 		return CreateFeedResponse.of(200, savedFeed.getId(), "피드 등록이 완료되었습니다.");
 	}
 

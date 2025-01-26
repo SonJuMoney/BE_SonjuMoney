@@ -1,6 +1,8 @@
 package com.hana4.sonjumoney.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -19,6 +21,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.ResultActions;
@@ -30,6 +33,7 @@ import com.hana4.sonjumoney.domain.Feed;
 import com.hana4.sonjumoney.domain.FeedContent;
 import com.hana4.sonjumoney.domain.Member;
 import com.hana4.sonjumoney.domain.enums.FeedType;
+import com.hana4.sonjumoney.dto.SendAlarmDto;
 import com.hana4.sonjumoney.dto.request.CreateFeedRequest;
 import com.hana4.sonjumoney.dto.request.PostFeedCommentRequest;
 import com.hana4.sonjumoney.dto.response.CreateFeedResponse;
@@ -39,6 +43,7 @@ import com.hana4.sonjumoney.repository.CommentRepository;
 import com.hana4.sonjumoney.repository.FeedContentRepository;
 import com.hana4.sonjumoney.repository.FeedRepository;
 import com.hana4.sonjumoney.repository.MemberRepository;
+import com.hana4.sonjumoney.websocket.handler.AlarmHandler;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -58,10 +63,14 @@ class FeedControllerTest extends ControllerTest {
 	@Autowired
 	private CommentRepository commentRepository;
 
+	@MockBean
+	private AlarmHandler alarmHandler;
+
 	@Test
 	@Order(1)
 	void addFeedTest() throws Exception {
 		// given
+		doNothing().when(alarmHandler).sendUserAlarm(any(SendAlarmDto.class));
 		CreateFeedRequest request = new CreateFeedRequest(1L, "즐거운 여행~");
 		MockMultipartFile image1 = new MockMultipartFile(
 			"files",
