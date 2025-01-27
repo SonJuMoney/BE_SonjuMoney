@@ -1,37 +1,19 @@
 package com.hana4.sonjumoney.dto;
 
-import java.time.LocalDateTime;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.hana4.sonjumoney.domain.enums.TransactionType;
+import java.time.LocalDate;
+import java.util.List;
 
 import lombok.Builder;
 
 @Builder
-public record TransactionHistoryContentsDto(
-	@JsonProperty("message")
-	String message,
-
-	@JsonProperty("transaction_type")
-	String transactionType,
-
-	@JsonProperty("after_balance")
-	Long afterBalance,
-
-	@JsonProperty("created_at")
-	LocalDateTime createdAt,
-
-	@JsonProperty("amount")
-	Long amount
+public record TransactionHistoryContentsDto(LocalDate date,
+											List<TransactionHistoryTransactionsDto> transactions
 ) {
-	public static TransactionHistoryContentsDto of(String message, TransactionType transactionType,
-		Long afterBalance, LocalDateTime createdAt, Long amount) {
+	public static TransactionHistoryContentsDto of(LocalDate date,
+		List<TransactionHistoryTransactionsDto> transactions) {
 		return TransactionHistoryContentsDto.builder()
-			.message(message)
-			.transactionType(transactionType.getValue())
-			.amount(amount)
-			.afterBalance(afterBalance)
-			.createdAt(createdAt)
+			.date(date)
+			.transactions(transactions)
 			.build();
 	}
 }

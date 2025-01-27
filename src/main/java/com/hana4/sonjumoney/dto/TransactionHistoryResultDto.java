@@ -7,14 +7,14 @@ import lombok.Builder;
 @Builder
 public record TransactionHistoryResultDto(Boolean hasNext,
 										  Integer page,
-										  List<TransactionHistoryDatesDto> dates
+										  List<TransactionHistoryContentsDto> contents
 ) {
 	public static TransactionHistoryResultDto of(Boolean hasNext, Integer page,
-		List<TransactionHistoryDatesDto> dates) {
+		List<TransactionHistoryContentsDto> contents) {
 		return TransactionHistoryResultDto.builder()
 			.hasNext(hasNext)
 			.page(page)
-			.dates(dates)
+			.contents(contents)
 			.build();
 	}
 }
