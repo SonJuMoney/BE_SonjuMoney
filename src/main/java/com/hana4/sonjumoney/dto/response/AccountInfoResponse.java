@@ -8,6 +8,8 @@ import lombok.Builder;
 
 @Builder
 public record AccountInfoResponse(
+	@JsonProperty("account_id")
+	Long accountId,
 	@JsonProperty("account_name")
 	String accountName,
 	String bank,
@@ -15,8 +17,10 @@ public record AccountInfoResponse(
 	String accountNum,
 	Long balance
 ) {
-	public static AccountInfoResponse of(String accountName, Bank bank,String accountNum,Long balance) {
+	public static AccountInfoResponse of(Long accountId, String accountName, Bank bank, String accountNum,
+		Long balance) {
 		return AccountInfoResponse.builder()
+			.accountId(accountId)
 			.accountName(accountName)
 			.bank(bank.getValue())
 			.accountNum(accountNum)
@@ -28,6 +32,7 @@ public record AccountInfoResponse(
 		String name = account.getBank().getValue() + account.getAccountType().getAccountProduct().getName() + "통장";
 		String bank = account.getBank().getValue() + "은행";
 		return AccountInfoResponse.builder()
+			.accountId(account.getId())
 			.accountName(name)
 			.bank(bank)
 			.accountNum(account.getAccountNum())
