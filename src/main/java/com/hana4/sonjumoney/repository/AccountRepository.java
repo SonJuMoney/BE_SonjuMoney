@@ -18,6 +18,8 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
 	Optional<Account> findByUserId(Long userId);
 
+	Optional<Account> findByIdAndUserId(Long id, Long userId);
+
 	Optional<Account> findByHolderResidentNum(String residentNum);
 
 	Long user(User user);
