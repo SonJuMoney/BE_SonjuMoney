@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.context.WebApplicationContext;
@@ -86,6 +87,27 @@ public class UserControllerTest {
 			.andExpect(jsonPath("$[0].user_id").value(3))
 			.andExpect(jsonPath("$[0].user_name").value("용돈 받을 애"))
 			.andDo(print());
+	}
+
+	@Test
+	void updateProfileTest() throws Exception {
+		MockMultipartFile image = new MockMultipartFile(
+			"file",
+			"profile-test-image.png",
+			MediaType.IMAGE_PNG_VALUE,
+			new byte[] {1}
+		);
+
+		String api = "/api/users/profiles";
+		mockMvc.perform(multipart(api)
+				.file(image)
+				.with(request -> {
+					request.setMethod("PATCH");
+					return request;
+				})
+				.header("Authorization", "Bearer " + accessToken)
+				.contentType(MediaType.MULTIPART_FORM_DATA))
+			.andExpect(status().isOk());
 	}
 
 }

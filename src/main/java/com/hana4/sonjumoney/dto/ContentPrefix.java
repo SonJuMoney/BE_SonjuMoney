@@ -9,6 +9,7 @@ public enum ContentPrefix {
 	ALLOWANCE("allowance/"),
 	THANKS("thanks/"),
 	FEED("feed/"),
+	PROFILE("profiles/"),
 	;
 	private final String prefix;
 }

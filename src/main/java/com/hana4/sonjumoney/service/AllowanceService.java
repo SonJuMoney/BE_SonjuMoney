@@ -2,6 +2,7 @@ package com.hana4.sonjumoney.service;
 
 import com.hana4.sonjumoney.domain.enums.AlarmType;
 import com.hana4.sonjumoney.dto.CreateAlarmDto;
+import com.hana4.sonjumoney.dto.TransactionHistoryDto;
 import com.hana4.sonjumoney.dto.request.SendThanksRequest;
 import com.hana4.sonjumoney.dto.response.AllowanceInfoResponse;
 import com.hana4.sonjumoney.dto.response.SendAllowanceResponse;
@@ -22,6 +23,7 @@ import com.hana4.sonjumoney.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 @Slf4j
 @Service
@@ -34,7 +36,7 @@ public class AllowanceService {
 	private final AlarmService alarmService;
 
 	@Transactional
-	public SendAllowanceResponse sendAllowance(MultipartFile image, Long userId, SendAllowanceRequest sendAllowanceRequest) {
+	public SendAllowanceResponse sendAllowance(MultipartFile file, Long userId, SendAllowanceRequest sendAllowanceRequest) {
 		Member receiver = memberRepository.findById(sendAllowanceRequest.receiverId())
 			.orElseThrow(() -> new CommonException(
 				ErrorCode.NOT_FOUND_MEMBER));
@@ -46,29 +48,45 @@ public class AllowanceService {
 			throw new CommonException(ErrorCode.DIFFERENT_FAMILY);
 		}
 
-		accountService.makeTransferByUserId(AllowanceDto.of(sender.getUser().getId(), receiver.getUser().getId(),
-			sendAllowanceRequest.amount()));
+		String message = sendAllowanceRequest.message();
+		accountService.makeTransferByUserId(
+			AllowanceDto.of(sender.getUser().getId(), receiver.getUser().getId(), sendAllowanceRequest.amount(),
+				message != null ? message : ""));
 
 		Allowance savedAllowance = allowanceRepository.save(
 			new Allowance(sender,receiver,sendAllowanceRequest.amount())
 		);
-		Long feedId = feedService.saveAllowanceFeed(
-			CreateAllowanceThanksDto.of(savedAllowance, image, sendAllowanceRequest.message()));
+
+		if (message != null) {
+			feedService.saveAllowanceFeed(
+				CreateAllowanceThanksDto.of(savedAllowance, file, message));
+		}
 
 		alarmService.createOneOffAlarm(
-			CreateAlarmDto.of(receiver.getUser().getId(), sender.getId(), feedId, AlarmType.ALLOWANCE));
+			CreateAlarmDto.of(receiver.getUser().getId(), sender.getId(), savedAllowance.getId(), receiver.getFamily().getId(),
+				AlarmType.ALLOWANCE));
 		return SendAllowanceResponse.of(200, "송금을 완료했습니다.", savedAllowance.getId());
 	}
 
-	public SendThanksResponse sendThanks(MultipartFile image, Long userId, Long allowanceId,SendThanksRequest sendThanksRequest) {
+	public SendThanksResponse sendThanks(MultipartFile file, Long userId, Long allowanceId, SendThanksRequest sendThanksRequest) {
 		Allowance allowance = allowanceRepository.findById(allowanceId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
-		Member sender = allowance.getReceiver();
 		Member receiver = allowance.getSender();
-		String thanksMessage = sendThanksRequest.message();
-		Long feedId = feedService.saveThanksFeed(CreateAllowanceThanksDto.of(allowance, image, thanksMessage));
-		alarmService.createOneOffAlarm(
-			CreateAlarmDto.of(receiver.getUser().getId(), sender.getId(), feedId, AlarmType.THANKS));
+		Member sender = allowance.getReceiver();
+		if (memberRepository.findByUser_IdAndFamily(userId, receiver.getFamily())
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER))
+			.equals(sender)) {
+			throw new CommonException(ErrorCode.DIFFERENT_MEMBER_USER);
+		}
+		String message = sendThanksRequest.message();
+		if (message != null) {
+			Long feedId = feedService.saveThanksFeed(CreateAllowanceThanksDto.of(allowance, file, message));
+			alarmService.createOneOffAlarm(
+				CreateAlarmDto.of(receiver.getUser().getId(), sender.getId(), feedId, receiver.getFamily().getId(),
+					AlarmType.THANKS));
+		} else {
+			throw new CommonException(ErrorCode.NULL_THANKS_MESSAGE);
+		}
 		return SendThanksResponse.of(200, "감사 메시지를 전송했습니다.");
 	}
 

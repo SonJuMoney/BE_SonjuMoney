@@ -17,6 +17,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Lombok;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -45,6 +46,9 @@ public class Alarm extends BaseEntity {
 	@Column(name = "link_id", nullable = false)
 	private Long linkId;
 
+	@Column(name = "family_id", nullable = false)
+	private Long familyId;
+
 	@Column(length = 300, nullable = false)
 	private String message;
 
@@ -57,11 +61,12 @@ public class Alarm extends BaseEntity {
 	}
 
 	@Builder
-	public Alarm(User user, AlarmType alarmType, Long linkId, String message) {
+	public Alarm(User user, AlarmType alarmType, Long linkId, Long familyId, String message) {
 		this.user = user;
 		this.alarmStatus = AlarmStatus.RECEIVED;
 		this.alarmType = alarmType;
 		this.linkId = linkId;
+		this.familyId = familyId;
 		this.message = message;
 	}
 }

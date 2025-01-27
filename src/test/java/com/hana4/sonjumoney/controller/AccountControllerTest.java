@@ -18,6 +18,7 @@ import com.hana4.sonjumoney.ControllerTest;
 import com.hana4.sonjumoney.domain.Account;
 import com.hana4.sonjumoney.dto.request.CreateAccountRequest;
 import com.hana4.sonjumoney.dto.request.CreateSavingAccountRequest;
+import com.hana4.sonjumoney.dto.request.CreateSavingsMessageRequest;
 import com.hana4.sonjumoney.dto.request.SendMoneyRequest;
 import com.hana4.sonjumoney.repository.AccountRepository;
 
@@ -179,4 +180,30 @@ public class AccountControllerTest extends ControllerTest {
 			.andDo(print());
 	}
 
+	@Test
+	@Transactional
+	@DisplayName("내 계좌 이체 내역 조회")
+	void getTransactionsTest() throws Exception {
+		Integer page = 0;
+
+		mockMvc.perform(get("/api/accounts/transactions?page=" + page)
+				.header("Authorization", "Bearer " + accessToken)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("적금 메세지 생성")
+	void createSavingsMessage() throws Exception {
+		CreateSavingsMessageRequest messageRequest = CreateSavingsMessageRequest.builder()
+			.Message("우리 손주. 할아버지야. 건강하게 자라렴")
+			.build();
+		mockMvc.perform(post("/api/accounts/savings/{auto_transfer_id}/message", 1)
+				.header("Authorization", "Bearer " + accessToken)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(messageRequest)))
+			.andExpect(status().isCreated())
+			.andDo(print());
+	}
 }

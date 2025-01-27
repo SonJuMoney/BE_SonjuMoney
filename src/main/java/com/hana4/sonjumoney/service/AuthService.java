@@ -212,18 +212,21 @@ public class AuthService implements UserDetailsService {
 		List<AuthListResponse> result = new ArrayList<>();
 		List<Relationship> relationships = relationshipRepository.findAllByUserId(userId);
 		if (relationships.isEmpty()) {
-			result.add(AuthListResponse.of(userId, Role.INDIVIDUAL, userRepository.findById(userId)
-				.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER))
-				.getUsername()));
+			User user = userRepository.findById(userId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER
+			));
+			result.add(AuthListResponse.of(userId, Role.INDIVIDUAL, user.getUsername(), user.getProfileLink(),
+				user.getGender()));
 			return result;
 		}
 		try {
-			result.add(AuthListResponse.of(relationships.get(0).getParent().getId(), Role.PARENT,
-				relationships.get(0).getParent().getUsername()));
+			User parent = relationships.get(0).getParent();
+			result.add(AuthListResponse.of(parent.getId(), Role.PARENT,
+				parent.getUsername(), parent.getProfileLink(), parent.getGender()));
 
 			for (Relationship relationship : relationships) {
-				result.add(AuthListResponse.of(relationship.getChild().getId(), Role.CHILD,
-					relationship.getChild().getUsername()));
+				User child = relationship.getChild();
+				result.add(AuthListResponse.of(child.getId(), Role.CHILD,
+					child.getUsername(), child.getProfileLink(), child.getGender()));
 			}
 			return result;
 		} catch (Exception e) {

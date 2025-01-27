@@ -21,6 +21,8 @@ public enum ErrorCode {
 	WRONG_FILE_NAME(40008, HttpStatus.BAD_REQUEST, "파일 이름은 null일 수 없습니다."),
 	WRONG_FILE_TYPE(40009, HttpStatus.BAD_REQUEST, "잘못된 확장자입니다."),
 	EXCESSIVE_SIZE(40010, HttpStatus.BAD_REQUEST, "비디오 크기는 10GB를 넘을 수 없습니다."),
+	NULL_THANKS_MESSAGE(40011, HttpStatus.BAD_REQUEST, "감사메시지는 null일 수 없습니다."),
+	DIFFERENT_MEMBER_USER(40012, HttpStatus.BAD_REQUEST, "유저와 멤버가 다릅니다."),
 
 	//401
 	UNAUTHORIZED(40100, HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),
@@ -36,6 +38,7 @@ public enum ErrorCode {
 	NOT_FOUND_USER(40400, HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."),
 	NOT_FOUND_MEMBER(40401, HttpStatus.NOT_FOUND, "존재하지 않는 멤버입니다."),
 	NOT_FOUND_DATA(40402, HttpStatus.NOT_FOUND, "해당 데이터를 찾을 수 없습니다."),
+	NOT_FOUND_OPPONENET(40403, HttpStatus.NOT_FOUND, "상대방이 존재하지 않습니다.(개발용 에러)"),
 
 	// 409
 	CONFLICT_ID(40901, HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),
@@ -48,7 +51,12 @@ public enum ErrorCode {
 	TRANSACTION_FAILED(50002, HttpStatus.INTERNAL_SERVER_ERROR, "거래가 실패했습니다."),
 	ALARM_SEND_FAILED(50003, HttpStatus.INTERNAL_SERVER_ERROR, "알림 전송에 실패했습니다."),
 	VIDEO_UPLOAD_FAILED(50004, HttpStatus.INTERNAL_SERVER_ERROR, "비디오 업로드에 실패했습니다."),
-	;
+	VIDEO_STREAM_FAILED(50005, HttpStatus.INTERNAL_SERVER_ERROR, "비디오 스트리밍 실패했습니다."),
+	VIDEO_DELETE_FAILED(50006, HttpStatus.INTERNAL_SERVER_ERROR, "비디오 삭제에 실패했습니다."),
+	REDIS_OPERATION_FAILED(50007, HttpStatus.INTERNAL_SERVER_ERROR, "REDIS 작업에 실패했습니다."),
+
+	//503
+	REDIS_CONNECTION_FAILED(50300, HttpStatus.SERVICE_UNAVAILABLE, "REDIS 연결에 실패했습니다.");
 	private final Integer code;
 	private final HttpStatus httpStatus;
 	private final String message;

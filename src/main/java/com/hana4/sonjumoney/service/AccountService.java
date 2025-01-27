@@ -29,16 +29,22 @@ import com.hana4.sonjumoney.dto.AllowanceDto;
 import com.hana4.sonjumoney.dto.SavingAccountContentDto;
 import com.hana4.sonjumoney.dto.SavingAccountResultDto;
 import com.hana4.sonjumoney.dto.SavingAccountTransactionDto;
+import com.hana4.sonjumoney.dto.TransactionHistoryContentsDto;
 import com.hana4.sonjumoney.dto.TransactionHistoryDto;
+import com.hana4.sonjumoney.dto.TransactionHistoryResultDto;
+import com.hana4.sonjumoney.dto.TransactionHistoryTransactionsDto;
 import com.hana4.sonjumoney.dto.TransferDto;
 import com.hana4.sonjumoney.dto.request.AuthPinRequest;
 import com.hana4.sonjumoney.dto.request.CreateSavingAccountRequest;
+import com.hana4.sonjumoney.dto.request.CreateSavingsMessageRequest;
 import com.hana4.sonjumoney.dto.request.SendMoneyRequest;
 import com.hana4.sonjumoney.dto.response.AccountInfoResponse;
 import com.hana4.sonjumoney.dto.response.CreateAccountResponse;
 import com.hana4.sonjumoney.dto.response.CreateSavingAccountResponse;
+import com.hana4.sonjumoney.dto.response.CreateSavingsMessageResponse;
 import com.hana4.sonjumoney.dto.response.GetSavingAccountLimitResponse;
 import com.hana4.sonjumoney.dto.response.GetSavingAccountResponse;
+import com.hana4.sonjumoney.dto.response.GetTransactionHistoryResponse;
 import com.hana4.sonjumoney.dto.response.SavingAccountInfoResponse;
 import com.hana4.sonjumoney.dto.response.SavingAccountResponse;
 import com.hana4.sonjumoney.dto.response.TransferResponse;
@@ -70,6 +76,7 @@ public class AccountService {
 	private final AuthService authService;
 
 	private final Integer PAGE_SIZE = 20;
+	private final RedisService redisService;
 
 	@Transactional
 	public void makeTransferByUserId(AllowanceDto allowanceDto) {
@@ -79,6 +86,24 @@ public class AccountService {
 			AccountProduct.FREE_DEPOSIT).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		Long amount = allowanceDto.amount();
 		transfer(TransferDto.of(sender, receiver, amount));
+
+		makeTransactionHistory(TransactionHistoryDto.builder()
+			.account(sender)
+			.afterBalance(sender.getBalance())
+			.opponentAccountId(receiver.getId())
+			.message(allowanceDto.message())
+			.transactionType(TransactionType.WITHDRAW)
+			.amount(allowanceDto.amount())
+			.build());
+
+		makeTransactionHistory(TransactionHistoryDto.builder()
+			.account(receiver)
+			.afterBalance(sender.getBalance())
+			.opponentAccountId(sender.getId())
+			.message(allowanceDto.message())
+			.transactionType(TransactionType.DEPOSIT)
+			.amount(allowanceDto.amount())
+			.build());
 	}
 
 	public CreateAccountResponse makeAccount(Long userId, Long mockaccId) {
@@ -163,8 +188,9 @@ public class AccountService {
 	}
 
 	public SavingAccountResponse findSavingAccounts(Long userId) {
+		/* members -> empty = 모든 family에서 son or daughter인 경우 */
 		List<Member> members = memberRepository.findMemberByMemberRoleAndUserId(userId);
-		if (!members.isEmpty()) {
+		if (members.isEmpty()) {
 			return SavingAccountResponse.of(true, null);
 		}
 
@@ -189,10 +215,10 @@ public class AccountService {
 
 		Account senderAccount = accountRepository.findByUserId(userId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
-		Account recieverAccount = accountRepository.findById(accountId)
+		Account receiverAccount = accountRepository.findById(accountId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 
-		transfer(TransferDto.of(senderAccount, recieverAccount, request.amount()));
+		transfer(TransferDto.of(senderAccount, receiverAccount, request.amount()));
 
 		TransactionHistoryDto senderHistoryDto = TransactionHistoryDto.builder()
 			.account(senderAccount)
@@ -200,20 +226,20 @@ public class AccountService {
 			.message(request.message())
 			.afterBalance(senderAccount.getBalance())
 			.transactionType(TransactionType.WITHDRAW)
-			.opponentAccountId(recieverAccount.getId())
+			.opponentAccountId(receiverAccount.getId())
 			.build();
 
-		TransactionHistoryDto recieverHistoryDto = TransactionHistoryDto.builder()
-			.account(recieverAccount)
+		TransactionHistoryDto receiverHistoryDto = TransactionHistoryDto.builder()
+			.account(receiverAccount)
 			.amount(request.amount())
 			.message(request.message())
-			.afterBalance(recieverAccount.getBalance())
-			.transactionType(TransactionType.WITHDRAW)
+			.afterBalance(receiverAccount.getBalance())
+			.transactionType(TransactionType.DEPOSIT)
 			.opponentAccountId(senderAccount.getId())
 			.build();
 
 		makeTransactionHistory(senderHistoryDto);
-		makeTransactionHistory(recieverHistoryDto);
+		makeTransactionHistory(receiverHistoryDto);
 		return TransferResponse.of(201, "입,출금 완료");
 	}
 
@@ -269,7 +295,7 @@ public class AccountService {
 
 		List<LocalDate> dateList;
 		try {
-			dateList = transactionHistoryRepository.findDistinctDatesAsObjects(userAccount.getId(),
+			dateList = transactionHistoryRepository.findDistinctSavingsDatesAsObjects(userAccount.getId(),
 					opponentAccountId, pageRequest)
 				.stream()
 				.map(result -> ((Date)result[0]).toLocalDate())
@@ -280,7 +306,7 @@ public class AccountService {
 
 		List<TransactionHistory> transactionHistories;
 		try {
-			transactionHistories = transactionHistoryRepository.findByDates(
+			transactionHistories = transactionHistoryRepository.findSavingsByDates(
 				userAccount.getId(), opponentAccountId, dateList);
 		} catch (Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
@@ -303,7 +329,7 @@ public class AccountService {
 
 		Boolean hasNext;
 		try {
-			hasNext = transactionHistoryRepository.hasNext(userAccount.getId(), opponentAccountId,
+			hasNext = transactionHistoryRepository.hasNextSavings(userAccount.getId(), opponentAccountId,
 				transactionHistories.get(transactionHistories.size() - 1).getId());
 		} catch (Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
@@ -366,4 +392,79 @@ public class AccountService {
 
 	}
 
+	public GetTransactionHistoryResponse getTransactions(Long userId, Integer page) {
+		PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE);
+		Account account = accountRepository.findByUserId(userId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		List<LocalDate> dateList;
+		try {
+			dateList = transactionHistoryRepository.findDistinctDatesAsObjects(account.getId(),
+					pageRequest)
+				.stream()
+				.map(result -> ((Date)result[0]).toLocalDate())
+				.collect(Collectors.toList());
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+
+		List<TransactionHistory> myTransactions;
+		try {
+			myTransactions = transactionHistoryRepository.findByDates(account.getId(), dateList);
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+		if (myTransactions.isEmpty()) {
+			return GetTransactionHistoryResponse.builder()
+				.isSuccess(true)
+				.code(200)
+				.message("요청 성공")
+				.result(TransactionHistoryResultDto.builder()
+					.hasNext(false)
+					.page(page)
+					.contents(new ArrayList<>())
+					.build())
+				.build();
+		}
+		List<TransactionHistoryContentsDto> contents = new ArrayList<>();
+		Boolean hasNext;
+		try {
+			hasNext = transactionHistoryRepository.hasNext(account.getId(),
+				myTransactions.get(myTransactions.size() - 1).getId());
+		} catch (Exception e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+		for (LocalDate localDate : dateList) {
+			List<TransactionHistoryTransactionsDto> transactions = myTransactions.stream()
+				.filter(content -> content.getCreatedAt().toLocalDate().equals(localDate))
+				.map(content -> TransactionHistoryTransactionsDto.of(
+					content.getMessage(),
+					content.getTransactionType(),
+					content.getAfterBalance(),
+					content.getCreatedAt(),
+					content.getAmount()))
+				.collect(Collectors.toList());
+
+			contents.add(TransactionHistoryContentsDto.of(localDate, transactions));
+		}
+		contents.sort(Comparator.comparing(TransactionHistoryContentsDto::date).reversed());
+		TransactionHistoryResultDto result = TransactionHistoryResultDto.of(hasNext, page, contents);
+		return GetTransactionHistoryResponse.of(true, 200, "요청 성공", result);
+
+	}
+
+	public CreateSavingsMessageResponse createSavingsMessage(Long userId, Long autoTransferId,
+		CreateSavingsMessageRequest messageRequest) {
+		Account account = accountRepository.findByUserId(userId)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+
+		AutoTransfer autoTransfer = autoTransferRepository.findByIdAndWithdrawalAccountId(autoTransferId,
+				account.getId())
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+
+		String savedMessage = redisService.createSavingsMessage(account.getId(), autoTransferId,
+			messageRequest.Message());
+
+		return CreateSavingsMessageResponse.of(201,
+			savedMessage);
+	}
 }
