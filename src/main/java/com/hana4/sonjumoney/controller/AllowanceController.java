@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.hana4.sonjumoney.dto.request.SendAllowanceRequest;
+import com.hana4.sonjumoney.dto.response.SendThanksResponse;
 import com.hana4.sonjumoney.service.AllowanceService;
 import com.hana4.sonjumoney.util.AuthenticationUtil;
 
@@ -46,12 +47,11 @@ public class AllowanceController {
 	}
 
 	@PostMapping("/{allowance_id}/thanks")
-	public ResponseEntity<?> sendThanks(Authentication authentication,
+	public ResponseEntity<SendThanksResponse> sendThanks(Authentication authentication,
 		@PathVariable(value = "allowance_id") Long allowanceId,
 		@RequestPart(value = "file", required = false) MultipartFile image,
 		@RequestPart(value = "data") SendThanksRequest sendThanksRequest
 	) {
-
 		return ResponseEntity.ok()
 			.body(allowanceService.sendThanks(image, AuthenticationUtil.getUserId(authentication), allowanceId,
 				sendThanksRequest));
