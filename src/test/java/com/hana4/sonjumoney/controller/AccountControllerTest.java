@@ -186,7 +186,7 @@ public class AccountControllerTest extends ControllerTest {
 	void getTransactionsTest() throws Exception {
 		Integer page = 0;
 
-		mockMvc.perform(get("/api/accounts/transactions?page=" + page)
+		mockMvc.perform(get("/api/accounts/{account_id}/transactions?page=" + page, 1)
 				.header("Authorization", "Bearer " + accessToken)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())

@@ -392,10 +392,10 @@ public class AccountService {
 
 	}
 
-	public GetTransactionHistoryResponse getTransactions(Long userId, Integer page) {
+	public GetTransactionHistoryResponse getTransactions(Long userId, Long accountId, Integer page) {
 		PageRequest pageRequest = PageRequest.of(page, PAGE_SIZE);
-		Account account = accountRepository.findByUserId(userId)
-			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		Account account = accountRepository.findByIdAndUserId(accountId, userId)
+			.orElseThrow(() -> new CommonException(ErrorCode.BAD_REQUEST));
 		List<LocalDate> dateList;
 		try {
 			dateList = transactionHistoryRepository.findDistinctDatesAsObjects(account.getId(),
