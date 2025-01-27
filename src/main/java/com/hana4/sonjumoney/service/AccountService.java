@@ -30,9 +30,9 @@ import com.hana4.sonjumoney.dto.SavingAccountContentDto;
 import com.hana4.sonjumoney.dto.SavingAccountResultDto;
 import com.hana4.sonjumoney.dto.SavingAccountTransactionDto;
 import com.hana4.sonjumoney.dto.TransactionHistoryContentsDto;
-import com.hana4.sonjumoney.dto.TransactionHistoryDatesDto;
 import com.hana4.sonjumoney.dto.TransactionHistoryDto;
 import com.hana4.sonjumoney.dto.TransactionHistoryResultDto;
+import com.hana4.sonjumoney.dto.TransactionHistoryTransactionsDto;
 import com.hana4.sonjumoney.dto.TransferDto;
 import com.hana4.sonjumoney.dto.request.AuthPinRequest;
 import com.hana4.sonjumoney.dto.request.CreateSavingAccountRequest;
@@ -420,11 +420,11 @@ public class AccountService {
 				.result(TransactionHistoryResultDto.builder()
 					.hasNext(false)
 					.page(page)
-					.dates(new ArrayList<>())
+					.contents(new ArrayList<>())
 					.build())
 				.build();
 		}
-		List<TransactionHistoryDatesDto> dates = new ArrayList<>();
+		List<TransactionHistoryContentsDto> contents = new ArrayList<>();
 		Boolean hasNext;
 		try {
 			hasNext = transactionHistoryRepository.hasNext(account.getId(),
@@ -433,9 +433,9 @@ public class AccountService {
 			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
 		}
 		for (LocalDate localDate : dateList) {
-			List<TransactionHistoryContentsDto> contents = myTransactions.stream()
+			List<TransactionHistoryTransactionsDto> transactions = myTransactions.stream()
 				.filter(content -> content.getCreatedAt().toLocalDate().equals(localDate))
-				.map(content -> TransactionHistoryContentsDto.of(
+				.map(content -> TransactionHistoryTransactionsDto.of(
 					content.getMessage(),
 					content.getTransactionType(),
 					content.getAfterBalance(),
@@ -443,10 +443,10 @@ public class AccountService {
 					content.getAmount()))
 				.collect(Collectors.toList());
 
-			dates.add(TransactionHistoryDatesDto.of(localDate, contents));
+			contents.add(TransactionHistoryContentsDto.of(localDate, transactions));
 		}
-		dates.sort(Comparator.comparing(TransactionHistoryDatesDto::date).reversed());
-		TransactionHistoryResultDto result = TransactionHistoryResultDto.of(hasNext, page, dates);
+		contents.sort(Comparator.comparing(TransactionHistoryContentsDto::date).reversed());
+		TransactionHistoryResultDto result = TransactionHistoryResultDto.of(hasNext, page, contents);
 		return GetTransactionHistoryResponse.of(true, 200, "요청 성공", result);
 
 	}
