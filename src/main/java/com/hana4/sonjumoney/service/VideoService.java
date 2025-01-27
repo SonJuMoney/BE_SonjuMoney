@@ -2,6 +2,8 @@ package com.hana4.sonjumoney.service;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -56,8 +58,9 @@ public class VideoService {
 		Path filePath = Paths.get(directoryPath, fileName);
 		try (OutputStream os = Files.newOutputStream(filePath)) {
 			os.write(video.getBytes());
-			log.info(filePath.toString());
-			return filePath.toString();
+			String encodedPath = URLEncoder.encode(filePath.toString(), StandardCharsets.UTF_8);
+			log.info(encodedPath);
+			return encodedPath;
 		} catch (IOException e) {
 			log.error("file upload failed", e);
 			throw new CommonException(ErrorCode.VIDEO_UPLOAD_FAILED);
