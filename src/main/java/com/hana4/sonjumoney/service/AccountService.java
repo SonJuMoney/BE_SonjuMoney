@@ -188,8 +188,9 @@ public class AccountService {
 	}
 
 	public SavingAccountResponse findSavingAccounts(Long userId) {
+		/* members -> empty = 모든 family에서 son or daughter인 경우 */
 		List<Member> members = memberRepository.findMemberByMemberRoleAndUserId(userId);
-		if (!members.isEmpty()) {
+		if (members.isEmpty()) {
 			return SavingAccountResponse.of(true, null);
 		}
 
