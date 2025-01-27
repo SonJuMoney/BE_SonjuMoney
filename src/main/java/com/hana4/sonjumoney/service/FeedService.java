@@ -78,12 +78,14 @@ public class FeedService {
 				}
 				String contentType = file.getContentType();
 				log.info("컨텐츠: " + contentType);
-				if (contentType != null) {
-					if (contentType.startsWith("image/")) {
-						images.add(file);
-					} else if (contentType.startsWith("video/")) {
-						videos.add(file);
-					}
+				if (contentType == null) {
+					throw new CommonException(ErrorCode.WRONG_FILE_TYPE);
+				} else if (contentType.startsWith("image/")) {
+					images.add(file);
+				} else if (contentType.startsWith("video/")) {
+					videos.add(file);
+				} else {
+					throw new CommonException(ErrorCode.WRONG_FILE_TYPE);
 				}
 			}
 			List<String> contentsUrl = s3Service.uploadImagesToS3(images, ContentPrefix.FEED, savedFeed.getId());
@@ -94,7 +96,6 @@ public class FeedService {
 					new FeedContent(savedFeed, contentUrl));
 			}
 		}
-		// TODO: 웹소켓 알림 전송
 		alarmService.createOneOffAlarm(
 			CreateAlarmDto.of(writer.getFamily().getId(), writer.getId(), savedFeed.getId(), writer.getFamily().getId(),
 				AlarmType.FEED));
@@ -106,16 +107,15 @@ public class FeedService {
 		Allowance allowance = createAllowanceThanksDto.allowance();
 		Member sender = allowance.getSender();
 		Member receiver = allowance.getReceiver();
-		boolean contentExist = createAllowanceThanksDto.image() != null;
+		MultipartFile file = createAllowanceThanksDto.file();
+		boolean contentExist = file != null;
 		String message = createAllowanceThanksDto.message();
 
 		Feed savedFeed = feedRepository.save(
 			new Feed(sender, allowance, receiver.getId(), contentExist, 0, message, FeedType.ALLOWANCE));
 
 		if (contentExist) {
-			String contentUrl = s3Service.uploadImageToS3(createAllowanceThanksDto.image(), ContentPrefix.ALLOWANCE,
-				savedFeed.getId());
-
+			String contentUrl = uploadOneContent(file, ContentPrefix.ALLOWANCE, savedFeed.getId());
 			feedContentRepository.save(new FeedContent(savedFeed, contentUrl));
 		}
 		return savedFeed.getId();
@@ -126,19 +126,34 @@ public class FeedService {
 		Allowance allowance = createAllowanceThanksDto.allowance();
 		Member sender = allowance.getReceiver();
 		Member receiver = allowance.getSender();
-		boolean contentExist = createAllowanceThanksDto.image() != null;
+		MultipartFile file = createAllowanceThanksDto.file();
+		boolean contentExist = file != null;
 		String message = createAllowanceThanksDto.message();
 
 		Feed savedFeed = feedRepository.save(
 			new Feed(sender, allowance, receiver.getId(), contentExist, 0, message, FeedType.THANKS));
 
 		if (contentExist) {
-			String contentUrl = s3Service.uploadImageToS3(createAllowanceThanksDto.image(), ContentPrefix.THANKS,
-				savedFeed.getId());
-
+			String contentUrl = uploadOneContent(file, ContentPrefix.THANKS, savedFeed.getId());
 			feedContentRepository.save(new FeedContent(savedFeed, contentUrl));
 		}
 		return savedFeed.getId();
+	}
+
+	private String uploadOneContent(MultipartFile file, ContentPrefix prefix, Long feedId) {
+		String contentUrl;
+		String contentType = file.getContentType();
+
+		if (contentType == null) {
+			throw new CommonException(ErrorCode.WRONG_FILE_TYPE);
+		} else if (contentType.startsWith("image/")) {
+			contentUrl = s3Service.uploadImageToS3(file, prefix, feedId);
+		} else if (contentType.startsWith("video/")) {
+			contentUrl = videoService.uploadVideo(file, prefix, feedId);
+		} else {
+			throw new CommonException(ErrorCode.WRONG_FILE_TYPE);
+		}
+		return contentUrl;
 	}
 
 	@Transactional

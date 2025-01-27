@@ -21,6 +21,8 @@ public enum ErrorCode {
 	WRONG_FILE_NAME(40008, HttpStatus.BAD_REQUEST, "파일 이름은 null일 수 없습니다."),
 	WRONG_FILE_TYPE(40009, HttpStatus.BAD_REQUEST, "잘못된 확장자입니다."),
 	EXCESSIVE_SIZE(40010, HttpStatus.BAD_REQUEST, "비디오 크기는 10GB를 넘을 수 없습니다."),
+	NULL_THANKS_MESSAGE(40011, HttpStatus.BAD_REQUEST, "감사메시지는 null일 수 없습니다."),
+	DIFFERENT_MEMBER_USER(40012, HttpStatus.BAD_REQUEST, "유저와 멤버가 다릅니다."),
 
 	//401
 	UNAUTHORIZED(40100, HttpStatus.UNAUTHORIZED, "인증이 필요합니다."),

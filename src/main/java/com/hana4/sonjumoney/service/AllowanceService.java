@@ -36,7 +36,7 @@ public class AllowanceService {
 	private final AlarmService alarmService;
 
 	@Transactional
-	public SendAllowanceResponse sendAllowance(MultipartFile image, Long userId, SendAllowanceRequest sendAllowanceRequest) {
+	public SendAllowanceResponse sendAllowance(MultipartFile file, Long userId, SendAllowanceRequest sendAllowanceRequest) {
 		Member receiver = memberRepository.findById(sendAllowanceRequest.receiverId())
 			.orElseThrow(() -> new CommonException(
 				ErrorCode.NOT_FOUND_MEMBER));
@@ -59,7 +59,7 @@ public class AllowanceService {
 
 		if (message != null) {
 			feedService.saveAllowanceFeed(
-				CreateAllowanceThanksDto.of(savedAllowance, image, message));
+				CreateAllowanceThanksDto.of(savedAllowance, file, message));
 		}
 
 		alarmService.createOneOffAlarm(
@@ -68,16 +68,25 @@ public class AllowanceService {
 		return SendAllowanceResponse.of(200, "송금을 완료했습니다.", savedAllowance.getId());
 	}
 
-	public SendThanksResponse sendThanks(MultipartFile image, Long userId, Long allowanceId,SendThanksRequest sendThanksRequest) {
+	public SendThanksResponse sendThanks(MultipartFile file, Long userId, Long allowanceId, SendThanksRequest sendThanksRequest) {
 		Allowance allowance = allowanceRepository.findById(allowanceId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
-		Member sender = allowance.getReceiver();
 		Member receiver = allowance.getSender();
-		String thanksMessage = sendThanksRequest.message();
-		Long feedId = feedService.saveThanksFeed(CreateAllowanceThanksDto.of(allowance, image, thanksMessage));
-		alarmService.createOneOffAlarm(
-			CreateAlarmDto.of(receiver.getUser().getId(), sender.getId(), feedId, receiver.getFamily().getId(),
-				AlarmType.THANKS));
+		Member sender = allowance.getReceiver();
+		if (memberRepository.findByUser_IdAndFamily(userId, receiver.getFamily())
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER))
+			.equals(sender)) {
+			throw new CommonException(ErrorCode.DIFFERENT_MEMBER_USER);
+		}
+		String message = sendThanksRequest.message();
+		if (message != null) {
+			Long feedId = feedService.saveThanksFeed(CreateAllowanceThanksDto.of(allowance, file, message));
+			alarmService.createOneOffAlarm(
+				CreateAlarmDto.of(receiver.getUser().getId(), sender.getId(), feedId, receiver.getFamily().getId(),
+					AlarmType.THANKS));
+		} else {
+			throw new CommonException(ErrorCode.NULL_THANKS_MESSAGE);
+		}
 		return SendThanksResponse.of(200, "감사 메시지를 전송했습니다.");
 	}
 
