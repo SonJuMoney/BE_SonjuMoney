@@ -11,13 +11,13 @@ import lombok.Builder;
 public record CreateAllowanceThanksDto(
 	Allowance allowance,
 	@Nullable
-	MultipartFile image,
+	MultipartFile file,
 	String message
 ) {
-	public static CreateAllowanceThanksDto of(Allowance allowance, MultipartFile image, String message) {
+	public static CreateAllowanceThanksDto of(Allowance allowance, MultipartFile file, String message) {
 		return CreateAllowanceThanksDto.builder()
 			.allowance(allowance)
-			.image(image)
+			.file(file)
 			.message(message)
 			.build();
 	}
