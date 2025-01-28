@@ -190,6 +190,9 @@ public class FeedService {
 			List<FeedContentDto> contents = new ArrayList<>();
 
 			for (Feed feed : feeds) {
+				if (feed.getFeedType() != FeedType.NORMAL && !feed.getReceiverId().equals(member.getId())) {
+					continue;
+				}
 				List<FeedContent> feedContents = feedContentRepository.findAllByFeed(feed);
 				List<Comment> comments = commentRepository.findAllByFeed(feed);
 				List<FeedContentContentDto> feedContentContentDtoList = new ArrayList<>();
