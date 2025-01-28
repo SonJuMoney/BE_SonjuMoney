@@ -26,7 +26,9 @@ import com.hana4.sonjumoney.repository.RelationshipRepository;
 import com.hana4.sonjumoney.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class InvitationService {
@@ -86,6 +88,7 @@ public class InvitationService {
 					InvitationStatus.PENDING));
 
 			if (invitedUser != null) {
+				log.info("초대 보낼 유저: " + invitedUser.getId());
 				alarmService.createOneOffAlarm(
 					CreateAlarmDto.of(invitedUser.getId(), senderId, savedInvitation.getId(), familyId, AlarmType.INVITE));
 			}
