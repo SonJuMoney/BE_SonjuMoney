@@ -17,6 +17,8 @@ import com.hana4.sonjumoney.domain.Event;
 import com.hana4.sonjumoney.domain.EventParticipant;
 import com.hana4.sonjumoney.domain.Family;
 import com.hana4.sonjumoney.domain.Member;
+import com.hana4.sonjumoney.domain.enums.AlarmType;
+import com.hana4.sonjumoney.dto.CreateAlarmDto;
 import com.hana4.sonjumoney.dto.request.AddEventRequest;
 import com.hana4.sonjumoney.dto.request.UpdateEventRequest;
 import com.hana4.sonjumoney.dto.response.DeleteEventResponse;
@@ -38,6 +40,7 @@ public class EventService {
 	private final FamilyRepository familyRepository;
 	private final MemberRepository memberRepository;
 	private final EventParticipantRepository eventParticipantRepository;
+	private final AlarmService alarmService;
 
 	@Transactional
 	public EventResponse addEvent(Long userId, Long familyId, AddEventRequest addEventRequest) {
@@ -46,8 +49,7 @@ public class EventService {
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
 
 		Family family = findMember.getFamily();
-		Event event = addEventRequest.toEntity(family);
-		eventRepository.save(event);
+		Event savedEvent = eventRepository.save(addEventRequest.toEntity(family));
 		List<Member> members;
 		try {
 			members = memberRepository.findAllWithUserByIds(addEventRequest.memberId());
@@ -57,23 +59,25 @@ public class EventService {
 
 		List<EventParticipant> eventParticipants = members.stream()
 			.map(member -> EventParticipant.builder()
-				.event(event)
+				.event(savedEvent)
 				.member(member)
 				.build())
 			.toList();
 		eventParticipantRepository.saveAll(eventParticipants);
+		alarmService.createOneOffAlarm(CreateAlarmDto.of(familyId, findMember.getId(), savedEvent.getId(), familyId,
+			AlarmType.EVENT));
 
 		List<EventParticipantResponse> participantResponses = eventParticipants.stream()
 			.map(EventParticipantResponse::from)
 			.toList();
 
 		return EventResponse.of(
-			event.getId(),
-			event.getEventCategory(),
-			event.getEventName(),
-			event.getStartDateTime(),
-			event.getEndDateTime(),
-			event.getAllDayStatus(),
+			savedEvent.getId(),
+			savedEvent.getEventCategory(),
+			savedEvent.getEventName(),
+			savedEvent.getStartDateTime(),
+			savedEvent.getEndDateTime(),
+			savedEvent.getAllDayStatus(),
 			participantResponses
 		);
 

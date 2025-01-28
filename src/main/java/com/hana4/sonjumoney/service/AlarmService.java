@@ -132,7 +132,7 @@ public class AlarmService {
 				alarmHandler.sendUserAlarm(SendAlarmDto.from(alarm));
 				break;
 			}
-			case FEED: {
+			case FEED, EVENT: {
 				Family family = familyRepository.findById(createAlarmDto.alarmSessionId())
 					.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 				String message = alarmType.getMessage();
