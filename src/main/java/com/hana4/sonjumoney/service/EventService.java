@@ -52,7 +52,7 @@ public class EventService {
 		Event savedEvent = eventRepository.save(addEventRequest.toEntity(family));
 		List<Member> members;
 		try {
-			members = memberRepository.findAllWithUserByIds(addEventRequest.memberId());
+			members = memberRepository.findAllByIds(addEventRequest.memberId());
 		} catch (NoSuchElementException e) {
 			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
 		}
@@ -184,7 +184,7 @@ public class EventService {
 
 		List<Member> newMembers;
 		try {
-			newMembers = memberRepository.findAllWithUserByIds(updateEventRequest.memberId());
+			newMembers = memberRepository.findAllByIds(updateEventRequest.memberId());
 		} catch (NoSuchElementException e) {
 			throw new CommonException(ErrorCode.NOT_FOUND_DATA);
 		}
