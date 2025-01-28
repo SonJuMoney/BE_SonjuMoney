@@ -64,7 +64,8 @@ public class CallService {
 		String[] response = chatGPTService.askChatGPT(prompt).split("\\n");
 		List<CallRecommendationResponse> recommendations = new ArrayList<CallRecommendationResponse>();
 		for (String s : response) {
-			recommendations.add(CallRecommendationResponse.of(s));
+			String recommendation = s.replaceFirst("^\\d+\\.\\s*", "");
+			recommendations.add(CallRecommendationResponse.of(recommendation));
 		}
 
 		return recommendations;
