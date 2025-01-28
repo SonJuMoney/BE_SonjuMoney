@@ -37,6 +37,7 @@ public class FamilyService {
 	private final FamilyRepository familyRepository;
 	private final UserRepository userRepository;
 	private final EventService eventService;
+	private final InvitationService invitationService;
 
 	public List<GetFamilyResponse> findFamilies(Long userId) {
 		// 유저가 속한 가족(들)의 family_id를 찾는다.
@@ -110,7 +111,7 @@ public class FamilyService {
 			}
 		}
 		addBirthWhenMemberAdded(userId, user.getUsername(), user.getResidentNum(), member.getId(), family.getId());
-		// TODO: 초대 보내기 구현
+		invitationService.sendInvitation(family.getId(), member.getId(), request.addMembers());
 		return family.getId();
 
 	}
