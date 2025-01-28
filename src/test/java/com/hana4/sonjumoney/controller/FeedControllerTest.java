@@ -187,8 +187,9 @@ class FeedControllerTest extends ControllerTest {
 	@Test
 	@Order(3)
 	void getFeedsTest() throws Exception {
+		Member member = memberRepository.findByUserIdAndFamilyId(1L, 1L).orElseThrow();
 		Feed feed = Feed.builder()
-			.member(memberRepository.findByUserIdAndFamilyId(1L, 1L).orElseThrow())
+			.member(member)
 			.allowance(null)
 			.receiverId(null)
 			.contentExist(true)
@@ -198,6 +199,16 @@ class FeedControllerTest extends ControllerTest {
 			.build();
 		feedRepository.saveAndFlush(feed);
 
+		Feed allowanceFeed = Feed.builder()
+			.member(member)
+			.allowance(null)
+			.receiverId(2L)
+			.contentExist(true)
+			.likes(0)
+			.feedMessage("ㅋㅋ")
+			.feedType(FeedType.ALLOWANCE)
+			.build();
+		feedRepository.saveAndFlush(allowanceFeed);
 		String api = "/api/feeds";
 
 		mockMvc.perform(get(api).header("Authorization", "Bearer " + accessToken)
@@ -205,7 +216,8 @@ class FeedControllerTest extends ControllerTest {
 				.param("family_id", "1")
 				.param("page", "0"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.result.contents").isNotEmpty());
+			.andExpect(jsonPath("$.result.contents").isNotEmpty())
+			.andExpect(jsonPath("$.result.contents.length()").value(1));
 	}
 
 	@Test

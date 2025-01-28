@@ -2,6 +2,7 @@ package com.hana4.sonjumoney.dto;
 
 import java.time.LocalDateTime;
 
+import com.hana4.sonjumoney.domain.Comment;
 import com.hana4.sonjumoney.domain.enums.MemberRole;
 
 import lombok.Builder;
@@ -18,6 +19,20 @@ public record FeedContentCommentDto(
 	Boolean is_update,
 	LocalDateTime created_at
 ) {
+
+	public static FeedContentCommentDto from(Comment comment, Long userId) {
+		return FeedContentCommentDto.builder()
+			.comment_id(comment.getId())
+			.writer_id(comment.getMember().getUser().getId())
+			.writer_name(comment.getMember().getUser().getUsername())
+			.member_role(comment.getMember().getMemberRole())
+			.is_mine(comment.getMember().getUser().getId().equals(userId))
+			.writer_image(comment.getMember().getUser().getProfileLink())
+			.message(comment.getMessage())
+			.is_update(!comment.getCreatedAt().equals(comment.getUpdatedAt()))
+			.created_at(comment.getCreatedAt())
+			.build();
+	}
 	public static FeedContentCommentDto of(Long comment_id, Long writer_id, String writer_name, MemberRole member_role,
 		Boolean is_mine,
 		String writer_image,
