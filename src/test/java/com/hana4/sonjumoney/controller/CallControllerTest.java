@@ -19,8 +19,9 @@ public class CallControllerTest extends ControllerTest {
 	@Test
 	void getRecommendationsTest() throws Exception {
 		String api = "/api/calls/recommendations";
-		mockMvc.perform(get(api + "/2")
+		mockMvc.perform(get(api)
 				.header("Authorization", "Bearer " + accessToken)
+				.param("target_id", "2")
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$[0].topic").isNotEmpty())

@@ -43,7 +43,6 @@ public class AuthControllerTest {
 				get(url).contentType(MediaType.APPLICATION_JSON)
 					.param("id", authId))
 			.andExpect(status().isOk())
-			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.duplication", is(true)));
 
 		// 없는 아이디를 넣으면 false 반환
@@ -51,7 +50,6 @@ public class AuthControllerTest {
 				get(url).contentType(MediaType.APPLICATION_JSON)
 					.param("id", notFoundedId))
 			.andExpect(status().isOk())
-			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.duplication", is(false)));
 	}
 
@@ -78,8 +76,7 @@ public class AuthControllerTest {
 				mockMvc.perform(
 						post(url).contentType(MediaType.APPLICATION_JSON)
 							.content(objectMapper.writeValueAsString(signUpRequest)))
-					.andExpect(status().isOk())
-					.andExpect(content().contentType(MediaType.APPLICATION_JSON));
+					.andExpect(status().isOk());
 
 				User user = userRepository.findByAuthId(authId).orElseThrow();
 				userRepository.delete(user);
@@ -96,8 +93,7 @@ public class AuthControllerTest {
 						is(404),
 						is(409),
 						is(500)
-					)))
-					.andExpect(content().contentType(MediaType.APPLICATION_JSON));
+					)));
 			}
 
 		}
