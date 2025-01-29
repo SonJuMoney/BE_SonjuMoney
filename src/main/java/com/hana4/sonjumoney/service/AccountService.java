@@ -122,6 +122,7 @@ public class AccountService {
 			.user(user)
 			.bank(Bank.HANA)
 			.holderResidentNum(user.getResidentNum())
+			.deputyResidentNum(mockAccount.getDeputyResidentNum())
 			.accountNum(mockAccount.getAccountNum())
 			.accountPassword(mockAccount.getAccountPassword())
 			.balance(mockAccount.getBalance())
