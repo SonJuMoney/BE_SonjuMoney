@@ -45,7 +45,7 @@ public class SecurityConfig {
 				.requestMatchers("/api/auth/error", "/api/auth/sign-up", "/api/auth/sign-in",
 					"/api/auth/id-duplication",
 					"/api/auth/resident-duplication", "/api/auth/phone-duplication",
-					"/api/auth/reissue", "/api/videos/stream", "/ws/alarms")
+					"/api/auth/reissue", "/api/videos/stream", "/ws/alarms","/actuator/**")
 				.permitAll()
 				.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui/index.html").permitAll()
 				.anyRequest()
