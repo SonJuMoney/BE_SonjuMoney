@@ -24,9 +24,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 	@Query("select m from Member m where m.user.id = :userId and (m.memberRole != 'SON' and m.memberRole != 'DAUGHTER')")
 	List<Member> findMemberByMemberRoleAndUserId(Long userId);
 
-	@Query("select m from Member m where m.user.id = :userId")
-	List<Member> findByUserId(Long userId);
-
 	@Query("SELECT m " +
 		"FROM Member m " +
 		"JOIN Family f ON m.family.id = f.id " +

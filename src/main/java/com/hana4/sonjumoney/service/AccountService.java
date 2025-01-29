@@ -190,7 +190,7 @@ public class AccountService {
 
 	public SavingAccountResponse findSavingAccounts(Long userId) {
 		/* 처음 회원가입한 사람은 가족 설정이 안되어있으므로 MemberResponse가 Empty */
-		List<Member> newUserMember = memberRepository.findByUserId(userId);
+		List<Member> newUserMember = memberRepository.findAllByUserId(userId);
 		if (newUserMember.isEmpty()) {
 			return SavingAccountResponse.of(false, null);
 		}
