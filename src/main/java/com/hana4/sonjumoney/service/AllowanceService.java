@@ -73,7 +73,7 @@ public class AllowanceService {
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		Member receiver = allowance.getSender();
 		Member sender = allowance.getReceiver();
-		if (memberRepository.findByUser_IdAndFamily(userId, receiver.getFamily())
+		if (!memberRepository.findByUser_IdAndFamily(userId, receiver.getFamily())
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER))
 			.equals(sender)) {
 			throw new CommonException(ErrorCode.DIFFERENT_MEMBER_USER);
