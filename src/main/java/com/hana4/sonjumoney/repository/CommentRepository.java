@@ -12,4 +12,6 @@ import com.hana4.sonjumoney.domain.Feed;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
 	List<Comment> findAllByFeed(Feed feed);
+
+	void deleteAllByFeed(Feed feed);
 }

@@ -173,6 +173,7 @@ public class FeedService {
 			}
 		}
 		feedContentRepository.deleteFeedContentsByFeedId(feedId);
+		commentRepository.deleteAllByFeed(feed);
 		feedRepository.delete(feed);
 		return DeleteFeedResponse.of(200, "삭제가 완료되었습니다.");
 	}
