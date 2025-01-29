@@ -1,5 +1,6 @@
 package com.hana4.sonjumoney.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hana4.sonjumoney.domain.enums.AccountProduct;
 import com.hana4.sonjumoney.domain.enums.Bank;
 
@@ -10,9 +11,11 @@ public record MockAccountResponse(
 	Long mockacc_id,
 	Bank bank,
 	Long balance,
+	@JsonProperty("account_name")
 	AccountProduct accountName,
+	@JsonProperty("account_num")
 	String accountNumber
-){
+) {
 	public static MockAccountResponse of(
 		Long mockacc_id,
 		Bank bank,
@@ -29,5 +32,3 @@ public record MockAccountResponse(
 			.build();
 	}
 }
-
-
