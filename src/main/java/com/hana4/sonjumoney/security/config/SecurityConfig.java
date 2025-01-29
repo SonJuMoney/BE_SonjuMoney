@@ -42,7 +42,8 @@ public class SecurityConfig {
 			.httpBasic(AbstractHttpConfigurer::disable)
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests((auth) -> auth
-				.requestMatchers("/api/auth/sign-up", "/api/auth/sign-in", "/api/auth/id-duplication",
+				.requestMatchers("/api/auth/error", "/api/auth/sign-up", "/api/auth/sign-in",
+					"/api/auth/id-duplication",
 					"/api/auth/resident-duplication", "/api/auth/phone-duplication",
 					"/api/auth/reissue", "/api/videos/stream", "/ws/alarms")
 				.permitAll()
