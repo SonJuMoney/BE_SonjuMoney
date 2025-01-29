@@ -32,6 +32,7 @@ public record FeedContentDto(
 			.writer_id(feed.getMember().getId())
 			.member_role(feed.getMember().getMemberRole())
 			.is_mine(feed.getMember().getUser().getId().equals(userId))
+			.writer_name(feed.getMember().getUser().getUsername())
 			.writer_image(feed.getMember().getUser().getProfileLink())
 			.feed_type(feed.getFeedType())
 			.message(feed.getFeedMessage())
