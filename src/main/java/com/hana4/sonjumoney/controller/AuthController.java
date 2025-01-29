@@ -42,8 +42,21 @@ public class AuthController {
 	}
 
 	@GetMapping("/id-duplication")
-	public ResponseEntity<DuplicationResponse> getDuplication(@RequestParam(name = "id") String id) {
-		DuplicationResponse duplicationResponse = authService.getDuplication(id);
+	public ResponseEntity<DuplicationResponse> getIdDuplication(@RequestParam(name = "id") String id) {
+		DuplicationResponse duplicationResponse = authService.getIdDuplication(id);
+		return ResponseEntity.ok().body(duplicationResponse);
+	}
+
+	@GetMapping("/resident-duplication")
+	public ResponseEntity<DuplicationResponse> getResidentDulplication(
+		@RequestParam(name = "resident") String residentNum) {
+		DuplicationResponse duplicationResponse = authService.getResidentDuplication(residentNum);
+		return ResponseEntity.ok().body(duplicationResponse);
+	}
+
+	@GetMapping("/phone-duplication")
+	public ResponseEntity<DuplicationResponse> getPhoneDuplication(@RequestParam(name = "phone") String phoneNum) {
+		DuplicationResponse duplicationResponse = authService.getPhoneDuplication(phoneNum);
 		return ResponseEntity.ok().body(duplicationResponse);
 	}
 

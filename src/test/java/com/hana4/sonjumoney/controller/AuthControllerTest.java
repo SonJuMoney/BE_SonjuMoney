@@ -34,7 +34,7 @@ public class AuthControllerTest {
 	private UserRepository userRepository;
 
 	@Test
-	void getDuplicationTest() throws Exception {
+	void getIdDuplicationTest() throws Exception {
 		String url = "/api/auth/id-duplication";
 		String notFoundedId = "test0";
 
