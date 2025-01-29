@@ -69,11 +69,30 @@ public class AuthService implements UserDetailsService {
 		return new ReissueResponse(newAccessToken);
 	}
 
-	public DuplicationResponse getDuplication(String authId) {
+	public DuplicationResponse getIdDuplication(String authId) {
 		try {
 			User user = userRepository.findByAuthId(authId)
 				.orElseThrow(() -> new UserNotFoundException(ErrorCode.NOT_FOUND_USER.getMessage()));
 		} catch (UserNotFoundException e) {
+			return DuplicationResponse.of(false);
+		}
+		return DuplicationResponse.of(true);
+	}
+
+	public DuplicationResponse getResidentDuplication(String residentNum) {
+		String resident = addHyphenFromResidentNum(residentNum);
+		try {
+			User user = userRepository.findByResidentNum(resident)
+				.orElseThrow(() -> new UserNotFoundException(ErrorCode.NOT_FOUND_USER.getMessage()));
+		} catch (UserNotFoundException e) {
+			return DuplicationResponse.of(false);
+		}
+		return DuplicationResponse.of(true);
+	}
+
+	public DuplicationResponse getPhoneDuplication(String phoneNum) {
+		List<User> users = userRepository.findUsersByPhone(phoneNum);
+		if (users.isEmpty()) {
 			return DuplicationResponse.of(false);
 		}
 		return DuplicationResponse.of(true);
@@ -94,7 +113,7 @@ public class AuthService implements UserDetailsService {
 	public SignUpResponse signUp(SignUpRequest signUpRequest) {
 		//----------예외처리 시작----------//
 
-		Boolean isDuplication = getDuplication(signUpRequest.authId()).duplication();
+		Boolean isDuplication = getIdDuplication(signUpRequest.authId()).duplication();
 		if (isDuplication) {
 			throw new CommonException(ErrorCode.CONFLICT_ID);
 		}
@@ -147,7 +166,7 @@ public class AuthService implements UserDetailsService {
 	@Transactional
 	public SignUpChildResponse signUpChild(SignUpChildRequest signUpChildRequest, Long parentId) {
 		//----------예외처리 시작----------//
-		Boolean isDuplication = getDuplication(signUpChildRequest.authId()).duplication();
+		Boolean isDuplication = getIdDuplication(signUpChildRequest.authId()).duplication();
 		if (isDuplication) {
 			throw new CommonException(ErrorCode.CONFLICT_ID);
 		}
@@ -263,4 +282,5 @@ public class AuthService implements UserDetailsService {
 			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
 		}
 	}
+
 }
