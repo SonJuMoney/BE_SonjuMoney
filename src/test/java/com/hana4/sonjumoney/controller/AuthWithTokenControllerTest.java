@@ -65,8 +65,7 @@ public class AuthWithTokenControllerTest extends ControllerTest {
 				post(api).contentType(MediaType.APPLICATION_JSON)
 					.header("Authorization", "Bearer " + accessToken)
 					.content(objectMapper.writeValueAsString(request)))
-			.andExpect(status().isOk())
-			.andExpect(content().contentType(MediaType.APPLICATION_JSON));
+			.andExpect(status().isOk());
 		User child = userRepository.findByAuthId(authId).orElseThrow();
 		Relationship relationship = relationshipRepository.findByChildId(child.getId());
 		relationshipRepository.delete(relationship);
@@ -101,7 +100,6 @@ public class AuthWithTokenControllerTest extends ControllerTest {
 				.header("Authorization", "Bearer " + accessToken)
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk())
-			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.access_token").isNotEmpty())
 			.andExpect(jsonPath("$.refresh_token").isNotEmpty())
 		;

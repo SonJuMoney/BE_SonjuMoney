@@ -2,6 +2,7 @@ package com.hana4.sonjumoney.service;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -102,9 +103,10 @@ public class VideoService {
 	}
 
 	public void deleteVideo(String pathStr) {
-		Path path = Paths.get(pathStr);
+		String decodedPath = URLDecoder.decode(pathStr);
+		Path path = Paths.get(decodedPath);
 		try {
-			Files.deleteIfExists(path);
+			Files.delete(path);
 		} catch (IOException e) {
 			throw new CommonException(ErrorCode.VIDEO_DELETE_FAILED);
 		}
@@ -118,6 +120,7 @@ public class VideoService {
 			try {
 				Files.createDirectories(path);
 			} catch (IOException e) {
+				log.error("actual: " + path);
 				throw new CommonException(ErrorCode.VIDEO_UPLOAD_FAILED);
 			}
 		}

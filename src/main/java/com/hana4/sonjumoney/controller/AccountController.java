@@ -60,11 +60,12 @@ public class AccountController {
 	}
 
 	/*내 계좌 이체내역 조회*/
-	@GetMapping("/transactions")
-	public ResponseEntity<GetTransactionHistoryResponse> getTransactionHistory(@RequestParam Integer page,
+	@GetMapping("/{account_id}/transactions")
+	public ResponseEntity<GetTransactionHistoryResponse> getTransactionHistory(
+		@PathVariable("account_id") Long accountId, @RequestParam Integer page,
 		Authentication authentication) {
 		Long userId = AuthenticationUtil.getUserId(authentication);
-		return ResponseEntity.ok().body(accountService.getTransactions(userId, page));
+		return ResponseEntity.ok().body(accountService.getTransactions(userId, accountId, page));
 	}
 
 	@PostMapping("/savings")

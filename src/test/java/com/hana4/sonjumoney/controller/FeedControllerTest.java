@@ -32,6 +32,7 @@ import com.hana4.sonjumoney.domain.Comment;
 import com.hana4.sonjumoney.domain.Feed;
 import com.hana4.sonjumoney.domain.FeedContent;
 import com.hana4.sonjumoney.domain.Member;
+import com.hana4.sonjumoney.domain.enums.ContentType;
 import com.hana4.sonjumoney.domain.enums.FeedType;
 import com.hana4.sonjumoney.dto.SendAlarmDto;
 import com.hana4.sonjumoney.dto.request.CreateFeedRequest;
@@ -43,6 +44,9 @@ import com.hana4.sonjumoney.repository.CommentRepository;
 import com.hana4.sonjumoney.repository.FeedContentRepository;
 import com.hana4.sonjumoney.repository.FeedRepository;
 import com.hana4.sonjumoney.repository.MemberRepository;
+import com.hana4.sonjumoney.service.S3Service;
+import com.hana4.sonjumoney.service.VideoService;
+import com.hana4.sonjumoney.util.ContentUtil;
 import com.hana4.sonjumoney.websocket.handler.AlarmHandler;
 
 @SpringBootTest
@@ -62,6 +66,12 @@ class FeedControllerTest extends ControllerTest {
 	private MemberRepository memberRepository;
 	@Autowired
 	private CommentRepository commentRepository;
+
+	@Autowired
+	private S3Service s3Service;
+
+	@Autowired
+	private VideoService videoService;
 
 	@MockBean
 	private AlarmHandler alarmHandler;
@@ -114,11 +124,17 @@ class FeedControllerTest extends ControllerTest {
 		Feed savedFeed = feedRepository.findById(feedId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		List<FeedContent> feedContents = feedContentRepository.findAllByFeed(savedFeed);
-		List<String> urls = feedContents.stream().map(FeedContent::getContentUrl).toList();
 		for (FeedContent content : feedContents) {
 			assertNotNull(content.getContentUrl(), "URL should not be null");
+			String extension = ContentUtil.getExtension(content.getContentUrl());
+			System.out.println(content.getContentUrl());
+			if (ContentUtil.classifyContentType(extension).equals(ContentType.IMAGE)) {
+				s3Service.deleteImage(content.getContentUrl());
+			} else {
+				videoService.deleteVideo(content.getContentUrl());
+			}
+			// Files.delete(Paths.get(urls.get(2)));
 		}
-		Files.delete(Paths.get(urls.get(2)));
 	}
 
 	@Test
@@ -171,8 +187,9 @@ class FeedControllerTest extends ControllerTest {
 	@Test
 	@Order(3)
 	void getFeedsTest() throws Exception {
+		Member member = memberRepository.findByUserIdAndFamilyId(1L, 1L).orElseThrow();
 		Feed feed = Feed.builder()
-			.member(memberRepository.findByUserIdAndFamilyId(1L, 1L).orElseThrow())
+			.member(member)
 			.allowance(null)
 			.receiverId(null)
 			.contentExist(true)
@@ -182,6 +199,16 @@ class FeedControllerTest extends ControllerTest {
 			.build();
 		feedRepository.saveAndFlush(feed);
 
+		Feed allowanceFeed = Feed.builder()
+			.member(member)
+			.allowance(null)
+			.receiverId(2L)
+			.contentExist(true)
+			.likes(0)
+			.feedMessage("ㅋㅋ")
+			.feedType(FeedType.ALLOWANCE)
+			.build();
+		feedRepository.saveAndFlush(allowanceFeed);
 		String api = "/api/feeds";
 
 		mockMvc.perform(get(api).header("Authorization", "Bearer " + accessToken)
@@ -189,7 +216,8 @@ class FeedControllerTest extends ControllerTest {
 				.param("family_id", "1")
 				.param("page", "0"))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.result.contents").isNotEmpty());
+			.andExpect(jsonPath("$.result.contents").isNotEmpty())
+			.andExpect(jsonPath("$.result.contents.length()").value(1));
 	}
 
 	@Test

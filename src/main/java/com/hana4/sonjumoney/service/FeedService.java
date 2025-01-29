@@ -173,6 +173,7 @@ public class FeedService {
 			}
 		}
 		feedContentRepository.deleteFeedContentsByFeedId(feedId);
+		commentRepository.deleteAllByFeed(feed);
 		feedRepository.delete(feed);
 		return DeleteFeedResponse.of(200, "삭제가 완료되었습니다.");
 	}
@@ -186,72 +187,26 @@ public class FeedService {
 			if (feeds.isEmpty()) {
 				return FeedResponse.of(true, 200, "요청성공", FeedResultDto.of(false, page, new ArrayList<>()));
 			}
-
-			// FeedResultDto args start //
 			Boolean hasNext = feedRepository.hasNext(familyId, feeds.get(feeds.size() - 1).getId());
 			List<FeedContentDto> contents = new ArrayList<>();
-			// FeedResultDto args end //
 
 			for (Feed feed : feeds) {
+				if (feed.getFeedType() != FeedType.NORMAL && !feed.getReceiverId().equals(member.getId())) {
+					continue;
+				}
 				List<FeedContent> feedContents = feedContentRepository.findAllByFeed(feed);
 				List<Comment> comments = commentRepository.findAllByFeed(feed);
-
-				// FeedContentDto args start //
-				Long feedId = feed.getId();
-				Long writerId = feed.getMember().getUser().getId();
-				String writerName = feed.getMember().getUser().getUsername();
-				MemberRole memberRole = feed.getMember().getMemberRole();
-				Boolean isMine = userId.equals(writerId);
-				String writerImage = feed.getMember().getUser().getProfileLink();
-				FeedType feedType = feed.getFeedType();
-				String message = feed.getFeedMessage();
-				Integer like = feed.getLikes();
-				Boolean isUpdate = !feed.getCreatedAt().equals(feed.getUpdatedAt());
-				LocalDateTime createdAt = feed.getCreatedAt();
-				List<FeedContentContentDto> feedContentContentDtos = new ArrayList<>();
-				List<FeedContentCommentDto> feedContentCommentDtos = new ArrayList<>();
-				// FeedContentDto args end //
+				List<FeedContentContentDto> feedContentContentDtoList = new ArrayList<>();
+				List<FeedContentCommentDto> feedContentCommentDtoList = new ArrayList<>();
 
 				for (FeedContent feedContent : feedContents) {
-					String extension = ContentUtil.getExtension(feedContent.getContentUrl());
-					ContentType contentType = ContentUtil.classifyContentType(extension);
-					feedContentContentDtos.add(FeedContentContentDto.of(
-						feedContent.getContentUrl(),
-						contentType
-					));
+					feedContentContentDtoList.add(FeedContentContentDto.from(feedContent.getContentUrl()));
 				}
-
 				for (Comment comment : comments) {
-					feedContentCommentDtos.add(FeedContentCommentDto.of(
-						comment.getId(),
-						comment.getMember().getUser().getId(),
-						comment.getMember().getUser().getUsername(),
-						comment.getMember().getMemberRole(),
-						comment.getMember().getUser().getId().equals(userId),
-						comment.getMember().getUser().getProfileLink(),
-						comment.getMessage(),
-						!comment.getCreatedAt().equals(comment.getUpdatedAt()),
-						comment.getCreatedAt()
-					));
+					feedContentCommentDtoList.add(FeedContentCommentDto.from(comment, userId));
 				}
-
-				contents.add(FeedContentDto.of(
-					feedId,
-					writerId,
-					writerName,
-					memberRole,
-					isMine,
-					writerImage,
-					feedType,
-					message,
-					like,
-					isUpdate,
-					createdAt,
-					feedContentContentDtos,
-					feedContentCommentDtos
-				));
+				contents.add(FeedContentDto.from(feed, userId, feedContentContentDtoList, feedContentCommentDtoList));
 			}
-
 			FeedResultDto result = FeedResultDto.of(hasNext, page, contents);
 
 			return FeedResponse.of(true, 200, "요청성공", result);

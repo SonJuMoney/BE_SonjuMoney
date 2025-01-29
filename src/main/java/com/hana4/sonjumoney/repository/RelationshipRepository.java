@@ -26,4 +26,6 @@ public interface RelationshipRepository extends JpaRepository<Relationship, Long
 		    OR r.parent.id = (SELECT r2.parent.id FROM Relationship r2 WHERE r2.child.id = :user_id)
 		""")
 	List<Relationship> findAllByUserId(@Param(value = "user_id") Long userId);
+
+	Boolean existsByParentId(Long userId);
 }
