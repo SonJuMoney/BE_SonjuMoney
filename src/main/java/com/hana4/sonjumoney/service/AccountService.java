@@ -189,6 +189,12 @@ public class AccountService {
 	}
 
 	public SavingAccountResponse findSavingAccounts(Long userId) {
+		/* 처음 회원가입한 사람은 가족 설정이 안되어있으므로 MemberResponse가 Empty */
+		List<Member> newUserMember = memberRepository.findByUserId(userId);
+		if (newUserMember.isEmpty()) {
+			return SavingAccountResponse.of(false, null);
+		}
+
 		/* members -> empty = 모든 family에서 son or daughter인 경우 */
 		List<Member> members = memberRepository.findMemberByMemberRoleAndUserId(userId);
 		if (members.isEmpty()) {
