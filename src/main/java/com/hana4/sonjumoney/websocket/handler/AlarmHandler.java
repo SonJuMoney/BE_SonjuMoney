@@ -75,11 +75,17 @@ public class AlarmHandler extends TextWebSocketHandler {
 			Long userAlarmSessionId = sendAlarmDto.alarmSessionId();
 			WebSocketSession session = userAlarmSessionMap.get(userAlarmSessionId);
 			log.info("toId: " + userAlarmSessionId + " session: " + session.getId());
-			TextMessage alarmMessage = new TextMessage(objectMapper.writeValueAsString(
-				AlarmMessageDto.of(sendAlarmDto.alarmId(), sendAlarmDto.alarmStatus(), sendAlarmDto.alarmType(),
-					sendAlarmDto.message(), sendAlarmDto.linkId(), sendAlarmDto.familyId(), sendAlarmDto.createdAt())));
-			log.info(alarmMessage.getPayload());
-			session.sendMessage(alarmMessage);
+			if (session.isOpen()) {
+				TextMessage alarmMessage = new TextMessage(objectMapper.writeValueAsString(
+					AlarmMessageDto.of(sendAlarmDto.alarmId(), sendAlarmDto.alarmStatus(), sendAlarmDto.alarmType(),
+						sendAlarmDto.message(), sendAlarmDto.linkId(), sendAlarmDto.familyId(),
+						sendAlarmDto.createdAt())));
+				log.info(alarmMessage.getPayload());
+				session.sendMessage(alarmMessage);
+			} else {
+				log.info("세션을 닫습니다.");
+				session.close();
+			}
 		} catch (NullPointerException e) {
 			log.error(ErrorCode.NOT_FOUND_OPPONENET.getMessage());
 		} catch (Exception e) {
@@ -137,6 +143,7 @@ public class AlarmHandler extends TextWebSocketHandler {
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
 		sessions.remove(session);
+		userAlarmSessionMap.values().remove(session);
 		familyAlarmSessionMap.values().forEach(sessions -> sessions.remove(session));
 		memberAlarmSessionMap.values().remove(session);
 	}
