@@ -124,7 +124,7 @@ public class AlarmService {
 			case ALLOWANCE, THANKS, INVITE: {
 				User receiver = userRepository.findById(createAlarmDto.alarmSessionId())
 					.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
-				String message = sender.getMemberRole().getValue() + "님이 " + alarmType.getMessage();
+				String message = sender.getUser().getUsername() + "님이 " + alarmType.getMessage();
 
 				Alarm alarm = alarmRepository.save(
 					new Alarm(receiver, alarmType, createAlarmDto.linkId(), createAlarmDto.familyId(),
