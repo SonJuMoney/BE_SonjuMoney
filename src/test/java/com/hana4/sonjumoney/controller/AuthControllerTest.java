@@ -29,7 +29,8 @@ public class AuthControllerTest {
 	ObjectMapper objectMapper;
 
 	String authId = "test1";
-	String password = "1234";
+	String residentNum = "0101013123453";
+	String phoneNum = "01012345678";
 	@Autowired
 	private UserRepository userRepository;
 
@@ -49,6 +50,46 @@ public class AuthControllerTest {
 		mockMvc.perform(
 				get(url).contentType(MediaType.APPLICATION_JSON)
 					.param("id", notFoundedId))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.duplication", is(false)));
+	}
+
+	@Test
+	void getResidentDuplicationTest() throws Exception {
+		String url = "/api/auth/resident-duplication";
+		String notFoundedNum = "0101013123451";
+
+		// 전화번호가 중복일 때는 true 반환
+		mockMvc.perform(
+				get(url).contentType(MediaType.APPLICATION_JSON)
+					.param("resident", residentNum))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.duplication", is(true)));
+
+		// 전화번호를 넣으면 false 반환
+		mockMvc.perform(
+				get(url).contentType(MediaType.APPLICATION_JSON)
+					.param("resident", notFoundedNum))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.duplication", is(false)));
+	}
+
+	@Test
+	void getPhoneDuplicationTest() throws Exception {
+		String url = "/api/auth/phone-duplication";
+		String notFoundedNum = "0101013123451";
+
+		// 주민등록번호가 중복일 때는 true 반환
+		mockMvc.perform(
+				get(url).contentType(MediaType.APPLICATION_JSON)
+					.param("phone", phoneNum))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.duplication", is(true)));
+
+		// 없는 주민등록번호를 넣으면 false 반환
+		mockMvc.perform(
+				get(url).contentType(MediaType.APPLICATION_JSON)
+					.param("phone", notFoundedNum))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.duplication", is(false)));
 	}
