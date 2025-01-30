@@ -201,8 +201,8 @@ public class AccountService {
 			return SavingAccountResponse.of(true, null);
 		}
 
-		List<Account> accounts = accountRepository.findSavingAccountsByUserId(userId)
-			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		List<Account> accounts = accountRepository.findSavingAccountsByUserIdAAndAccountType_AccountProduct(userId,
+			AccountProduct.MY_SAVINGS).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 
 		List<SavingAccountInfoResponse> response = accounts.stream()
 			.map(account -> SavingAccountInfoResponse.of(account.getId(),
