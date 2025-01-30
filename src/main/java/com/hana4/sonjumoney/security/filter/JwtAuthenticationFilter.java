@@ -17,7 +17,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -29,11 +31,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		FilterChain filterChain) throws ServletException, IOException {
 
 		String uri = request.getRequestURI();
+		log.info("jwtauthfilter 진입: " + uri);
 		if (uri.equals("/api/auth/reissue")) {
 			filterChain.doFilter(request, response);
 			return;
 		}
-
 		String authHeader = request.getHeader("Authorization");
 
 		String token = null;
@@ -67,7 +69,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 			}
 		}
-
+		log.info(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
 		filterChain.doFilter(request, response);
 	}
 }

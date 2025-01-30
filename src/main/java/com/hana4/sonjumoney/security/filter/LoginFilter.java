@@ -22,7 +22,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
 	private final AuthenticationManager authenticationManager;
@@ -38,6 +40,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws
 		AuthenticationException {
 		try {
+			log.info("AttemptAuth 진입");
 			ObjectMapper objectMapper = new ObjectMapper();
 			SignInRequest signInRequest = objectMapper.readValue(request.getInputStream(), SignInRequest.class);
 
@@ -48,6 +51,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
 			return authenticationManager.authenticate(authenticationToken);
 		} catch (IOException e) {
+			log.error(e.getMessage());
 			throw new AuthenticationServiceException(ErrorCode.BAD_REQUEST.getMessage());
 		}
 	}
@@ -55,6 +59,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 		Authentication authResult) throws IOException, ServletException {
+		log.info("Successful Authentication 진입");
 
 		CustomUserDetails userDetails = (CustomUserDetails)authResult.getPrincipal();
 
@@ -77,6 +82,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 	@Override
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
 		AuthenticationException failed) throws IOException, ServletException {
+		log.info("Unsuccessful Authentication 진입");
 		response.setContentType("application/json;charset=UTF-8");
 		Throwable cause = failed.getCause();
 		if (cause instanceof UserNotFoundException) {
@@ -96,5 +102,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 			response.setStatus(ErrorCode.INTERNAL_SERVER_ERROR.getHttpStatus().value());
 			response.getWriter().write(ErrorCode.INTERNAL_SERVER_ERROR.getMessage());
 		}
+		log.info(response.toString());
 	}
 }
