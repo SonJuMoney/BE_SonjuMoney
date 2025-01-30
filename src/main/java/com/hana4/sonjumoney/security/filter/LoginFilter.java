@@ -102,6 +102,5 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 			response.setStatus(ErrorCode.INTERNAL_SERVER_ERROR.getHttpStatus().value());
 			response.getWriter().write(ErrorCode.INTERNAL_SERVER_ERROR.getMessage());
 		}
-		log.info(response.toString());
 	}
 }
