@@ -20,7 +20,7 @@ import com.hana4.sonjumoney.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class MockAccountController {
 

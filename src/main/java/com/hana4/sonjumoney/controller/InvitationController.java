@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Invitation", description = "가족 초대 관련 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/invitation")
+@RequestMapping("/api/v1/invitation")
 public class InvitationController {
 	private final InvitationService invitationService;
 

@@ -19,7 +19,7 @@ import com.hana4.sonjumoney.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/alarms")
+@RequestMapping("/api/v1/alarms")
 @RequiredArgsConstructor
 public class AlarmController {
 
