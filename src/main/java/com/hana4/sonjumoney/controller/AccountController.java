@@ -30,7 +30,7 @@ import com.hana4.sonjumoney.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/accounts")
+@RequestMapping("/api/v1/accounts")
 @RequiredArgsConstructor
 public class AccountController {
 

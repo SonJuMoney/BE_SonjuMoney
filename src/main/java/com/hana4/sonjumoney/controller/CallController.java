@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/calls")
+@RequestMapping("/api/v1/calls")
 public class CallController {
 
 	private final CallService callService;

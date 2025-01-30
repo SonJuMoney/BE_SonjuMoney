@@ -1,10 +1,5 @@
 package com.hana4.sonjumoney.controller;
 
-import com.hana4.sonjumoney.dto.request.SendThanksRequest;
-import com.hana4.sonjumoney.dto.response.AllowanceInfoResponse;
-import com.hana4.sonjumoney.dto.response.SendAllowanceResponse;
-
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.hana4.sonjumoney.dto.request.SendAllowanceRequest;
+import com.hana4.sonjumoney.dto.request.SendThanksRequest;
+import com.hana4.sonjumoney.dto.response.AllowanceInfoResponse;
+import com.hana4.sonjumoney.dto.response.SendAllowanceResponse;
 import com.hana4.sonjumoney.dto.response.SendThanksResponse;
 import com.hana4.sonjumoney.service.AllowanceService;
 import com.hana4.sonjumoney.util.AuthenticationUtil;
@@ -23,22 +21,22 @@ import com.hana4.sonjumoney.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "Allowances",description = "용돈 관련 API")
+@Tag(name = "Allowances", description = "용돈 관련 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/allowances")
+@RequestMapping("/api/v1/allowances")
 public class AllowanceController {
 	private final AllowanceService allowanceService;
 
 	@PostMapping
 	public ResponseEntity<SendAllowanceResponse> sendAllowance(
-			Authentication authentication,
-			@RequestPart(value = "file", required = false) MultipartFile image,
-			@RequestPart(value = "data") SendAllowanceRequest sendAllowanceRequest
+		Authentication authentication,
+		@RequestPart(value = "file", required = false) MultipartFile image,
+		@RequestPart(value = "data") SendAllowanceRequest sendAllowanceRequest
 	) {
 		return ResponseEntity.ok()
-				.body(allowanceService.sendAllowance(image, AuthenticationUtil.getUserId(authentication),
-						sendAllowanceRequest));
+			.body(allowanceService.sendAllowance(image, AuthenticationUtil.getUserId(authentication),
+				sendAllowanceRequest));
 	}
 
 	@GetMapping("/{allowance_id}")
