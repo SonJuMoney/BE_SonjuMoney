@@ -57,7 +57,7 @@ public class AllowanceService {
 			new Allowance(sender,receiver,sendAllowanceRequest.amount())
 		);
 
-		if (message != null) {
+		if (message != null && !message.isEmpty()) {
 			feedService.saveAllowanceFeed(
 				CreateAllowanceThanksDto.of(savedAllowance, file, message));
 		}
