@@ -44,9 +44,9 @@ public class SecurityConfig {
 			.httpBasic(AbstractHttpConfigurer::disable)
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests((auth) -> auth
-				.requestMatchers("/api/auth/sign-up", "/api/auth/sign-in", "/api/auth/id-duplication",
-					"/api/auth/resident-duplication", "/api/auth/phone-duplication", "/api/auth/reissue",
-					"/api/videos/stream", "/ws/alarms", "/actuator/**")
+				.requestMatchers("/api/v1/auth/sign-up", "/api/v1/auth/sign-in", "/api/v1/auth/id-duplication",
+					"/api/v1/auth/resident-duplication", "/api/v1/auth/phone-duplication", "/api/v1/auth/reissue",
+					"/api/v1/videos/stream", "/ws/alarms", "/actuator/**")
 				.permitAll()
 				.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui/index.html").permitAll()
 				.anyRequest()
