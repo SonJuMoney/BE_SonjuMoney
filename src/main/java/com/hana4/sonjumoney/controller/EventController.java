@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Events", description = "일정 관련 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/events")
+@RequestMapping("/api/v1/events")
 public class EventController {
 	private final EventService eventService;
 
@@ -77,5 +77,5 @@ public class EventController {
 		Long userId = AuthenticationUtil.getUserId(authentication);
 		return ResponseEntity.ok().body(eventService.deleteEvent(userId, eventId));
 	}
-	
+
 }

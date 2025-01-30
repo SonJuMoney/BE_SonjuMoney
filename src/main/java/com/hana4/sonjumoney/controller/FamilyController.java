@@ -23,7 +23,7 @@ import com.hana4.sonjumoney.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/families")
+@RequestMapping("/api/v1/families")
 @RequiredArgsConstructor
 public class FamilyController {
 

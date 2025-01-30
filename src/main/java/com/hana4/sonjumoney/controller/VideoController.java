@@ -14,7 +14,7 @@ import com.hana4.sonjumoney.service.VideoService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/videos")
+@RequestMapping("/api/v1/videos")
 @RequiredArgsConstructor
 public class VideoController {
 	private final VideoService videoService;
