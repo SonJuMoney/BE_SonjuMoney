@@ -1,6 +1,5 @@
 package com.hana4.sonjumoney.service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +16,6 @@ import com.hana4.sonjumoney.domain.Member;
 import com.hana4.sonjumoney.domain.enums.AlarmType;
 import com.hana4.sonjumoney.domain.enums.ContentType;
 import com.hana4.sonjumoney.domain.enums.FeedType;
-import com.hana4.sonjumoney.domain.enums.MemberRole;
 import com.hana4.sonjumoney.dto.ContentPrefix;
 import com.hana4.sonjumoney.dto.CreateAlarmDto;
 import com.hana4.sonjumoney.dto.CreateAllowanceThanksDto;
@@ -58,13 +56,13 @@ public class FeedService {
 	private static final int PAGE_SIZE = 30;
 
 	@Transactional
-	public CreateFeedResponse saveNormalFeed(Long userId, MultipartFile[] files, CreateFeedRequest createFeedRequest) {
+	public CreateFeedResponse saveFamilyFeed(Long userId, MultipartFile[] files, CreateFeedRequest createFeedRequest) {
 		Member writer = memberRepository.findByUserIdAndFamilyId(userId, createFeedRequest.familyId())
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		String feedMessage = createFeedRequest.message();
-		boolean contentExist;
-		contentExist = files != null && files.length != 0;
+		boolean contentExist = files != null && files.length != 0;
 		log.info("contents: " + contentExist);
+
 		Feed savedFeed = feedRepository.save(
 			new Feed(writer, null, null, contentExist, 0, feedMessage, FeedType.NORMAL));
 
@@ -103,38 +101,30 @@ public class FeedService {
 	}
 
 	@Transactional
-	public Long saveAllowanceFeed(CreateAllowanceThanksDto createAllowanceThanksDto) {
+	public Long saveDirectFeed(CreateAllowanceThanksDto createAllowanceThanksDto) {
 		Allowance allowance = createAllowanceThanksDto.allowance();
-		Member sender = allowance.getSender();
-		Member receiver = allowance.getReceiver();
-		MultipartFile file = createAllowanceThanksDto.file();
-		boolean contentExist = file != null;
-		String message = createAllowanceThanksDto.message();
-
-		Feed savedFeed = feedRepository.save(
-			new Feed(sender, allowance, receiver.getId(), contentExist, 0, message, FeedType.ALLOWANCE));
-
-		if (contentExist) {
-			String contentUrl = uploadOneContent(file, ContentPrefix.ALLOWANCE, savedFeed.getId());
-			feedContentRepository.save(new FeedContent(savedFeed, contentUrl));
+		FeedType feedType = createAllowanceThanksDto.feedType();
+		Member sender;
+		Member receiver;
+		if (feedType.equals(FeedType.ALLOWANCE)) {
+			sender = allowance.getSender();
+			receiver = allowance.getReceiver();
+		} else if (feedType.equals(FeedType.THANKS)) {
+			sender = allowance.getReceiver();
+			receiver = allowance.getSender();
+		} else {
+			throw new CommonException(ErrorCode.BAD_REQUEST);
 		}
-		return savedFeed.getId();
-	}
-
-	@Transactional
-	public Long saveThanksFeed(CreateAllowanceThanksDto createAllowanceThanksDto) {
-		Allowance allowance = createAllowanceThanksDto.allowance();
-		Member sender = allowance.getReceiver();
-		Member receiver = allowance.getSender();
 		MultipartFile file = createAllowanceThanksDto.file();
 		boolean contentExist = file != null;
 		String message = createAllowanceThanksDto.message();
-
 		Feed savedFeed = feedRepository.save(
-			new Feed(sender, allowance, receiver.getId(), contentExist, 0, message, FeedType.THANKS));
+			new Feed(sender, allowance, receiver.getId(), contentExist, 0, message,
+				createAllowanceThanksDto.feedType()));
 
 		if (contentExist) {
-			String contentUrl = uploadOneContent(file, ContentPrefix.THANKS, savedFeed.getId());
+			String contentUrl = uploadOneContent(file, ContentUtil.convertFeedTypeToContentPrefix(feedType),
+				savedFeed.getId());
 			feedContentRepository.save(new FeedContent(savedFeed, contentUrl));
 		}
 		return savedFeed.getId();

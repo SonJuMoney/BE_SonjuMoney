@@ -40,7 +40,7 @@ public class FeedController {
 		@RequestPart(value = "data") CreateFeedRequest createFeedRequest
 	) {
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(feedService.saveNormalFeed(AuthenticationUtil.getUserId(authentication), images, createFeedRequest));
+			.body(feedService.saveFamilyFeed(AuthenticationUtil.getUserId(authentication), images, createFeedRequest));
 	}
 
 	@DeleteMapping("/{feed_id}")
