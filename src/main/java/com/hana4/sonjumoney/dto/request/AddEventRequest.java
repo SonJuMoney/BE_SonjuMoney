@@ -36,8 +36,10 @@ public record AddEventRequest(
 			.family(family)
 			.eventCategory(this.eventCategory)
 			.eventName(this.eventName)
-			.startDateTime(this.startDateTime)
-			.endDateTime(this.endDateTime)
+			.startDateTime(this.allDayStatus == AllDayStatus.SPECIFIC_TIME ? this.startDateTime :
+				this.startDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0))
+			.endDateTime(this.allDayStatus == AllDayStatus.SPECIFIC_TIME ? this.endDateTime :
+				this.endDateTime.withHour(23).withMinute(59).withSecond(59))
 			.allDayStatus(this.allDayStatus)
 			.status(NotifyStatus.REGISTERED)
 			.build();
