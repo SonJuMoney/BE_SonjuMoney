@@ -5,6 +5,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.hana4.sonjumoney.domain.enums.ContentType;
+import com.hana4.sonjumoney.domain.enums.FeedType;
+import com.hana4.sonjumoney.dto.ContentPrefix;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 
@@ -44,5 +46,20 @@ public class ContentUtil {
 			throw new CommonException(ErrorCode.BAD_REQUEST);
 		}
 
+	}
+
+	public static ContentPrefix convertFeedTypeToContentPrefix(FeedType feedType) {
+		switch (feedType) {
+			case NORMAL -> {
+				return ContentPrefix.FEED;
+			}
+			case ALLOWANCE -> {
+				return ContentPrefix.ALLOWANCE;
+			}
+			case THANKS -> {
+				return ContentPrefix.THANKS;
+			}
+			default -> throw new CommonException(ErrorCode.BAD_REQUEST);
+		}
 	}
 }
