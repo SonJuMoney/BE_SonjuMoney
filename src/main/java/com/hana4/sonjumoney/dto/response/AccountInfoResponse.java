@@ -3,6 +3,7 @@ package com.hana4.sonjumoney.dto.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hana4.sonjumoney.domain.Account;
 import com.hana4.sonjumoney.domain.enums.Bank;
+import com.hana4.sonjumoney.util.CommonUtil;
 
 import lombok.Builder;
 
@@ -29,7 +30,7 @@ public record AccountInfoResponse(
 	}
 
 	public static AccountInfoResponse from(Account account) {
-		String name = account.getBank().getValue() + account.getAccountType().getAccountProduct().getName() + "통장";
+		String name = CommonUtil.getAccountName(account.getBank(), account.getAccountType().getAccountProduct());
 		String bank = account.getBank().getValue() + "은행";
 		return AccountInfoResponse.builder()
 			.accountId(account.getId())
