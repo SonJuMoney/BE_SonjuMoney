@@ -38,7 +38,7 @@ public class EventController {
 		@RequestParam(value = "family_id") Long familyId,
 		@RequestBody AddEventRequest addEventRequest) {
 		Long userId = AuthenticationUtil.getUserId(authentication);
-		EventResponse eventResponse = eventService.addEvent(userId, familyId, addEventRequest);
+		EventResponse eventResponse = eventService.addEvent(userId, familyId, addEventRequest,true);
 		return ResponseEntity.status(HttpStatus.CREATED).body(eventResponse);
 	}
 
