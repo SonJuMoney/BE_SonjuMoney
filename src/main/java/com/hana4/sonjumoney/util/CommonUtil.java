@@ -42,13 +42,6 @@ public class CommonUtil {
 		int year = LocalDateTime.now().getYear();
 		int month = Integer.parseInt(front.substring(2, 4));
 		int day = Integer.parseInt(front.substring(4, 6));
-		if (genderCode == '1' || genderCode == '2') {
-			year += 1900;
-		} else if (genderCode == '3' || genderCode == '4') {
-			year += 2000;
-		} else {
-			throw new CommonException(ErrorCode.BAD_REQUEST);
-		}
 		return LocalDateTime.of(year, month, day, 0, 0, 0, 0);
 	}
 
