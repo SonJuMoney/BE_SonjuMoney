@@ -124,7 +124,7 @@ public class FamilyService {
 			LocalDateTime eventDate = birth.plusYears(cnt);
 			eventService.addEvent(userId, familyId,
 				AddEventRequest.of(EventCategory.BIRTHDAY, userName + "의 생일", eventDate, eventDate,
-					AllDayStatus.ALL_DAY, Collections.singletonList(memberId)));
+					AllDayStatus.ALL_DAY, Collections.singletonList(memberId)), false);
 			cnt += 1;
 		}
 	}

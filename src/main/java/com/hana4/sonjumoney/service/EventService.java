@@ -43,7 +43,7 @@ public class EventService {
 	private final AlarmService alarmService;
 
 	@Transactional
-	public EventResponse addEvent(Long userId, Long familyId, AddEventRequest addEventRequest) {
+	public EventResponse addEvent(Long userId, Long familyId, AddEventRequest addEventRequest, boolean flag) {
 		//userId,familyId기반으로 확인
 		Member findMember = memberRepository.findByUserIdAndFamilyId(userId, familyId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
@@ -64,8 +64,10 @@ public class EventService {
 				.build())
 			.toList();
 		eventParticipantRepository.saveAll(eventParticipants);
-		alarmService.createOneOffAlarm(CreateAlarmDto.of(familyId, findMember.getId(), savedEvent.getId(), familyId,
-			AlarmType.EVENT));
+		if (flag) {
+			alarmService.createOneOffAlarm(CreateAlarmDto.of(familyId, findMember.getId(), savedEvent.getId(), familyId,
+				AlarmType.EVENT));
+		}
 
 		List<EventParticipantResponse> participantResponses = eventParticipants.stream()
 			.map(EventParticipantResponse::from)
