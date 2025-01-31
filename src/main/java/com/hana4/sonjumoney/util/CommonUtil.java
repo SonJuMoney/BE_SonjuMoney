@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.hana4.sonjumoney.domain.AccountType;
+import com.hana4.sonjumoney.domain.enums.AccountProduct;
+import com.hana4.sonjumoney.domain.enums.Bank;
 import com.hana4.sonjumoney.domain.enums.Gender;
 import com.hana4.sonjumoney.domain.enums.MemberRole;
 import com.hana4.sonjumoney.exception.CommonException;
@@ -13,6 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CommonUtil {
+
+	public static String getAccountName(Bank bank, AccountProduct accountProduct) {
+		return bank.getValue() + accountProduct.getName() + "통장";
+	}
 	// 해당 메소드는 주민등록번호 14자리 형식에서만 유효함.
 	public static Gender getGender(String residentNum) {
 		if (residentNum.length() != 14) {
