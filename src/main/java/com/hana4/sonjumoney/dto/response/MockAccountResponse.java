@@ -3,6 +3,7 @@ package com.hana4.sonjumoney.dto.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hana4.sonjumoney.domain.enums.AccountProduct;
 import com.hana4.sonjumoney.domain.enums.Bank;
+import com.hana4.sonjumoney.util.CommonUtil;
 
 import lombok.Builder;
 
@@ -12,7 +13,7 @@ public record MockAccountResponse(
 	Bank bank,
 	Long balance,
 	@JsonProperty("account_name")
-	AccountProduct accountName,
+	String accountName,
 	@JsonProperty("account_num")
 	String accountNumber
 ) {
@@ -20,7 +21,7 @@ public record MockAccountResponse(
 		Long mockacc_id,
 		Bank bank,
 		Long balance,
-		AccountProduct accountName,
+		String accountName,
 		String accountNumber
 	) {
 		return MockAccountResponse.builder()

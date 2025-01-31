@@ -19,6 +19,7 @@ import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.MockAccountRepository;
 import com.hana4.sonjumoney.repository.RelationshipRepository;
 import com.hana4.sonjumoney.repository.UserRepository;
+import com.hana4.sonjumoney.util.CommonUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -58,7 +59,7 @@ public class MockAccountService {
 		List<MockAccountResponse> response = new ArrayList<>();
 		for (MockAccount mockAccount : mockAccounts) {
 			response.add(MockAccountResponse.of(mockAccount.getId(), Bank.HANA, mockAccount.getBalance(),
-				AccountProduct.FREE_DEPOSIT,
+				CommonUtil.getAccountName(mockAccount.getBank(), mockAccount.getAccountType().getAccountProduct()),
 				mockAccount.getAccountNum()));
 		}
 
