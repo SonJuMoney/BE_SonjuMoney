@@ -1,6 +1,7 @@
 package com.hana4.sonjumoney.service;
 
 import com.hana4.sonjumoney.domain.enums.AlarmType;
+import com.hana4.sonjumoney.domain.enums.FeedType;
 import com.hana4.sonjumoney.dto.CreateAlarmDto;
 import com.hana4.sonjumoney.dto.TransactionHistoryDto;
 import com.hana4.sonjumoney.dto.request.SendThanksRequest;
@@ -58,8 +59,8 @@ public class AllowanceService {
 		);
 
 		if (message != null && !message.isEmpty()) {
-			feedService.saveAllowanceFeed(
-				CreateAllowanceThanksDto.of(savedAllowance, file, message));
+			feedService.saveDirectFeed(
+				CreateAllowanceThanksDto.of(savedAllowance, file, message, FeedType.ALLOWANCE));
 		}
 
 		alarmService.createOneOffAlarm(
@@ -80,7 +81,8 @@ public class AllowanceService {
 		}
 		String message = sendThanksRequest.message();
 		if (message != null) {
-			Long feedId = feedService.saveThanksFeed(CreateAllowanceThanksDto.of(allowance, file, message));
+			Long feedId = feedService.saveDirectFeed(
+				CreateAllowanceThanksDto.of(allowance, file, message, FeedType.THANKS));
 			alarmService.createOneOffAlarm(
 				CreateAlarmDto.of(receiver.getUser().getId(), sender.getId(), feedId, receiver.getFamily().getId(),
 					AlarmType.THANKS));
