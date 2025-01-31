@@ -1,5 +1,9 @@
 package com.hana4.sonjumoney.service;
 
+import javax.management.relation.Relation;
+
+import com.hana4.sonjumoney.domain.Relationship;
+import com.hana4.sonjumoney.domain.User;
 import com.hana4.sonjumoney.domain.enums.AlarmType;
 import com.hana4.sonjumoney.domain.enums.FeedType;
 import com.hana4.sonjumoney.dto.CreateAlarmDto;
@@ -21,6 +25,8 @@ import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.AllowanceRepository;
 import com.hana4.sonjumoney.repository.MemberRepository;
+import com.hana4.sonjumoney.repository.RelationshipRepository;
+import com.hana4.sonjumoney.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,18 +38,20 @@ import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 public class AllowanceService {
 	private final AllowanceRepository allowanceRepository;
 	private final MemberRepository memberRepository;
+	private final RelationshipRepository relationshipRepository;
 	private final AccountService accountService;
 	private final FeedService feedService;
 	private final AlarmService alarmService;
 
 	@Transactional
 	public SendAllowanceResponse sendAllowance(MultipartFile file, Long userId, SendAllowanceRequest sendAllowanceRequest) {
-		Member receiver = memberRepository.findById(sendAllowanceRequest.receiverId())
+		Member receiver = memberRepository.findByIdWithUser(sendAllowanceRequest.receiverId())
 			.orElseThrow(() -> new CommonException(
 				ErrorCode.NOT_FOUND_MEMBER));
 		Member sender = memberRepository.findByUser_IdAndFamily(userId, receiver.getFamily())
 			.orElseThrow(() -> new CommonException(
 				ErrorCode.NOT_FOUND_MEMBER));
+		User receiverUser = receiver.getUser();
 
 		if (!sender.getFamily().equals(receiver.getFamily())) {
 			throw new CommonException(ErrorCode.DIFFERENT_FAMILY);
@@ -51,7 +59,7 @@ public class AllowanceService {
 
 		String message = sendAllowanceRequest.message();
 		accountService.makeTransferByUserId(
-			AllowanceDto.of(sender.getUser().getId(), receiver.getUser().getId(), sendAllowanceRequest.amount(),
+			AllowanceDto.of(sender.getUser().getId(), receiverUser.getId(), sendAllowanceRequest.amount(),
 				message != null ? message : ""));
 
 		Allowance savedAllowance = allowanceRepository.save(
@@ -62,9 +70,12 @@ public class AllowanceService {
 			feedService.saveDirectFeed(
 				CreateAllowanceThanksDto.of(savedAllowance, file, message, FeedType.ALLOWANCE));
 		}
-
+		if (receiverUser.getPhone() == null) {
+			Relationship relationship = relationshipRepository.findByChildId(receiverUser.getId());
+			receiverUser = relationship.getParent();
+		}
 		alarmService.createOneOffAlarm(
-			CreateAlarmDto.of(receiver.getUser().getId(), sender.getId(), savedAllowance.getId(), receiver.getFamily().getId(),
+			CreateAlarmDto.of(receiverUser.getId(), sender.getId(), savedAllowance.getId(), receiver.getFamily().getId(),
 				AlarmType.ALLOWANCE));
 		return SendAllowanceResponse.of(200, "송금을 완료했습니다.", savedAllowance.getId());
 	}
