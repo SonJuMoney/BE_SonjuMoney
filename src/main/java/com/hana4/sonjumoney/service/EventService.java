@@ -86,8 +86,13 @@ public class EventService {
 	public List<EventResponse> getAllEvents(Long userId, Long familyId, int getYear, int getMonth) {
 		validateUserMember(userId, familyId);
 
-		LocalDateTime startDateTime = LocalDateTime.of(getYear, getMonth, 1, 0, 0, 0);
-		LocalDateTime endDateTime = startDateTime.with(TemporalAdjusters.lastDayOfMonth());
+		LocalDateTime startDateTime = LocalDateTime.of(getYear, getMonth, 1, 0, 0, 0, 0);
+		LocalDateTime endDateTime = startDateTime.with(TemporalAdjusters.lastDayOfMonth())
+			.withHour(23)
+			.withMinute(59)
+			.withSecond(59)
+			.withNano(999_999_999);
+
 		List<EventParticipant> participants;
 		try {
 			participants = eventParticipantRepository.findAllParticipantsByFamilyIdAndEventDateRange(familyId,
