@@ -39,9 +39,6 @@ public class UserControllerTest {
 	@Autowired
 	WebApplicationContext context;
 
-	@Autowired
-	private UserService userService;
-
 	private static String accessToken;
 
 	@BeforeAll
@@ -59,11 +56,6 @@ public class UserControllerTest {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	@AfterAll
-	public void cleanUp() throws IOException {
-
 	}
 
 	@Test

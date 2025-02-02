@@ -28,7 +28,7 @@ public class AlarmControllerTest extends ControllerTest {
 	void getAlarmsTest() throws Exception {
 		String api = "/api/v1/alarms";
 
-		Integer page = 0;
+		int page = 0;
 
 		mockMvc.perform(get(api + "?page=" + page)
 				.contentType(MediaType.APPLICATION_JSON)
