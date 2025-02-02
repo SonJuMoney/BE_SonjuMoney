@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,7 @@ import com.hana4.sonjumoney.domain.enums.AlarmType;
 import com.hana4.sonjumoney.dto.SendAlarmDto;
 import com.hana4.sonjumoney.dto.request.SendAllowanceRequest;
 import com.hana4.sonjumoney.dto.request.SendThanksRequest;
+import com.hana4.sonjumoney.dto.request.SignInRequest;
 import com.hana4.sonjumoney.dto.response.SendAllowanceResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
@@ -74,7 +77,7 @@ class AllowanceControllerTest extends ControllerTest {
 			"application/json",
 			objectMapper.writeValueAsString(request).getBytes(StandardCharsets.UTF_8)
 		);
-		String api = "/api/allowances";
+		String api = "/api/v1/allowances";
 		mockMvc.perform(multipart(api)
 				.file(image)
 				.file(data)
@@ -99,7 +102,7 @@ class AllowanceControllerTest extends ControllerTest {
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
 		Allowance allowance = allowanceRepository.save(new Allowance(sender, receiver, 5000L));
 
-		String api = "/api/allowances/" + allowance.getId();
+		String api = "/api/v1/allowances/" + allowance.getId();
 		mockMvc.perform(get(api)
 				.header("Authorization", "Bearer " + accessToken))
 			.andDo(print())
@@ -122,7 +125,7 @@ class AllowanceControllerTest extends ControllerTest {
 			"application/json",
 			objectMapper.writeValueAsString(request).getBytes(StandardCharsets.UTF_8)
 		);
-		String api = "/api/allowances";
+		String api = "/api/v1/allowances";
 		ResultActions resultActions = mockMvc.perform(multipart(api)
 				.file(data)
 				.contentType(MediaType.MULTIPART_FORM_DATA)
@@ -134,7 +137,21 @@ class AllowanceControllerTest extends ControllerTest {
 		SendAllowanceResponse sendAllowanceResponse = objectMapper.readValue(
 			resultActions.andReturn().getResponse().getContentAsString(), SendAllowanceResponse.class);
 		Long allowanceId = sendAllowanceResponse.allowanceId();
-		api = "/api/allowances/" + allowanceId + "/thanks";
+
+		SignInRequest signInRequest = new SignInRequest("test3", "1234");
+		MvcResult mvcResult = mockMvc.perform(post("/api/v1/auth/sign-in")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(signInRequest)))
+			.andExpect(status().isOk()).andReturn();
+
+		String responseBody = mvcResult.getResponse().getContentAsString();
+		Map<String, String> responseMap = objectMapper.readValue(responseBody, Map.class);
+		accessToken = responseMap.get("access_token");
+
+		loginUserId = String.valueOf(responseMap.get("user_id"));
+		System.out.println("accessToken:" + accessToken);
+
+		api = "/api/v1/allowances/" + allowanceId + "/thanks";
 		SendThanksRequest sendThanksRequest = SendThanksRequest.builder().message("감사합니다!").build();
 		data = new MockMultipartFile(
 			"data",

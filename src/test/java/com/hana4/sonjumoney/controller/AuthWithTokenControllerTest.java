@@ -37,7 +37,7 @@ public class AuthWithTokenControllerTest extends ControllerTest {
 	void validatePinTest() throws Exception {
 		String pin = userRepository.findById(jwtUtil.getUserId(accessToken)).get().getPin();
 
-		String url = "/api/auth/pin";
+		String url = "/api/v1/auth/pin";
 		AuthPinRequest pinRequest = new AuthPinRequest(pin);
 		mockMvc.perform(post(url)
 				.header("Authorization", "Bearer " + accessToken)
@@ -55,7 +55,7 @@ public class AuthWithTokenControllerTest extends ControllerTest {
 
 	@Test
 	void SignUpChildTest() throws Exception {
-		String api = "/api/auth/sign-up-child";
+		String api = "/api/v1/auth/sign-up-child";
 		String authId = "child0";
 		String name = "테스트자식0";
 		String residentNumber = "2412314123123";
@@ -74,7 +74,7 @@ public class AuthWithTokenControllerTest extends ControllerTest {
 
 	@Test
 	void getAuthListTest() throws Exception {
-		String api = "/api/auth/list";
+		String api = "/api/v1/auth/list";
 
 		mockMvc.perform(
 				get(api)
@@ -88,7 +88,7 @@ public class AuthWithTokenControllerTest extends ControllerTest {
 	@Test
 	void switchAccountTest() throws Exception {
 
-		String api = "/api/auth/switch-account";
+		String api = "/api/v1/auth/switch-account";
 		User child = new User("테스트자식", "test0", "1234", null, "241231-4123123", "123456", Gender.FEMALE, null);
 		child = userRepository.save(child);
 		Relationship childRelationship = new Relationship(

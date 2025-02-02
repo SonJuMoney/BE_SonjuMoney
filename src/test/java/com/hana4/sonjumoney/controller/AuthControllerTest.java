@@ -36,7 +36,7 @@ public class AuthControllerTest {
 
 	@Test
 	void getIdDuplicationTest() throws Exception {
-		String url = "/api/auth/id-duplication";
+		String url = "/api/v1/auth/id-duplication";
 		String notFoundedId = "test0";
 
 		// 아이디가 중복일 때는 true 반환
@@ -56,7 +56,7 @@ public class AuthControllerTest {
 
 	@Test
 	void getResidentDuplicationTest() throws Exception {
-		String url = "/api/auth/resident-duplication";
+		String url = "/api/v1/auth/resident-duplication";
 		String notFoundedNum = "0101013123451";
 
 		// 전화번호가 중복일 때는 true 반환
@@ -76,7 +76,7 @@ public class AuthControllerTest {
 
 	@Test
 	void getPhoneDuplicationTest() throws Exception {
-		String url = "/api/auth/phone-duplication";
+		String url = "/api/v1/auth/phone-duplication";
 		String notFoundedNum = "0101013123451";
 
 		// 주민등록번호가 중복일 때는 true 반환
@@ -98,7 +98,7 @@ public class AuthControllerTest {
 	void signUpTest() throws Exception {
 
 		class Test {
-			final String url = "/api/auth/sign-up";
+			final String url = "/api/v1/auth/sign-up";
 			final String password = "test123!@#";
 			final String name = "테스트유저0";
 

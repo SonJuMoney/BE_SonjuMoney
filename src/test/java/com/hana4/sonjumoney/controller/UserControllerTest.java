@@ -39,9 +39,6 @@ public class UserControllerTest {
 	@Autowired
 	WebApplicationContext context;
 
-	@Autowired
-	private UserService userService;
-
 	private static String accessToken;
 
 	@BeforeAll
@@ -50,7 +47,7 @@ public class UserControllerTest {
 			SignInRequest signInRequest = new SignInRequest("test1", "1234");
 			String reqBody = objectMapper.writeValueAsString(signInRequest);
 			ResultActions resultActions = mockMvc.perform(
-					post("/api/auth/sign-in").contentType(MediaType.APPLICATION_JSON).content(reqBody))
+					post("/api/v1/auth/sign-in").contentType(MediaType.APPLICATION_JSON).content(reqBody))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 			JwtTokenDto jwtTokenDto = objectMapper.readValue(
@@ -61,15 +58,10 @@ public class UserControllerTest {
 		}
 	}
 
-	@AfterAll
-	public void cleanUp() throws IOException {
-
-	}
-
 	@Test
 	@DisplayName("/user - User info test")
 	void getUserInfo() throws Exception {
-		String url = "/api/users";
+		String url = "/api/v1/users";
 		mockMvc.perform(
 				get(url)
 					.header("Authorization", "Bearer " + accessToken)
@@ -80,7 +72,7 @@ public class UserControllerTest {
 	@Test
 	@DisplayName("내 아이 조회 테스트")
 	void getChildrenTest() throws Exception {
-		mockMvc.perform(get("/api/users/children")
+		mockMvc.perform(get("/api/v1/users/children")
 				.header("Authorization", "Bearer " + accessToken)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
@@ -98,7 +90,7 @@ public class UserControllerTest {
 			new byte[] {1}
 		);
 
-		String api = "/api/users/profiles";
+		String api = "/api/v1/users/profiles";
 		mockMvc.perform(multipart(api)
 				.file(image)
 				.with(request -> {

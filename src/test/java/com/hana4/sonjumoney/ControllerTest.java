@@ -37,7 +37,7 @@ public class ControllerTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		SignInRequest signInRequest = new SignInRequest("test1", "1234");
-		MvcResult mvcResult = mockMvc.perform(post("/api/auth/sign-in")
+		MvcResult mvcResult = mockMvc.perform(post("/api/v1/auth/sign-in")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(signInRequest)))
 			.andExpect(status().isOk()).andReturn();

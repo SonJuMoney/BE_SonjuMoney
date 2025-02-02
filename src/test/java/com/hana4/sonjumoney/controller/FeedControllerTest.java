@@ -8,8 +8,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
@@ -107,7 +105,7 @@ class FeedControllerTest extends ControllerTest {
 			objectMapper.writeValueAsString(request).getBytes(StandardCharsets.UTF_8)
 		);
 
-		String api = "/api/feeds";
+		String api = "/api/v1/feeds";
 		ResultActions resultActions = mockMvc.perform(multipart(api)
 				.file(image1)
 				.file(image2)
@@ -161,7 +159,7 @@ class FeedControllerTest extends ControllerTest {
 			objectMapper.writeValueAsString(request).getBytes(StandardCharsets.UTF_8)
 		);
 
-		ResultActions resultActions = mockMvc.perform(multipart("/api/feeds")
+		ResultActions resultActions = mockMvc.perform(multipart("/api/v1/feeds")
 				.file(image1)
 				.file(image2)
 				.file(data)
@@ -175,7 +173,7 @@ class FeedControllerTest extends ControllerTest {
 		feedId = createFeedResponse.feedId();
 
 		// when
-		String api = "/api/feeds/" + feedId;
+		String api = "/api/v1/feeds/" + feedId;
 		mockMvc.perform(delete(api)
 				.header("Authorization", "Bearer " + accessToken))
 			.andDo(print())
@@ -209,7 +207,7 @@ class FeedControllerTest extends ControllerTest {
 			.feedType(FeedType.ALLOWANCE)
 			.build();
 		feedRepository.saveAndFlush(allowanceFeed);
-		String api = "/api/feeds";
+		String api = "/api/v1/feeds";
 
 		mockMvc.perform(get(api).header("Authorization", "Bearer " + accessToken)
 				.contentType(MediaType.APPLICATION_JSON)
@@ -234,7 +232,7 @@ class FeedControllerTest extends ControllerTest {
 			.build();
 		Feed result = feedRepository.saveAndFlush(feed);
 		Long feedId = result.getId();
-		String api = "/api/feeds/" + feedId + "/likes";
+		String api = "/api/v1/feeds/" + feedId + "/likes";
 
 		mockMvc.perform(post(api).header("Authorization", "Bearer " + accessToken)
 				.contentType(MediaType.APPLICATION_JSON))
@@ -258,7 +256,7 @@ class FeedControllerTest extends ControllerTest {
 			.build();
 		Feed result = feedRepository.saveAndFlush(feed);
 		Long feedId = result.getId();
-		String api = "/api/feeds/" + feedId + "/comments";
+		String api = "/api/v1/feeds/" + feedId + "/comments";
 		String comment = "댓글ㅋㅋ";
 		PostFeedCommentRequest request = new PostFeedCommentRequest(comment);
 		mockMvc.perform(post(api).header("Authorization", "Bearer " + accessToken)
@@ -291,7 +289,7 @@ class FeedControllerTest extends ControllerTest {
 			.build();
 		Comment insertedComment = commentRepository.saveAndFlush(comment);
 
-		String api = "/api/feeds/comments/" + insertedComment.getId();
+		String api = "/api/v1/feeds/comments/" + insertedComment.getId();
 		mockMvc.perform(delete(api).header("Authorization", "Bearer " + accessToken)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk());
