@@ -34,7 +34,7 @@ public class AccountControllerTest extends ControllerTest {
 	@Transactional
 	@DisplayName("계좌 등록 예외 처리 테스트")
 	void makeAccountTest() throws Exception {
-		String api = "/api/accounts";
+		String api = "/api/v1/accounts";
 		CreateAccountRequest request = CreateAccountRequest.builder()
 			.mockaccId(1L)
 			.userId(1L)
@@ -50,7 +50,7 @@ public class AccountControllerTest extends ControllerTest {
 	@Test
 	@DisplayName("계좌 조회 테스트")
 	void getAccountTest() throws Exception {
-		String api = "/api/accounts";
+		String api = "/api/v1/accounts";
 
 		mockMvc.perform(get(api)
 				.contentType(MediaType.APPLICATION_JSON)
@@ -65,7 +65,7 @@ public class AccountControllerTest extends ControllerTest {
 	@Transactional
 	@DisplayName("적금 계좌 생성 테스트")
 	void createSavingAccountTest() throws Exception {
-		String api = "/api/accounts/savings";
+		String api = "/api/v1/accounts/savings";
 
 		CreateSavingAccountRequest request = CreateSavingAccountRequest.builder()
 			.message("착하게 자라야 한다~")
@@ -86,7 +86,7 @@ public class AccountControllerTest extends ControllerTest {
 	@Test
 	@DisplayName("적금 계좌(들) 조회 테스트")
 	void findSavingAccountsTest() throws Exception {
-		String api = "/api/accounts/savings";
+		String api = "/api/v1/accounts/savings";
 
 		mockMvc.perform(get(api)
 				.contentType(MediaType.APPLICATION_JSON)
@@ -102,7 +102,7 @@ public class AccountControllerTest extends ControllerTest {
 	@DisplayName("적금 계좌 송금 테스트 user1 -> user3 (account1 -> account2)")
 	void sendMoneyToSavingAccountTest() throws Exception {
 		String accountId = "2";
-		String api = "/api/accounts/savings/" + accountId + "/transfer";
+		String api = "/api/v1/accounts/savings/" + accountId + "/transfer";
 
 		Account senderAccount = accountRepository.findByUserId(1L).get();
 		Account recieverAccount = accountRepository.findById(Long.parseLong(accountId)).get();
@@ -136,7 +136,7 @@ public class AccountControllerTest extends ControllerTest {
 	@DisplayName("무인증 적금 계좌 송금 요청에 대한 예외 테스트")
 	void statusFalseTransferTest() throws Exception {
 		String accountId = "2";
-		String api = "/api/accounts/savings/" + accountId + "/transfer";
+		String api = "/api/v1/accounts/savings/" + accountId + "/transfer";
 
 		Long amount = 1000L;
 
@@ -161,7 +161,7 @@ public class AccountControllerTest extends ControllerTest {
 	void getSavingAccountTransactionTest() throws Exception {
 		Integer page = 0;
 
-		mockMvc.perform(get("/api/accounts/savings/{account_id}?page=" + page, 2)
+		mockMvc.perform(get("/api/v1/accounts/savings/{account_id}?page=" + page, 2)
 				.header("Authorization", "Bearer " + accessToken)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
@@ -173,7 +173,7 @@ public class AccountControllerTest extends ControllerTest {
 	@Transactional
 	@DisplayName("적금 납입 한도 조회")
 	void getSavingAccountLimitTest() throws Exception {
-		mockMvc.perform(get("/api/accounts/savings/{account_id}/limit", 2)
+		mockMvc.perform(get("/api/v1/accounts/savings/{account_id}/limit", 2)
 				.header("Authorization", "Bearer " + accessToken)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
@@ -186,7 +186,7 @@ public class AccountControllerTest extends ControllerTest {
 	void getTransactionsTest() throws Exception {
 		Integer page = 0;
 
-		mockMvc.perform(get("/api/accounts/{account_id}/transactions?page=" + page, 1)
+		mockMvc.perform(get("/api/v1/accounts/{account_id}/transactions?page=" + page, 1)
 				.header("Authorization", "Bearer " + accessToken)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
@@ -199,7 +199,7 @@ public class AccountControllerTest extends ControllerTest {
 		CreateSavingsMessageRequest messageRequest = CreateSavingsMessageRequest.builder()
 			.Message("우리 손주. 할아버지야. 건강하게 자라렴")
 			.build();
-		mockMvc.perform(post("/api/accounts/savings/{auto_transfer_id}/message", 1)
+		mockMvc.perform(post("/api/v1/accounts/savings/{auto_transfer_id}/message", 1)
 				.header("Authorization", "Bearer " + accessToken)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(messageRequest)))

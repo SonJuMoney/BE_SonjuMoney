@@ -38,7 +38,7 @@ public class MockAccountControllerTest {
 	@BeforeAll
 	void setUp() throws Exception {
 		SignInRequest signInRequest = new SignInRequest("test1", "1234");
-		MvcResult mvcResult = mockMvc.perform(post("/api/auth/sign-in")
+		MvcResult mvcResult = mockMvc.perform(post("/api/v1/auth/sign-in")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(signInRequest)))
 			.andExpect(status().isOk()).andReturn();
@@ -51,7 +51,7 @@ public class MockAccountControllerTest {
 	@Test
 	@DisplayName("유저의 MockAccounts 목록 조회 테스트")
 	void getMockAccountsTest() throws Exception {
-		String api = "/api/mock/accounts";
+		String api = "/api/v1/mock/accounts";
 		mockMvc.perform(get(api)
 				.header("Authorization", "Bearer " + accessToken))
 			.andExpect(status().isOk())
@@ -61,7 +61,7 @@ public class MockAccountControllerTest {
 	@Test
 	@DisplayName("자녀의 MockAccounts 목록 조회 테스트")
 	void getChildMockAccountsTest() throws Exception {
-		String api = "/api/mock/accounts";
+		String api = "/api/v1/mock/accounts";
 		mockMvc.perform(get(api).param("user_id", "3")
 				.header("Authorization", "Bearer " + accessToken))
 			.andExpect(status().isOk())
@@ -71,7 +71,7 @@ public class MockAccountControllerTest {
 	@Test
 	@DisplayName("Mock계좌 비밀번호 일치 확인 테스트")
 	void checkValidMockAccountPin() throws Exception {
-		String api = "/api/mock/accounts/pin";
+		String api = "/api/v1/mock/accounts/pin";
 		PinValidRequest request = PinValidRequest.builder()
 			.mockaccId(1L)
 			.pin("1234")
@@ -88,7 +88,7 @@ public class MockAccountControllerTest {
 	@Test
 	@DisplayName("Mock계좌 비밀번호 불일치 확인 테스트")
 	void checkInvalidMockAccountPin() throws Exception {
-		String api = "/api/mock/accounts/pin";
+		String api = "/api/v1/mock/accounts/pin";
 		PinValidRequest request = PinValidRequest.builder()
 			.mockaccId(1L)
 			.pin("5000")

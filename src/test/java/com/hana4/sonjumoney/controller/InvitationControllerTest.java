@@ -36,7 +36,7 @@ public class InvitationControllerTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		SignInRequest signInRequest = new SignInRequest("test4", "1234");
-		MvcResult mvcResult = mockMvc.perform(post("/api/auth/sign-in")
+		MvcResult mvcResult = mockMvc.perform(post("/api/v1/auth/sign-in")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(signInRequest)))
 			.andExpect(status().isOk()).andReturn();
@@ -51,7 +51,7 @@ public class InvitationControllerTest {
 	@Transactional
 	@DisplayName("초대 수락 테스트")
 	void acceptInvitationTest() throws Exception {
-		mockMvc.perform(post("/api/invitation/{invitation_id}", 1)
+		mockMvc.perform(post("/api/v1/invitation/{invitation_id}", 1)
 				.header("Authorization", "Bearer " + accessToken)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isCreated())

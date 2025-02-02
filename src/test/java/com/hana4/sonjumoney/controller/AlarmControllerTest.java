@@ -26,7 +26,7 @@ public class AlarmControllerTest extends ControllerTest {
 
 	@Test
 	void getAlarmsTest() throws Exception {
-		String api = "/api/alarms";
+		String api = "/api/v1/alarms";
 
 		Integer page = 0;
 
@@ -51,7 +51,7 @@ public class AlarmControllerTest extends ControllerTest {
 
 	@Test
 	void updateAlarmTest() throws Exception {
-		String api = "/api/alarms";
+		String api = "/api/v1/alarms";
 		final Long ID = 1L;
 
 		mockMvc.perform(patch(api + "/" + ID)
@@ -65,7 +65,7 @@ public class AlarmControllerTest extends ControllerTest {
 
 	@Test
 	void getAlarmStatusTest() throws Exception {
-		String api = "/api/alarms/status/";
+		String api = "/api/v1/alarms/status/";
 		AlarmStatus status = AlarmStatus.RECEIVED;
 
 		mockMvc.perform(get(api + status)

@@ -67,7 +67,7 @@ class FamilyControllerTest extends ControllerTest {
 			.addMembers(inviteUsers)
 			.addChildren(inviteChildren)
 			.build();
-		String api = "/api/families";
+		String api = "/api/v1/families";
 		ResultActions resultActions = mockMvc.perform(post(api)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request))
@@ -88,7 +88,7 @@ class FamilyControllerTest extends ControllerTest {
 	@Test
 	@DisplayName("가족 목록 조회 테스트")
 	void findFamiliesTest() throws Exception {
-		String api = "/api/families";
+		String api = "/api/v1/families";
 
 		mockMvc.perform(get(api)
 				.contentType(MediaType.APPLICATION_JSON)
@@ -101,7 +101,7 @@ class FamilyControllerTest extends ControllerTest {
 	@DisplayName("가족 구성원 조회 테스트 : 모두")
 	void findFamilyMembersAllTest() throws Exception {
 		long familyId = 1L;
-		String api = "/api/families/" + familyId + "/members?range=ALL";
+		String api = "/api/v1/families/" + familyId + "/members?range=ALL";
 
 		mockMvc.perform(get(api)
 				.contentType(MediaType.APPLICATION_JSON)
@@ -117,7 +117,7 @@ class FamilyControllerTest extends ControllerTest {
 	@DisplayName("가족 구성원 조회 테스트 : 본인 제외")
 	void findFamilyMembersExceptUserTest() throws Exception {
 		long familyId = 1L;
-		String api = "/api/families/" + familyId + "/members?range=EXCEPTME";
+		String api = "/api/v1/families/" + familyId + "/members?range=EXCEPTME";
 
 		mockMvc.perform(get(api)
 				.contentType(MediaType.APPLICATION_JSON)
@@ -143,7 +143,7 @@ class FamilyControllerTest extends ControllerTest {
 	@DisplayName("가족 구성원 조회 테스트 : 자식만")
 	void findFamilyMembersOnlyChildTest() throws Exception {
 		long familyId = 1L;
-		String api = "/api/families/" + familyId + "/members?range=CHILDREN";
+		String api = "/api/v1/families/" + familyId + "/members?range=CHILDREN";
 
 		mockMvc.perform(get(api)
 				.contentType(MediaType.APPLICATION_JSON)
