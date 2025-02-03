@@ -114,10 +114,15 @@ class AllowanceControllerTest extends ControllerTest {
 	}
 
 	@Test
-	@DisplayName("allowance-thanks-test")
+	@DisplayName("감사메시지 전송 테스트")
 	void createAllowanceThanksTest() throws Exception {
 		doNothing().when(alarmHandler).sendUserAlarm(any(SendAlarmDto.class));
-
+		MockMultipartFile video = new MockMultipartFile(
+			"file",
+			"test-video.mp4",
+			"video/mp4",
+			new byte[] {}
+		);
 		SendAllowanceRequest request = new SendAllowanceRequest(3L, 5000L, "용돈 잘 쓰렴");
 		MockMultipartFile data = new MockMultipartFile(
 			"data",
@@ -127,6 +132,7 @@ class AllowanceControllerTest extends ControllerTest {
 		);
 		String api = "/api/v1/allowances";
 		ResultActions resultActions = mockMvc.perform(multipart(api)
+				.file(video)
 				.file(data)
 				.contentType(MediaType.MULTIPART_FORM_DATA)
 				.header("Authorization", "Bearer " + accessToken))
