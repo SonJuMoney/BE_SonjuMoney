@@ -94,8 +94,9 @@ public class AllowanceService {
 			throw new CommonException(ErrorCode.DIFFERENT_MEMBER_USER);
 		}
 		String message = sendThanksRequest.message();
+		Long feedId;
 		if (message != null) {
-			Long feedId = feedService.saveDirectFeed(
+			feedId = feedService.saveDirectFeed(
 				CreateAllowanceThanksDto.of(allowance, file, message, FeedType.THANKS));
 			alarmService.createOneOffAlarm(
 				CreateAlarmDto.of(receiver.getUser().getId(), sender.getId(), feedId, receiver.getFamily().getId(),
@@ -103,7 +104,7 @@ public class AllowanceService {
 		} else {
 			throw new CommonException(ErrorCode.NULL_THANKS_MESSAGE);
 		}
-		return SendThanksResponse.of(200, "감사 메시지를 전송했습니다.");
+		return SendThanksResponse.of(200, "감사 메시지를 전송했습니다.", feedId);
 	}
 
 	public AllowanceInfoResponse getAllowanceById(Long allowanceId) {

@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hana4.sonjumoney.ControllerTest;
 import com.hana4.sonjumoney.domain.Alarm;
 import com.hana4.sonjumoney.domain.Allowance;
+import com.hana4.sonjumoney.domain.Feed;
 import com.hana4.sonjumoney.domain.Member;
 import com.hana4.sonjumoney.domain.enums.AlarmStatus;
 import com.hana4.sonjumoney.domain.enums.AlarmType;
@@ -34,11 +36,16 @@ import com.hana4.sonjumoney.dto.request.SendAllowanceRequest;
 import com.hana4.sonjumoney.dto.request.SendThanksRequest;
 import com.hana4.sonjumoney.dto.request.SignInRequest;
 import com.hana4.sonjumoney.dto.response.SendAllowanceResponse;
+import com.hana4.sonjumoney.dto.response.SendThanksResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.AlarmRepository;
 import com.hana4.sonjumoney.repository.AllowanceRepository;
+import com.hana4.sonjumoney.repository.FeedRepository;
 import com.hana4.sonjumoney.repository.MemberRepository;
+import com.hana4.sonjumoney.security.util.JwtUtil;
+import com.hana4.sonjumoney.service.FeedService;
+import com.hana4.sonjumoney.util.AuthenticationUtil;
 import com.hana4.sonjumoney.websocket.handler.AlarmHandler;
 
 @SpringBootTest
@@ -54,7 +61,16 @@ class AllowanceControllerTest extends ControllerTest {
 	private AllowanceRepository allowanceRepository;
 
 	@Autowired
+	private FeedRepository feedRepository;
+
+	@Autowired
 	private AlarmRepository alarmRepository;
+
+	@Autowired
+	private JwtUtil jwtUtil;
+
+	@Autowired
+	private FeedService feedService;
 
 	@MockBean
 	private AlarmHandler alarmHandler;
@@ -78,7 +94,7 @@ class AllowanceControllerTest extends ControllerTest {
 			objectMapper.writeValueAsString(request).getBytes(StandardCharsets.UTF_8)
 		);
 		String api = "/api/v1/allowances";
-		mockMvc.perform(multipart(api)
+		ResultActions resultActions = mockMvc.perform(multipart(api)
 				.file(image)
 				.file(data)
 				.contentType(MediaType.MULTIPART_FORM_DATA)
@@ -90,6 +106,55 @@ class AllowanceControllerTest extends ControllerTest {
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		assertThat(alarm.getAlarmType().equals(AlarmType.ALLOWANCE));
 		assertThat(alarm.getUser().getId().equals(3L));
+
+		SendAllowanceResponse response = objectMapper.readValue(
+			resultActions.andReturn().getResponse().getContentAsString(), SendAllowanceResponse.class);
+		List<Feed> savedFeeds = feedRepository.findFeedsByAllowanceId(response.allowanceId());
+		for (Feed feed : savedFeeds) {
+			feedService.deleteFeedById(jwtUtil.getUserId(accessToken), feed.getId());
+		}
+		feedRepository.deleteAll(savedFeeds);
+	}
+
+	@Test
+	@DisplayName("아이에게 용돈 보내기 기능 테스트")
+	void sendAllowanceChildTest() throws Exception {
+		// given
+		doNothing().when(alarmHandler).sendUserAlarm(any(SendAlarmDto.class));
+		SendAllowanceRequest request = new SendAllowanceRequest(4L, 5000L, "용돈 잘 쓰렴");
+		MockMultipartFile image = new MockMultipartFile(
+			"file",
+			"test-image.png",
+			MediaType.IMAGE_PNG_VALUE,
+			new byte[] {}
+		);
+		MockMultipartFile data = new MockMultipartFile(
+			"data",
+			"",
+			"application/json",
+			objectMapper.writeValueAsString(request).getBytes(StandardCharsets.UTF_8)
+		);
+		String api = "/api/v1/allowances";
+		ResultActions resultActions = mockMvc.perform(multipart(api)
+				.file(image)
+				.file(data)
+				.contentType(MediaType.MULTIPART_FORM_DATA)
+				.header("Authorization", "Bearer " + accessToken))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.message").value("송금을 완료했습니다."));
+		Alarm alarm = alarmRepository.findLatestAlarmByUserIdAndAlarmStatus(6L, AlarmStatus.RECEIVED)
+			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+		assertThat(alarm.getAlarmType().equals(AlarmType.ALLOWANCE));
+		assertThat(alarm.getUser().getId().equals(3L));
+
+		SendAllowanceResponse response = objectMapper.readValue(
+			resultActions.andReturn().getResponse().getContentAsString(), SendAllowanceResponse.class);
+		List<Feed> savedFeeds = feedRepository.findFeedsByAllowanceId(response.allowanceId());
+		for (Feed feed : savedFeeds) {
+			feedService.deleteFeedById(jwtUtil.getUserId(accessToken), feed.getId());
+		}
+		feedRepository.deleteAll(savedFeeds);
 	}
 
 	@Test
@@ -117,12 +182,6 @@ class AllowanceControllerTest extends ControllerTest {
 	@DisplayName("감사메시지 전송 테스트")
 	void createAllowanceThanksTest() throws Exception {
 		doNothing().when(alarmHandler).sendUserAlarm(any(SendAlarmDto.class));
-		MockMultipartFile video = new MockMultipartFile(
-			"file",
-			"test-video.mp4",
-			"video/mp4",
-			new byte[] {}
-		);
 		SendAllowanceRequest request = new SendAllowanceRequest(3L, 5000L, "용돈 잘 쓰렴");
 		MockMultipartFile data = new MockMultipartFile(
 			"data",
@@ -132,7 +191,6 @@ class AllowanceControllerTest extends ControllerTest {
 		);
 		String api = "/api/v1/allowances";
 		ResultActions resultActions = mockMvc.perform(multipart(api)
-				.file(video)
 				.file(data)
 				.contentType(MediaType.MULTIPART_FORM_DATA)
 				.header("Authorization", "Bearer " + accessToken))
@@ -157,7 +215,12 @@ class AllowanceControllerTest extends ControllerTest {
 		loginUserId = String.valueOf(responseMap.get("user_id"));
 		System.out.println("accessToken:" + accessToken);
 
-		api = "/api/v1/allowances/" + allowanceId + "/thanks";
+		MockMultipartFile video = new MockMultipartFile(
+			"file",
+			"test-video.mp4",
+			"video/mp4",
+			new byte[] {}
+		);
 		SendThanksRequest sendThanksRequest = SendThanksRequest.builder().message("감사합니다!").build();
 		data = new MockMultipartFile(
 			"data",
@@ -165,13 +228,17 @@ class AllowanceControllerTest extends ControllerTest {
 			"application/json",
 			objectMapper.writeValueAsString(sendThanksRequest).getBytes(StandardCharsets.UTF_8)
 		);
-		mockMvc.perform(multipart(api)
+		api = "/api/v1/allowances/" + allowanceId + "/thanks";
+		resultActions = mockMvc.perform(multipart(api)
+				.file(video)
 				.file(data)
 				.contentType(MediaType.MULTIPART_FORM_DATA)
 				.header("Authorization", "Bearer " + accessToken))
 			.andDo(print())
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.message").value("감사 메시지를 전송했습니다."));
-
+		SendThanksResponse response = objectMapper.readValue(
+			resultActions.andReturn().getResponse().getContentAsString(), SendThanksResponse.class);
+		feedService.deleteFeedById(jwtUtil.getUserId(accessToken), response.feedId());
 	}
 }
