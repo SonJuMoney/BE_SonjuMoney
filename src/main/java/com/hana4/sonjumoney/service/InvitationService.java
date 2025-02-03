@@ -73,15 +73,13 @@ public class InvitationService {
 			User invitedUser = null;
 			if (users.isEmpty()) {
 				continue;
-			} else if (users.size() > 1) {
+			} else {
 				for (User user : users) {
 					if (relationshipRepository.existsByParentId(user.getId())) {
 						invitedUser = user;
 						break;
 					}
 				}
-			} else {
-				invitedUser = users.get(0);
 			}
 			Invitation savedInvitation = invitationRepository.save(
 				new Invitation(sender.getUser(), invitedUser, family, MemberRole.fromValue(invitee.role()),
