@@ -13,9 +13,7 @@ import com.hana4.sonjumoney.domain.enums.AlarmType;
 import com.hana4.sonjumoney.domain.enums.InvitationStatus;
 import com.hana4.sonjumoney.domain.enums.MemberRole;
 import com.hana4.sonjumoney.dto.CreateAlarmDto;
-import com.hana4.sonjumoney.dto.InviteChildDto;
 import com.hana4.sonjumoney.dto.InviteUserDto;
-import com.hana4.sonjumoney.dto.request.CreateFamilyRequest;
 import com.hana4.sonjumoney.dto.response.AcceptInvitationResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
@@ -70,25 +68,13 @@ public class InvitationService {
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		for (InviteUserDto invitee : addMembers) {
 			List<User> users = userRepository.findUsersByPhone(invitee.phone());
-			User invitedUser = null;
-			if (users.isEmpty()) {
-				continue;
-			} else {
-				for (User user : users) {
-					if (relationshipRepository.existsByParentId(user.getId())) {
-						invitedUser = user;
-						break;
-					}
-				}
-			}
-			Invitation savedInvitation = invitationRepository.save(
-				new Invitation(sender.getUser(), invitedUser, family, MemberRole.fromValue(invitee.role()),
-					InvitationStatus.PENDING));
-
-			if (invitedUser != null) {
-				log.info("초대 보낼 유저: " + invitedUser.getId());
+			for (User user : users) {
+				Invitation savedInvitation = invitationRepository.save(
+					new Invitation(sender.getUser(), user, family, MemberRole.fromValue(invitee.role()),
+						InvitationStatus.PENDING));
+				log.info("초대 보낼 유저: " + user.getId());
 				alarmService.createOneOffAlarm(
-					CreateAlarmDto.of(invitedUser.getId(), senderId, savedInvitation.getId(), familyId, AlarmType.INVITE));
+					CreateAlarmDto.of(user.getId(), senderId, savedInvitation.getId(), familyId, AlarmType.INVITE));
 			}
 		}
 	}
