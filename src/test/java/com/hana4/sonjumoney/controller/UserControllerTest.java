@@ -102,4 +102,25 @@ public class UserControllerTest {
 			.andExpect(status().isOk());
 	}
 
+	@Test
+	void updateProfileExceptionTest() throws Exception {
+		MockMultipartFile image = new MockMultipartFile(
+			"file",
+			"profile-test-image.mp4",
+			MediaType.IMAGE_PNG_VALUE,
+			new byte[] {1}
+		);
+
+		String api = "/api/v1/users/profiles";
+		mockMvc.perform(multipart(api)
+				.file(image)
+				.with(request -> {
+					request.setMethod("PATCH");
+					return request;
+				})
+				.header("Authorization", "Bearer " + accessToken)
+				.contentType(MediaType.MULTIPART_FORM_DATA))
+			.andExpect(status().is4xxClientError());
+	}
+
 }
