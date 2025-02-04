@@ -368,10 +368,6 @@ public class AccountService {
 
 		try {
 			totalPayment = transactionHistoryRepository.getTotalPayment(userAccount.getId(), opponentAccountId);
-		} catch (Exception e) {
-			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
-		}
-		try {
 			monthPayment = transactionHistoryRepository.getCurrentMonthPayment(opponentAccountId,
 				startOfDay, endOfDay);
 		} catch (Exception e) {
