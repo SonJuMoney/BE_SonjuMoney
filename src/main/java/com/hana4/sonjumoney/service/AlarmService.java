@@ -134,8 +134,7 @@ public class AlarmService {
 				if (receiver.getPhone() == null) {
 					Relationship relationship = relationshipRepository.findByChildIdWithUser(receiver.getId());
 					User parent = relationship.getParent();
-					message = sender.getUser().getUsername() + "님이 " + receiver.getUsername() + "님에게 "
-						+ alarmType.getMessage();
+					message = receiver.getUsername() + "님에게 " + alarmType.getMessage();
 					alarm = alarmRepository.save(
 						new Alarm(parent, AlarmType.CHILD_ALLOWANCE, createAlarmDto.linkId(), createAlarmDto.familyId(),
 							message));
