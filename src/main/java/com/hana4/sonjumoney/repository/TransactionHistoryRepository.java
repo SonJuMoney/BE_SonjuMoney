@@ -48,22 +48,29 @@ public interface TransactionHistoryRepository extends JpaRepository<TransactionH
 		@Param("dates") List<LocalDate> dates
 	);
 
-	@Query("SELECT SUM(t.amount) " +
-		"FROM TransactionHistory t " +
-		"WHERE t.account.id = :accountId " +
-		"AND t.transactionType = 'WITHDRAW'" +
-		"AND t.opponentAccountId = :opponentAccountId")
+	@Query(
+  		"""
+  		SELECT COALESCE(SUM(t.amount),0)
+  		FROM TransactionHistory t
+  		WHERE t.account.id = :accountId
+  		AND t.transactionType = 'WITHDRAW'
+  		AND t.opponentAccountId = :opponentAccountId
+  		"""
+	)
 	Long getTotalPayment(@Param("accountId") Long accountId, @Param("opponentAccountId") Long opponentAccountId);
 
-	@Query("SELECT SUM(t.amount) " +
-		"FROM TransactionHistory t " +
-		"WHERE t.account.id = :accountId " +
-		"AND t.transactionType = 'WITHDRAW' " +
-		"AND t.createdAt BETWEEN :startOfMonth AND :endOfMonth "
-		+ "AND t.opponentAccountId = :opponentAccountId")
+	@Query(
+		"""
+       	SELECT COALESCE(SUM(t.amount),0)
+       	FROM TransactionHistory t
+       	WHERE t.account.id = :accountId
+       	AND t.transactionType = 'DEPOSIT'
+       	AND t.createdAt BETWEEN :startOfMonth AND :endOfMonth
+       	"""
+	)
 	Integer getCurrentMonthPayment(
 		@Param("accountId") Long accountId,
-		@Param("opponentAccountId") Long opponentAccountId,
+		// @Param("opponentAccountId") Long opponentAccountId,
 		@Param("startOfMonth") LocalDateTime startOfMonth,
 		@Param("endOfMonth") LocalDateTime endOfMonth);
 
