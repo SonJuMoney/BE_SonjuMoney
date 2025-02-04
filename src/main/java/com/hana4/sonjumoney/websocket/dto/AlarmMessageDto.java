@@ -21,11 +21,13 @@ public record AlarmMessageDto(
 	Long linkId,
 	@JsonProperty("family_id")
 	Long familyId,
+	@JsonProperty("child_id")
+	Long childId,
 	@JsonProperty("created_at")
 	LocalDateTime createdAt
 ) {
 	public static AlarmMessageDto of(Long alarmId, AlarmStatus alarmStatus, AlarmType alarmType, String message,
-		Long linkId, Long familyId, LocalDateTime createdAt) {
+		Long linkId, Long familyId, Long childId, LocalDateTime createdAt) {
 		return AlarmMessageDto.builder()
 			.alarmId(alarmId)
 			.alarmStatus(alarmStatus)
@@ -33,6 +35,7 @@ public record AlarmMessageDto(
 			.message(message)
 			.linkId(linkId)
 			.familyId(familyId)
+			.childId(childId)
 			.createdAt(createdAt)
 			.build();
 	}
