@@ -130,7 +130,7 @@ public class AlarmService {
 				Alarm alarm = alarmRepository.save(
 					new Alarm(receiver, alarmType, createAlarmDto.linkId(), createAlarmDto.familyId(),
 						message));
-				alarmHandler.sendUserAlarm(SendAlarmDto.from(alarm));
+				alarmHandler.sendUserAlarm(SendAlarmDto.from(alarm, null));
 				if (receiver.getPhone() == null) {
 					Relationship relationship = relationshipRepository.findByChildIdWithUser(receiver.getId());
 					User parent = relationship.getParent();
@@ -138,7 +138,7 @@ public class AlarmService {
 					alarm = alarmRepository.save(
 						new Alarm(parent, AlarmType.CHILD_ALLOWANCE, createAlarmDto.linkId(), createAlarmDto.familyId(),
 							message));
-					alarmHandler.sendUserAlarm(SendAlarmDto.from(alarm));
+					alarmHandler.sendUserAlarm(SendAlarmDto.from(alarm, receiver.getId()));
 				}
 
 				break;
@@ -156,7 +156,7 @@ public class AlarmService {
 					Alarm alarm = alarmRepository.save(
 						new Alarm(member.getUser(), alarmType, createAlarmDto.linkId(), createAlarmDto.familyId(),
 							message));
-					alarmHandler.sendUserAlarm(SendAlarmDto.from(alarm));
+					alarmHandler.sendUserAlarm(SendAlarmDto.from(alarm, null));
 				}
 				break;
 			}

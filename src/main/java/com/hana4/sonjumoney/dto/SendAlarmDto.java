@@ -18,10 +18,11 @@ public record SendAlarmDto(
 	String message,
 	Long linkId,
 	Long familyId,
+	Long childId,
 	LocalDateTime createdAt
 
 ) {
-	public static SendAlarmDto from(Alarm alarm) {
+	public static SendAlarmDto from(Alarm alarm,Long childId) {
 		return SendAlarmDto.builder()
 			.alarmId(alarm.getId())
 			.alarmSessionId(alarm.getUser().getId())
@@ -30,6 +31,7 @@ public record SendAlarmDto(
 			.message(alarm.getMessage())
 			.linkId(alarm.getLinkId())
 			.familyId(alarm.getFamilyId())
+			.childId(childId)
 			.createdAt(alarm.getCreatedAt())
 			.build();
 	}
