@@ -158,6 +158,34 @@ class AllowanceControllerTest extends ControllerTest {
 	}
 
 	@Test
+	@DisplayName("용돈 보내기 다른 가족 오류 테스트")
+	void sendAllowanceDifferentFamilyExceptionTest() throws Exception {
+		// given
+		doNothing().when(alarmHandler).sendUserAlarm(any(SendAlarmDto.class));
+		SendAllowanceRequest request = new SendAllowanceRequest(5L, 5000L, "용돈 잘 쓰렴");
+		MockMultipartFile image = new MockMultipartFile(
+			"file",
+			"test-image.png",
+			MediaType.IMAGE_PNG_VALUE,
+			new byte[] {}
+		);
+		MockMultipartFile data = new MockMultipartFile(
+			"data",
+			"",
+			"application/json",
+			objectMapper.writeValueAsString(request).getBytes(StandardCharsets.UTF_8)
+		);
+		String api = "/api/v1/allowances";
+		ResultActions resultActions = mockMvc.perform(multipart(api)
+				.file(image)
+				.file(data)
+				.contentType(MediaType.MULTIPART_FORM_DATA)
+				.header("Authorization", "Bearer " + accessToken))
+			.andDo(print())
+			.andExpect(status().is4xxClientError());
+	}
+
+	@Test
 	@DisplayName("용돈 조회 테스트")
 	void getAllowanceTest() throws Exception {
 		// given
@@ -240,5 +268,65 @@ class AllowanceControllerTest extends ControllerTest {
 		SendThanksResponse response = objectMapper.readValue(
 			resultActions.andReturn().getResponse().getContentAsString(), SendThanksResponse.class);
 		feedService.deleteFeedById(jwtUtil.getUserId(accessToken), response.feedId());
+	}
+
+	@Test
+	@DisplayName("감사메시지 null 예외 테스트")
+	void sendThanksNullMessageTest() throws Exception {
+		doNothing().when(alarmHandler).sendUserAlarm(any(SendAlarmDto.class));
+		SendAllowanceRequest request = new SendAllowanceRequest(3L, 5000L, "용돈 잘 쓰렴");
+		MockMultipartFile data = new MockMultipartFile(
+			"data",
+			"",
+			"application/json",
+			objectMapper.writeValueAsString(request).getBytes(StandardCharsets.UTF_8)
+		);
+		String api = "/api/v1/allowances";
+		ResultActions resultActions = mockMvc.perform(multipart(api)
+				.file(data)
+				.contentType(MediaType.MULTIPART_FORM_DATA)
+				.header("Authorization", "Bearer " + accessToken))
+			.andDo(print())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.message").value("송금을 완료했습니다."));
+
+		SendAllowanceResponse sendAllowanceResponse = objectMapper.readValue(
+			resultActions.andReturn().getResponse().getContentAsString(), SendAllowanceResponse.class);
+		Long allowanceId = sendAllowanceResponse.allowanceId();
+
+		SignInRequest signInRequest = new SignInRequest("test3", "1234");
+		MvcResult mvcResult = mockMvc.perform(post("/api/v1/auth/sign-in")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(signInRequest)))
+			.andExpect(status().isOk()).andReturn();
+
+		String responseBody = mvcResult.getResponse().getContentAsString();
+		Map<String, String> responseMap = objectMapper.readValue(responseBody, Map.class);
+		accessToken = responseMap.get("access_token");
+
+		loginUserId = String.valueOf(responseMap.get("user_id"));
+		System.out.println("accessToken:" + accessToken);
+		MockMultipartFile video = new MockMultipartFile(
+			"file",
+			"test-video.mp4",
+			"video/mp4",
+			new byte[] {}
+		);
+		SendThanksRequest sendThanksRequest = SendThanksRequest.builder().message(null).build();
+		data = new MockMultipartFile(
+			"data",
+			"",
+			"application/json",
+			objectMapper.writeValueAsString(sendThanksRequest).getBytes(StandardCharsets.UTF_8)
+		);
+		api = "/api/v1/allowances/" + allowanceId + "/thanks";
+		mockMvc.perform(multipart(api)
+				.file(video)
+				.file(data)
+				.contentType(MediaType.MULTIPART_FORM_DATA)
+				.header("Authorization", "Bearer " + accessToken))
+			.andDo(print())
+			.andExpect(status().is4xxClientError())
+			.andExpect(jsonPath("$.message").value("감사메시지는 null일 수 없습니다."));
 	}
 }

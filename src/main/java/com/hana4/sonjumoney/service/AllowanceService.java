@@ -1,13 +1,11 @@
 package com.hana4.sonjumoney.service;
 
-import javax.management.relation.Relation;
 
 import com.hana4.sonjumoney.domain.Relationship;
 import com.hana4.sonjumoney.domain.User;
 import com.hana4.sonjumoney.domain.enums.AlarmType;
 import com.hana4.sonjumoney.domain.enums.FeedType;
 import com.hana4.sonjumoney.dto.CreateAlarmDto;
-import com.hana4.sonjumoney.dto.TransactionHistoryDto;
 import com.hana4.sonjumoney.dto.request.SendThanksRequest;
 import com.hana4.sonjumoney.dto.response.AllowanceInfoResponse;
 import com.hana4.sonjumoney.dto.response.SendAllowanceResponse;
@@ -26,11 +24,9 @@ import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.AllowanceRepository;
 import com.hana4.sonjumoney.repository.MemberRepository;
 import com.hana4.sonjumoney.repository.RelationshipRepository;
-import com.hana4.sonjumoney.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 @Slf4j
 @Service
@@ -53,23 +49,17 @@ public class AllowanceService {
 				ErrorCode.NOT_FOUND_MEMBER));
 		User receiverUser = receiver.getUser();
 
-		if (!sender.getFamily().equals(receiver.getFamily())) {
-			throw new CommonException(ErrorCode.DIFFERENT_FAMILY);
-		}
-
-		String message = sendAllowanceRequest.message();
+		String message = sendAllowanceRequest.message() != null ? sendAllowanceRequest.message() : "";
 		accountService.makeTransferByUserId(
 			AllowanceDto.of(sender.getUser().getId(), receiverUser.getId(), sendAllowanceRequest.amount(),
-				message != null ? message : ""));
+				message));
 
 		Allowance savedAllowance = allowanceRepository.save(
 			new Allowance(sender,receiver,sendAllowanceRequest.amount())
 		);
+		feedService.saveDirectFeed(
+			CreateAllowanceThanksDto.of(savedAllowance, file, message, FeedType.ALLOWANCE));
 
-		if (message != null && !message.isEmpty()) {
-			feedService.saveDirectFeed(
-				CreateAllowanceThanksDto.of(savedAllowance, file, message, FeedType.ALLOWANCE));
-		}
 		if (receiverUser.getPhone() == null) {
 			Relationship relationship = relationshipRepository.findByChildId(receiverUser.getId());
 			User parent = relationship.getParent();
