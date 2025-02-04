@@ -5,6 +5,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.Map;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hana4.sonjumoney.ControllerTest;
@@ -20,6 +23,7 @@ import com.hana4.sonjumoney.dto.request.CreateAccountRequest;
 import com.hana4.sonjumoney.dto.request.CreateSavingAccountRequest;
 import com.hana4.sonjumoney.dto.request.CreateSavingsMessageRequest;
 import com.hana4.sonjumoney.dto.request.SendMoneyRequest;
+import com.hana4.sonjumoney.dto.request.SignInRequest;
 import com.hana4.sonjumoney.repository.AccountRepository;
 
 @SpringBootTest
@@ -32,8 +36,54 @@ public class AccountControllerTest extends ControllerTest {
 
 	@Test
 	@Transactional
-	@DisplayName("계좌 등록 예외 처리 테스트")
+	@DisplayName("계좌 등록 테스트")
 	void makeAccountTest() throws Exception {
+		SignInRequest signInRequest = new SignInRequest("test5", "1234");
+		MvcResult mvcResult = mockMvc.perform(post("/api/v1/auth/sign-in")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(signInRequest)))
+			.andExpect(status().isOk()).andReturn();
+
+		String responseBody = mvcResult.getResponse().getContentAsString();
+		Map<String, String> responseMap = objectMapper.readValue(responseBody, Map.class);
+		accessToken = responseMap.get("access_token");
+		loginUserId = String.valueOf(responseMap.get("user_id"));
+		System.out.println("accessToken:" + accessToken);
+
+		String api = "/api/v1/accounts";
+		CreateAccountRequest request = CreateAccountRequest.builder()
+			.mockaccId(3L)
+			.userId(5L)
+			.build();
+
+		mockMvc.perform(post(api)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request))
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk());
+	}
+
+	@Test
+	@Transactional
+	@DisplayName("자녀 계좌 등록 테스트")
+	void makeChildAccountTest() throws Exception {
+		String api = "/api/v1/accounts";
+		CreateAccountRequest request = CreateAccountRequest.builder()
+			.mockaccId(3L)
+			.userId(5L)
+			.build();
+
+		mockMvc.perform(post(api)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request))
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk());
+	}
+
+	@Test
+	@Transactional
+	@DisplayName("계좌 등록 예외 처리 테스트")
+	void makeAccountExceptionTest() throws Exception {
 		String api = "/api/v1/accounts";
 		CreateAccountRequest request = CreateAccountRequest.builder()
 			.mockaccId(1L)
@@ -93,7 +143,55 @@ public class AccountControllerTest extends ControllerTest {
 				.header("Authorization", "Bearer " + accessToken))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.is_child").exists())
-			.andExpect(jsonPath("$.savings").exists())
+			.andExpect(jsonPath("$.savings").isEmpty())
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("아이일 경우 적금 계좌(들) 조회 테스트")
+	void findSavingAccountsChildTest() throws Exception {
+		SignInRequest signInRequest = new SignInRequest("test7", "1234");
+		MvcResult mvcResult = mockMvc.perform(post("/api/v1/auth/sign-in")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(signInRequest)))
+			.andExpect(status().isOk()).andReturn();
+
+		String responseBody = mvcResult.getResponse().getContentAsString();
+		Map<String, String> responseMap = objectMapper.readValue(responseBody, Map.class);
+		accessToken = responseMap.get("access_token");
+
+		String api = "/api/v1/accounts/savings";
+
+		mockMvc.perform(get(api)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.is_child").value(true))
+			.andExpect(jsonPath("$.savings").doesNotExist())
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("적금 계좌(들) 조회 empty 테스트")
+	void findSavingAccountsEmptyTest() throws Exception {
+		SignInRequest signInRequest = new SignInRequest("test2", "1234");
+		MvcResult mvcResult = mockMvc.perform(post("/api/v1/auth/sign-in")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(signInRequest)))
+			.andExpect(status().isOk()).andReturn();
+
+		String responseBody = mvcResult.getResponse().getContentAsString();
+		Map<String, String> responseMap = objectMapper.readValue(responseBody, Map.class);
+		accessToken = responseMap.get("access_token");
+
+		String api = "/api/v1/accounts/savings";
+
+		mockMvc.perform(get(api)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.is_child").value(false))
+			.andExpect(jsonPath("$.savings").isEmpty())
 			.andDo(print());
 	}
 
@@ -129,6 +227,29 @@ public class AccountControllerTest extends ControllerTest {
 
 		assertThat(afterSenderBalance).isEqualTo(beforeSenderBalance - amount);
 		assertThat(afterRecieverBalance).isEqualTo(beforeRecieverBalance + amount);
+	}
+
+	@Test
+	@Transactional
+	@DisplayName("적금 계좌 송금 pin 오류 테스트")
+	void transferToSavingAccountInvalidPinTest() throws Exception {
+		String accountId = "2";
+		String api = "/api/v1/accounts/savings/" + accountId + "/transfer";
+		Long amount = 1000L;
+
+		SendMoneyRequest request = SendMoneyRequest.builder()
+			.amount(amount)
+			.pin("124353")
+			.message("돈 보낸다")
+			.build();
+
+		String requestBody = objectMapper.writeValueAsString(request);
+		mockMvc.perform(post(api)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + accessToken)
+				.content(requestBody))
+			.andExpect(status().is4xxClientError())
+			.andDo(print());
 	}
 
 	@Test

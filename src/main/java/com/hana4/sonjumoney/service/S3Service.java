@@ -49,9 +49,7 @@ public class S3Service {
 
 	public String uploadImageToS3(MultipartFile image, ContentPrefix prefix, Long feedId) {
 		String originalFilename = image.getOriginalFilename();
-		if (originalFilename == null) {
-			throw new CommonException(WRONG_FILE_NAME);
-		}
+		assert originalFilename != null;
 		String extension = ContentUtil.getExtension(originalFilename);
 		String s3FileName = prefix.getPrefix() + feedId + "/" + createFileName(originalFilename);
 
@@ -93,10 +91,6 @@ public class S3Service {
 
 	private String getKeyFromUrl(String url) {
 		String domain = "https://" + baseUrl + "/";
-		if (!url.startsWith(domain)) {
-			log.error("Domain Error!! Expected: " + domain + " Actual: " + url);
-			throw new CommonException(BAD_REQUEST);
-		}
 		return url.substring(domain.length());
 	}
 

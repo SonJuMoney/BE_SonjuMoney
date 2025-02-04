@@ -190,10 +190,10 @@ public class AccountService {
 
 	public SavingAccountResponse findSavingAccounts(Long userId) {
 		/* 처음 회원가입한 사람은 가족 설정이 안되어있으므로 MemberResponse가 Empty */
-		List<Member> newUserMember = memberRepository.findAllByUserId(userId);
-		if (newUserMember.isEmpty()) {
-			return SavingAccountResponse.of(false, null);
-		}
+		// List<Member> newUserMember = memberRepository.findAllByUserId(userId);
+		// if (newUserMember.isEmpty()) {
+		// 	return SavingAccountResponse.of(false, null);
+		// }
 
 		/* members -> empty = 모든 family에서 son or daughter인 경우 */
 		List<Member> members = memberRepository.findMemberByMemberRoleAndUserId(userId);
@@ -216,10 +216,7 @@ public class AccountService {
 	@Transactional
 	public TransferResponse sendMoneyProcess(Long accountId, SendMoneyRequest request, Long userId) {
 		/* 비밀번호 인증 여부가 false면 송금 process를 수행하지 않음 */
-		if (authService.validatePin(new AuthPinRequest(request.pin()), userId).code() != 200) {
-			throw new CommonException(ErrorCode.INVALID_PIN);
-		}
-
+		authService.validatePin(new AuthPinRequest(request.pin()), userId);
 		Account senderAccount = accountRepository.findByUserId(userId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		Account receiverAccount = accountRepository.findById(accountId)
@@ -258,10 +255,8 @@ public class AccountService {
 
 			sender.withdraw(transferDto.amount());
 			receiver.deposit(transferDto.amount());
-		} catch (CommonException e) {
-			throw new CommonException(ErrorCode.TRANSACTION_FAILED);
 		} catch (Exception e) {
-			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+			throw new CommonException(ErrorCode.TRANSACTION_FAILED);
 		}
 
 	}
@@ -373,18 +368,8 @@ public class AccountService {
 
 		try {
 			totalPayment = transactionHistoryRepository.getTotalPayment(userAccount.getId(), opponentAccountId);
-			if (totalPayment == null) {
-				totalPayment = 0L;
-			}
-		} catch (Exception e) {
-			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
-		}
-		try {
-			monthPayment = transactionHistoryRepository.getCurrentMonthPayment(userAccount.getId(), opponentAccountId,
+			monthPayment = transactionHistoryRepository.getCurrentMonthPayment(opponentAccountId,
 				startOfDay, endOfDay);
-			if (monthPayment == null) {
-				monthPayment = 0;
-			}
 		} catch (Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
 		}

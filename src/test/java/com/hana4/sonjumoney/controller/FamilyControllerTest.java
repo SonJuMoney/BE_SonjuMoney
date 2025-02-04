@@ -2,6 +2,8 @@ package com.hana4.sonjumoney.controller;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -28,6 +31,7 @@ import com.hana4.sonjumoney.domain.Member;
 import com.hana4.sonjumoney.domain.User;
 import com.hana4.sonjumoney.dto.InviteChildDto;
 import com.hana4.sonjumoney.dto.InviteUserDto;
+import com.hana4.sonjumoney.dto.SendAlarmDto;
 import com.hana4.sonjumoney.dto.request.CreateFamilyRequest;
 import com.hana4.sonjumoney.dto.response.CreateFamilyResponse;
 import com.hana4.sonjumoney.exception.CommonException;
@@ -35,6 +39,7 @@ import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.FamilyRepository;
 import com.hana4.sonjumoney.repository.MemberRepository;
 import com.hana4.sonjumoney.repository.UserRepository;
+import com.hana4.sonjumoney.websocket.handler.AlarmHandler;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -48,18 +53,24 @@ class FamilyControllerTest extends ControllerTest {
 
 	@Autowired
 	FamilyRepository familyRepository;
+
 	@Autowired
 	MemberRepository memberRepository;
+
 	@Autowired
 	UserRepository userRepository;
+
+	@MockBean
+	AlarmHandler alarmHandler;
 
 	@Test
 	@DisplayName("가족 생성 api 테스트")
 	void addFamilyTest() throws Exception {
+		doNothing().when(alarmHandler).sendUserAlarm(any(SendAlarmDto.class));
 		List<InviteUserDto> inviteUsers = new ArrayList<>();
 		List<InviteChildDto> inviteChildren = new ArrayList<>();
 		User user = userRepository.findById(3L).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-		inviteUsers.add(new InviteUserDto("01012341234", "아빠"));
+		inviteUsers.add(new InviteUserDto("01012341234", "할머니"));
 		inviteChildren.add(new InviteChildDto(user.getId(), user.getUsername()));
 		CreateFamilyRequest request = CreateFamilyRequest.builder()
 			.familyName("OO이네")

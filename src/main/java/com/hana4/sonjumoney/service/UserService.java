@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.hana4.sonjumoney.domain.Relationship;
 import com.hana4.sonjumoney.domain.User;
+import com.hana4.sonjumoney.domain.enums.ContentType;
 import com.hana4.sonjumoney.dto.ContentPrefix;
 import com.hana4.sonjumoney.dto.response.GetChildrenResponse;
 import com.hana4.sonjumoney.dto.response.UpdateProfileResponse;
@@ -16,6 +17,7 @@ import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.RelationshipRepository;
 import com.hana4.sonjumoney.repository.UserRepository;
+import com.hana4.sonjumoney.util.ContentUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +33,9 @@ public class UserService {
 
 	public UpdateProfileResponse updateProfile(Long userId, MultipartFile file) {
 		User user = userRepository.findById(userId).orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-
-		if (file == null || file.isEmpty() || !Objects.requireNonNull(file.getContentType())
-			.startsWith("image/")) {
+		if (file == null || file.isEmpty() || !Objects.requireNonNull(file.getContentType()).startsWith("image/")
+			|| !ContentUtil.classifyContentType(
+			ContentUtil.getExtension(Objects.requireNonNull(file.getOriginalFilename()))).equals(ContentType.IMAGE)) {
 			throw new CommonException(ErrorCode.BAD_REQUEST);
 		}
 		try {

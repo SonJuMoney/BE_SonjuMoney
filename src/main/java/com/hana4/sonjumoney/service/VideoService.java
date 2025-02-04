@@ -35,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class VideoService {
-	private static final long MAX_FILE_SIZE = 1024L * 1024L * 1024L * 5L;
 
 	public List<String> uploadVideos(List<MultipartFile> videos, ContentPrefix prefix, Long feedId) {
 		List<String> contentList = new ArrayList<>();
@@ -50,7 +49,6 @@ public class VideoService {
 		if (originalFileName == null) {
 			throw new CommonException(ErrorCode.WRONG_FILE_NAME);
 		}
-		checkFileSize(video);
 		String extension = ContentUtil.getExtension(originalFileName);
 		checkFileType(extension);
 
@@ -103,7 +101,7 @@ public class VideoService {
 	}
 
 	public void deleteVideo(String pathStr) {
-		String decodedPath = URLDecoder.decode(pathStr);
+		String decodedPath = URLDecoder.decode(pathStr, StandardCharsets.UTF_8);
 		Path path = Paths.get(decodedPath);
 		try {
 			Files.delete(path);
@@ -125,12 +123,6 @@ public class VideoService {
 			}
 		}
 		return path.toString();
-	}
-
-	private void checkFileSize(MultipartFile video) {
-		if (video.getSize() > MAX_FILE_SIZE) {
-			throw new CommonException(ErrorCode.EXCESSIVE_SIZE);
-		}
 	}
 
 	private void checkFileType(String extension) {

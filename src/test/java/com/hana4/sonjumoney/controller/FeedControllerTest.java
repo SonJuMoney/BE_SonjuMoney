@@ -137,19 +137,54 @@ class FeedControllerTest extends ControllerTest {
 
 	@Test
 	@Order(2)
+	void addFeedExceptionTest() throws Exception {
+		CreateFeedRequest request = new CreateFeedRequest(1L, "즐거운 여행~");
+		MockMultipartFile image2 = new MockMultipartFile(
+			"files",
+			"feed-test-video2.png",
+			"video/mp4",
+			new byte[] {2}
+		);
+		MockMultipartFile data = new MockMultipartFile(
+			"data",
+			"",
+			"application/json",
+			objectMapper.writeValueAsString(request).getBytes(StandardCharsets.UTF_8)
+		);
+
+		ResultActions resultActions = mockMvc.perform(multipart("/api/v1/feeds")
+				.file(image2)
+				.file(data)
+				.contentType(MediaType.MULTIPART_FORM_DATA)
+				.header("Authorization", "Bearer " + accessToken))
+			.andDo(print())
+			.andExpect(status().is4xxClientError());
+		CreateFeedResponse createFeedResponse = objectMapper.readValue(
+			resultActions.andReturn().getResponse().getContentAsString(), CreateFeedResponse.class);
+		feedId = createFeedResponse.feedId();
+
+		// when
+		String api = "/api/v1/feeds/" + feedId;
+		mockMvc.perform(delete(api)
+				.header("Authorization", "Bearer " + accessToken))
+			.andDo(print())
+			.andExpect(status().is5xxServerError());
+	}
+	@Test
+	@Order(3)
 	void deleteFeedTest() throws Exception {
 		// given
 		CreateFeedRequest request = new CreateFeedRequest(1L, "즐거운 여행~");
 		MockMultipartFile image1 = new MockMultipartFile(
-			"images",
+			"files",
 			"feed-test-image1.png",
 			MediaType.IMAGE_PNG_VALUE,
 			new byte[] {1}
 		);
 		MockMultipartFile image2 = new MockMultipartFile(
-			"images",
-			"feed-test-image2.png",
-			MediaType.IMAGE_PNG_VALUE,
+			"files",
+			"feed-test-video2.mp4",
+			"video/mp4",
 			new byte[] {2}
 		);
 		MockMultipartFile data = new MockMultipartFile(
@@ -183,7 +218,7 @@ class FeedControllerTest extends ControllerTest {
 	}
 
 	@Test
-	@Order(3)
+	@Order(4)
 	void getFeedsTest() throws Exception {
 		Member member = memberRepository.findByUserIdAndFamilyId(1L, 1L).orElseThrow();
 		Feed feed = Feed.builder()
@@ -219,7 +254,7 @@ class FeedControllerTest extends ControllerTest {
 	}
 
 	@Test
-	@Order(4)
+	@Order(5)
 	void postFeedLikeTest() throws Exception {
 		Feed feed = Feed.builder()
 			.member(memberRepository.findByUserIdAndFamilyId(1L, 1L).orElseThrow())
@@ -243,7 +278,7 @@ class FeedControllerTest extends ControllerTest {
 	}
 
 	@Test
-	@Order(5)
+	@Order(6)
 	void postFeedCommentTest() throws Exception {
 		Feed feed = Feed.builder()
 			.member(memberRepository.findByUserIdAndFamilyId(1L, 1L).orElseThrow())
@@ -268,7 +303,7 @@ class FeedControllerTest extends ControllerTest {
 	}
 
 	@Test
-	@Order(6)
+	@Order(7)
 	void DeleteCommentTest() throws Exception {
 		Member member = memberRepository.findByUserIdAndFamilyId(1L, 1L).orElseThrow();
 		String commentMessage = "ㅠㅠ";
