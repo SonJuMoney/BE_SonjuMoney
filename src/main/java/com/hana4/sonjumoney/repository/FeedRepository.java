@@ -13,6 +13,8 @@ import com.hana4.sonjumoney.domain.Feed;
 @Repository
 public interface FeedRepository extends JpaRepository<Feed, Long> {
 
+	List<Feed> findFeedsByAllowanceId(Long allowanceId);
+
 	@Query(
 		"""
 			select f

@@ -29,7 +29,7 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 	type = SecuritySchemeType.HTTP,
 	scheme = "bearer",
 	bearerFormat = "JWT",
-	description = "JWT 인증을 위해 'Bearer {token}' 형식으로 입력하세요."
+	description = "JWT 인증을 위해 '{token}' 형식으로 입력하세요."
 )
 public class SwaggerConfig {
 
@@ -52,7 +52,7 @@ public class SwaggerConfig {
 	}
 
 	@RestController
-	@RequestMapping("/api/auth")
+	@RequestMapping("/api/v1/auth")
 	@Tag(name = "인증", description = "로그인 관련 API")
 	static class SwaggerAuthController {
 		@Operation(

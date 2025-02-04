@@ -18,7 +18,7 @@ public class CallControllerTest extends ControllerTest {
 
 	@Test
 	void getRecommendationsTest() throws Exception {
-		String api = "/api/calls/recommendations";
+		String api = "/api/v1/calls/recommendations";
 		mockMvc.perform(get(api)
 				.header("Authorization", "Bearer " + accessToken)
 				.param("target_id", "2")

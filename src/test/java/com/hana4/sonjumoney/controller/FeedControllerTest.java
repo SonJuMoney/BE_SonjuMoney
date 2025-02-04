@@ -8,8 +8,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
@@ -107,7 +105,7 @@ class FeedControllerTest extends ControllerTest {
 			objectMapper.writeValueAsString(request).getBytes(StandardCharsets.UTF_8)
 		);
 
-		String api = "/api/feeds";
+		String api = "/api/v1/feeds";
 		ResultActions resultActions = mockMvc.perform(multipart(api)
 				.file(image1)
 				.file(image2)
@@ -139,19 +137,12 @@ class FeedControllerTest extends ControllerTest {
 
 	@Test
 	@Order(2)
-	void deleteFeedTest() throws Exception {
-		// given
+	void addFeedExceptionTest() throws Exception {
 		CreateFeedRequest request = new CreateFeedRequest(1L, "즐거운 여행~");
-		MockMultipartFile image1 = new MockMultipartFile(
-			"images",
-			"feed-test-image1.png",
-			MediaType.IMAGE_PNG_VALUE,
-			new byte[] {1}
-		);
 		MockMultipartFile image2 = new MockMultipartFile(
-			"images",
-			"feed-test-image2.png",
-			MediaType.IMAGE_PNG_VALUE,
+			"files",
+			"feed-test-video2.png",
+			"video/mp4",
 			new byte[] {2}
 		);
 		MockMultipartFile data = new MockMultipartFile(
@@ -161,7 +152,49 @@ class FeedControllerTest extends ControllerTest {
 			objectMapper.writeValueAsString(request).getBytes(StandardCharsets.UTF_8)
 		);
 
-		ResultActions resultActions = mockMvc.perform(multipart("/api/feeds")
+		ResultActions resultActions = mockMvc.perform(multipart("/api/v1/feeds")
+				.file(image2)
+				.file(data)
+				.contentType(MediaType.MULTIPART_FORM_DATA)
+				.header("Authorization", "Bearer " + accessToken))
+			.andDo(print())
+			.andExpect(status().is4xxClientError());
+		CreateFeedResponse createFeedResponse = objectMapper.readValue(
+			resultActions.andReturn().getResponse().getContentAsString(), CreateFeedResponse.class);
+		feedId = createFeedResponse.feedId();
+
+		// when
+		String api = "/api/v1/feeds/" + feedId;
+		mockMvc.perform(delete(api)
+				.header("Authorization", "Bearer " + accessToken))
+			.andDo(print())
+			.andExpect(status().is5xxServerError());
+	}
+	@Test
+	@Order(3)
+	void deleteFeedTest() throws Exception {
+		// given
+		CreateFeedRequest request = new CreateFeedRequest(1L, "즐거운 여행~");
+		MockMultipartFile image1 = new MockMultipartFile(
+			"files",
+			"feed-test-image1.png",
+			MediaType.IMAGE_PNG_VALUE,
+			new byte[] {1}
+		);
+		MockMultipartFile image2 = new MockMultipartFile(
+			"files",
+			"feed-test-video2.mp4",
+			"video/mp4",
+			new byte[] {2}
+		);
+		MockMultipartFile data = new MockMultipartFile(
+			"data",
+			"",
+			"application/json",
+			objectMapper.writeValueAsString(request).getBytes(StandardCharsets.UTF_8)
+		);
+
+		ResultActions resultActions = mockMvc.perform(multipart("/api/v1/feeds")
 				.file(image1)
 				.file(image2)
 				.file(data)
@@ -175,7 +208,7 @@ class FeedControllerTest extends ControllerTest {
 		feedId = createFeedResponse.feedId();
 
 		// when
-		String api = "/api/feeds/" + feedId;
+		String api = "/api/v1/feeds/" + feedId;
 		mockMvc.perform(delete(api)
 				.header("Authorization", "Bearer " + accessToken))
 			.andDo(print())
@@ -185,7 +218,7 @@ class FeedControllerTest extends ControllerTest {
 	}
 
 	@Test
-	@Order(3)
+	@Order(4)
 	void getFeedsTest() throws Exception {
 		Member member = memberRepository.findByUserIdAndFamilyId(1L, 1L).orElseThrow();
 		Feed feed = Feed.builder()
@@ -209,7 +242,7 @@ class FeedControllerTest extends ControllerTest {
 			.feedType(FeedType.ALLOWANCE)
 			.build();
 		feedRepository.saveAndFlush(allowanceFeed);
-		String api = "/api/feeds";
+		String api = "/api/v1/feeds";
 
 		mockMvc.perform(get(api).header("Authorization", "Bearer " + accessToken)
 				.contentType(MediaType.APPLICATION_JSON)
@@ -221,7 +254,7 @@ class FeedControllerTest extends ControllerTest {
 	}
 
 	@Test
-	@Order(4)
+	@Order(5)
 	void postFeedLikeTest() throws Exception {
 		Feed feed = Feed.builder()
 			.member(memberRepository.findByUserIdAndFamilyId(1L, 1L).orElseThrow())
@@ -234,7 +267,7 @@ class FeedControllerTest extends ControllerTest {
 			.build();
 		Feed result = feedRepository.saveAndFlush(feed);
 		Long feedId = result.getId();
-		String api = "/api/feeds/" + feedId + "/likes";
+		String api = "/api/v1/feeds/" + feedId + "/likes";
 
 		mockMvc.perform(post(api).header("Authorization", "Bearer " + accessToken)
 				.contentType(MediaType.APPLICATION_JSON))
@@ -245,7 +278,7 @@ class FeedControllerTest extends ControllerTest {
 	}
 
 	@Test
-	@Order(5)
+	@Order(6)
 	void postFeedCommentTest() throws Exception {
 		Feed feed = Feed.builder()
 			.member(memberRepository.findByUserIdAndFamilyId(1L, 1L).orElseThrow())
@@ -258,7 +291,7 @@ class FeedControllerTest extends ControllerTest {
 			.build();
 		Feed result = feedRepository.saveAndFlush(feed);
 		Long feedId = result.getId();
-		String api = "/api/feeds/" + feedId + "/comments";
+		String api = "/api/v1/feeds/" + feedId + "/comments";
 		String comment = "댓글ㅋㅋ";
 		PostFeedCommentRequest request = new PostFeedCommentRequest(comment);
 		mockMvc.perform(post(api).header("Authorization", "Bearer " + accessToken)
@@ -270,7 +303,7 @@ class FeedControllerTest extends ControllerTest {
 	}
 
 	@Test
-	@Order(6)
+	@Order(7)
 	void DeleteCommentTest() throws Exception {
 		Member member = memberRepository.findByUserIdAndFamilyId(1L, 1L).orElseThrow();
 		String commentMessage = "ㅠㅠ";
@@ -291,7 +324,7 @@ class FeedControllerTest extends ControllerTest {
 			.build();
 		Comment insertedComment = commentRepository.saveAndFlush(comment);
 
-		String api = "/api/feeds/comments/" + insertedComment.getId();
+		String api = "/api/v1/feeds/comments/" + insertedComment.getId();
 		mockMvc.perform(delete(api).header("Authorization", "Bearer " + accessToken)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk());

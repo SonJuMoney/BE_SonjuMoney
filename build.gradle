@@ -67,6 +67,9 @@ test {
 }
 jacocoTestReport {
     dependsOn test
+    reports {
+        html.required = true
+    }
 }
 check.dependsOn jacocoTestReport
 
