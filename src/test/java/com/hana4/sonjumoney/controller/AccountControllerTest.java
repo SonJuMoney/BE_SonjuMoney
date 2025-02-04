@@ -143,7 +143,55 @@ public class AccountControllerTest extends ControllerTest {
 				.header("Authorization", "Bearer " + accessToken))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.is_child").exists())
-			.andExpect(jsonPath("$.savings").exists())
+			.andExpect(jsonPath("$.savings").isEmpty())
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("아이일 경우 적금 계좌(들) 조회 테스트")
+	void findSavingAccountsChildTest() throws Exception {
+		SignInRequest signInRequest = new SignInRequest("test7", "1234");
+		MvcResult mvcResult = mockMvc.perform(post("/api/v1/auth/sign-in")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(signInRequest)))
+			.andExpect(status().isOk()).andReturn();
+
+		String responseBody = mvcResult.getResponse().getContentAsString();
+		Map<String, String> responseMap = objectMapper.readValue(responseBody, Map.class);
+		accessToken = responseMap.get("access_token");
+
+		String api = "/api/v1/accounts/savings";
+
+		mockMvc.perform(get(api)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.is_child").value(true))
+			.andExpect(jsonPath("$.savings").doesNotExist())
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("적금 계좌(들) 조회 empty 테스트")
+	void findSavingAccountsEmptyTest() throws Exception {
+		SignInRequest signInRequest = new SignInRequest("test2", "1234");
+		MvcResult mvcResult = mockMvc.perform(post("/api/v1/auth/sign-in")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(signInRequest)))
+			.andExpect(status().isOk()).andReturn();
+
+		String responseBody = mvcResult.getResponse().getContentAsString();
+		Map<String, String> responseMap = objectMapper.readValue(responseBody, Map.class);
+		accessToken = responseMap.get("access_token");
+
+		String api = "/api/v1/accounts/savings";
+
+		mockMvc.perform(get(api)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.is_child").value(false))
+			.andExpect(jsonPath("$.savings").isEmpty())
 			.andDo(print());
 	}
 
