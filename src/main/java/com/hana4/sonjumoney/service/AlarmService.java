@@ -137,7 +137,7 @@ public class AlarmService {
 					message = sender.getUser().getUsername() + "님이 " + receiver.getUsername() + "님에게 "
 						+ alarmType.getMessage();
 					alarm = alarmRepository.save(
-						new Alarm(parent, alarmType, createAlarmDto.linkId(), createAlarmDto.familyId(),
+						new Alarm(parent, AlarmType.CHILD_ALLOWANCE, createAlarmDto.linkId(), createAlarmDto.familyId(),
 							message));
 					alarmHandler.sendUserAlarm(SendAlarmDto.from(alarm));
 				}
