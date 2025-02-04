@@ -14,7 +14,8 @@ import com.hana4.sonjumoney.domain.Relationship;
 public interface RelationshipRepository extends JpaRepository<Relationship, Long> {
 	List<Relationship> findAllByParent_Id(Long userId);
 
-	Relationship findByChildId(Long childId);
+	@Query("select r from Relationship r join fetch User u on r.parent.id=u.id where r.child.id=:childId")
+	Relationship findByChildIdWithUser(Long childId);
 
 	@Query("select r from Relationship r where r.parent.id = :parentId and r.child.id = :childId")
 	Optional<Relationship> findRelationship(Long parentId, Long childId);

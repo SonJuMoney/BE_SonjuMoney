@@ -59,14 +59,6 @@ public class AllowanceService {
 		);
 		feedService.saveDirectFeed(
 			CreateAllowanceThanksDto.of(savedAllowance, file, message, FeedType.ALLOWANCE));
-
-		if (receiverUser.getPhone() == null) {
-			Relationship relationship = relationshipRepository.findByChildId(receiverUser.getId());
-			User parent = relationship.getParent();
-			alarmService.createOneOffAlarm(
-				CreateAlarmDto.of(parent.getId(), sender.getId(), savedAllowance.getId(), receiver.getFamily().getId(),
-					AlarmType.ALLOWANCE));
-		}
 		alarmService.createOneOffAlarm(
 			CreateAlarmDto.of(receiverUser.getId(), sender.getId(), savedAllowance.getId(), receiver.getFamily().getId(),
 				AlarmType.ALLOWANCE));
