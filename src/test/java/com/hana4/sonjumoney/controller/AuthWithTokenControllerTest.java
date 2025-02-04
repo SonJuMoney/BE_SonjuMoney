@@ -67,7 +67,7 @@ public class AuthWithTokenControllerTest extends ControllerTest {
 					.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk());
 		User child = userRepository.findByAuthId(authId).orElseThrow();
-		Relationship relationship = relationshipRepository.findByChildId(child.getId());
+		Relationship relationship = relationshipRepository.findByChildIdWithUser(child.getId());
 		relationshipRepository.delete(relationship);
 		userRepository.delete(child);
 	}

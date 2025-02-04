@@ -10,6 +10,7 @@ import com.hana4.sonjumoney.domain.Alarm;
 import com.hana4.sonjumoney.domain.Event;
 import com.hana4.sonjumoney.domain.Family;
 import com.hana4.sonjumoney.domain.Member;
+import com.hana4.sonjumoney.domain.Relationship;
 import com.hana4.sonjumoney.domain.User;
 import com.hana4.sonjumoney.domain.enums.AlarmStatus;
 import com.hana4.sonjumoney.domain.enums.AlarmType;
@@ -27,6 +28,7 @@ import com.hana4.sonjumoney.repository.EventParticipantRepository;
 import com.hana4.sonjumoney.repository.EventRepository;
 import com.hana4.sonjumoney.repository.FamilyRepository;
 import com.hana4.sonjumoney.repository.MemberRepository;
+import com.hana4.sonjumoney.repository.RelationshipRepository;
 import com.hana4.sonjumoney.repository.UserRepository;
 import com.hana4.sonjumoney.websocket.handler.AlarmHandler;
 
@@ -40,7 +42,7 @@ public class AlarmService {
 	private final MemberRepository memberRepository;
 	private final FamilyRepository familyRepository;
 	private final EventRepository eventRepository;
-	private final EventParticipantRepository eventParticipantRepository;
+	private final RelationshipRepository relationshipRepository;
 	private final UserRepository userRepository;
 	private final AlarmHandler alarmHandler;
 	private static final int PAGE_SIZE = 30;
@@ -125,11 +127,21 @@ public class AlarmService {
 				User receiver = userRepository.findById(createAlarmDto.alarmSessionId())
 					.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
 				String message = sender.getUser().getUsername() + "님이 " + alarmType.getMessage();
-
 				Alarm alarm = alarmRepository.save(
 					new Alarm(receiver, alarmType, createAlarmDto.linkId(), createAlarmDto.familyId(),
 						message));
 				alarmHandler.sendUserAlarm(SendAlarmDto.from(alarm));
+				if (receiver.getPhone() == null) {
+					Relationship relationship = relationshipRepository.findByChildIdWithUser(receiver.getId());
+					User parent = relationship.getParent();
+					message = sender.getUser().getUsername() + "님이 " + receiver.getUsername() + "님에게 "
+						+ alarmType.getMessage();
+					alarm = alarmRepository.save(
+						new Alarm(parent, alarmType, createAlarmDto.linkId(), createAlarmDto.familyId(),
+							message));
+					alarmHandler.sendUserAlarm(SendAlarmDto.from(alarm));
+				}
+
 				break;
 			}
 			case FEED, EVENT: {
