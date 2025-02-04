@@ -8,6 +8,7 @@ import lombok.Getter;
 public enum AlarmType {
 
 	ALLOWANCE("용돈","용돈을 보냈어요.",true),
+	CHILD_ALLOWANCE("자식 용돈","",true),
 	THANKS("감사메시지","감사메시지를 보냈어요.",true),
 	SAVINGS("적금입금","적금 입금일이에요. 메시지를 작성해주세요.",false),
 	FEED("피드","새로운 피드가 올라왔어요.",true),
