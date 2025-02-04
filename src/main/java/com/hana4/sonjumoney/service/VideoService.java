@@ -103,7 +103,7 @@ public class VideoService {
 	}
 
 	public void deleteVideo(String pathStr) {
-		String decodedPath = URLDecoder.decode(pathStr);
+		String decodedPath = URLDecoder.decode(pathStr, StandardCharsets.UTF_8);
 		Path path = Paths.get(decodedPath);
 		try {
 			Files.delete(path);
