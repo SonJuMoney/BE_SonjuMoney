@@ -183,6 +183,29 @@ public class AccountControllerTest extends ControllerTest {
 
 	@Test
 	@Transactional
+	@DisplayName("적금 계좌 송금 pin 오류 테스트")
+	void transferToSavingAccountInvalidPinTest() throws Exception {
+		String accountId = "2";
+		String api = "/api/v1/accounts/savings/" + accountId + "/transfer";
+		Long amount = 1000L;
+
+		SendMoneyRequest request = SendMoneyRequest.builder()
+			.amount(amount)
+			.pin("124353")
+			.message("돈 보낸다")
+			.build();
+
+		String requestBody = objectMapper.writeValueAsString(request);
+		mockMvc.perform(post(api)
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer " + accessToken)
+				.content(requestBody))
+			.andExpect(status().is4xxClientError())
+			.andDo(print());
+	}
+
+	@Test
+	@Transactional
 	@DisplayName("무인증 적금 계좌 송금 요청에 대한 예외 테스트")
 	void statusFalseTransferTest() throws Exception {
 		String accountId = "2";
