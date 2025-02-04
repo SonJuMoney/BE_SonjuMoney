@@ -216,10 +216,7 @@ public class AccountService {
 	@Transactional
 	public TransferResponse sendMoneyProcess(Long accountId, SendMoneyRequest request, Long userId) {
 		/* 비밀번호 인증 여부가 false면 송금 process를 수행하지 않음 */
-		if (authService.validatePin(new AuthPinRequest(request.pin()), userId).code() != 200) {
-			throw new CommonException(ErrorCode.INVALID_PIN);
-		}
-
+		authService.validatePin(new AuthPinRequest(request.pin()), userId);
 		Account senderAccount = accountRepository.findByUserId(userId)
 			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
 		Account receiverAccount = accountRepository.findById(accountId)
@@ -258,10 +255,8 @@ public class AccountService {
 
 			sender.withdraw(transferDto.amount());
 			receiver.deposit(transferDto.amount());
-		} catch (CommonException e) {
-			throw new CommonException(ErrorCode.TRANSACTION_FAILED);
 		} catch (Exception e) {
-			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
+			throw new CommonException(ErrorCode.TRANSACTION_FAILED);
 		}
 
 	}
