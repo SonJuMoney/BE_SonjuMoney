@@ -163,54 +163,53 @@ public class AlarmService {
 
 	// ---------------아래 부분은 추후 추가 구현 예정----------------//
 	// TODO: 이건 개별적으로 안하고 한번에 보내게 바꾸기
-	public void createEventAlarm(CreateAlarmDto createAlarmDto) {
-		AlarmType alarmType = createAlarmDto.alarmType();
-		Member sender = memberRepository.findById(createAlarmDto.senderId())
-			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
-		Event event = eventRepository.findById(createAlarmDto.linkId())
-			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
-		String alarmMessage = makeEventAlarmMessage(createAlarmDto.linkId());
-
-		switch (alarmType) {
-			case BIRTHDAY: {
-				Family family = familyRepository.findById(event.getId())
-					.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
-				List<Member> members = memberRepository.findByFamilyId(family.getId());
-
-				for (Member member : members) {
-					alarmRepository.save(
-						new Alarm(member.getUser(), alarmType, createAlarmDto.linkId(), createAlarmDto.familyId(),
-							alarmMessage));
-				}
-				break;
-			}
-			case TRAVEL, DINING, MEMORIAL, OTHERS: {
-				List<Member> participants = eventParticipantRepository.findMembersByEventId(event.getId());
-				participants.remove(sender);
-				for (Member participant : participants) {
-					alarmRepository.save(
-						new Alarm(participant.getUser(), alarmType, createAlarmDto.linkId(), createAlarmDto.familyId(),
-							alarmMessage));
-				}
-			}
-			default: {
-				throw new CommonException(ErrorCode.WRONG_ALARM_TYPE);
-			}
-		}
-
-	}
-
-	public void createSavingAlarm(CreateAlarmDto createAlarmDto) {
-		AlarmType alarmType = createAlarmDto.alarmType();
-		if (!alarmType.equals(AlarmType.SAVINGS)) {
-			throw new CommonException(ErrorCode.WRONG_ALARM_TYPE);
-		}
-		User user = userRepository.findById(createAlarmDto.alarmSessionId())
-			.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
-		String alarmMessage = "내일은 " + alarmType.getMessage();
-		alarmRepository.save(
-			new Alarm(user, alarmType, createAlarmDto.linkId(), createAlarmDto.familyId(), alarmMessage));
-
-	}
-
+	// public void createEventAlarm(CreateAlarmDto createAlarmDto) {
+	// 	AlarmType alarmType = createAlarmDto.alarmType();
+	// 	Member sender = memberRepository.findById(createAlarmDto.senderId())
+	// 		.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_MEMBER));
+	// 	Event event = eventRepository.findById(createAlarmDto.linkId())
+	// 		.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+	// 	String alarmMessage = makeEventAlarmMessage(createAlarmDto.linkId());
+	//
+	// 	switch (alarmType) {
+	// 		case BIRTHDAY: {
+	// 			Family family = familyRepository.findById(event.getId())
+	// 				.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_DATA));
+	// 			List<Member> members = memberRepository.findByFamilyId(family.getId());
+	//
+	// 			for (Member member : members) {
+	// 				alarmRepository.save(
+	// 					new Alarm(member.getUser(), alarmType, createAlarmDto.linkId(), createAlarmDto.familyId(),
+	// 						alarmMessage));
+	// 			}
+	// 			break;
+	// 		}
+	// 		case TRAVEL, DINING, MEMORIAL, OTHERS: {
+	// 			List<Member> participants = eventParticipantRepository.findMembersByEventId(event.getId());
+	// 			participants.remove(sender);
+	// 			for (Member participant : participants) {
+	// 				alarmRepository.save(
+	// 					new Alarm(participant.getUser(), alarmType, createAlarmDto.linkId(), createAlarmDto.familyId(),
+	// 						alarmMessage));
+	// 			}
+	// 		}
+	// 		default: {
+	// 			throw new CommonException(ErrorCode.WRONG_ALARM_TYPE);
+	// 		}
+	// 	}
+	//
+	// }
+	//
+	// public void createSavingAlarm(CreateAlarmDto createAlarmDto) {
+	// 	AlarmType alarmType = createAlarmDto.alarmType();
+	// 	if (!alarmType.equals(AlarmType.SAVINGS)) {
+	// 		throw new CommonException(ErrorCode.WRONG_ALARM_TYPE);
+	// 	}
+	// 	User user = userRepository.findById(createAlarmDto.alarmSessionId())
+	// 		.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
+	// 	String alarmMessage = "내일은 " + alarmType.getMessage();
+	// 	alarmRepository.save(
+	// 		new Alarm(user, alarmType, createAlarmDto.linkId(), createAlarmDto.familyId(), alarmMessage));
+	//
+	// }
 }
