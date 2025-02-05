@@ -107,7 +107,7 @@ public class FamilyService {
 					.orElseThrow(() -> new CommonException(ErrorCode.NOT_FOUND_USER));
 				memberRepository.save(
 					new Member(family, child,
-						user.getGender().equals(Gender.MALE) ? MemberRole.SON : MemberRole.DAUGHTER));
+						child.getGender().equals(Gender.MALE) ? MemberRole.SON : MemberRole.DAUGHTER));
 			}
 		}
 		addBirthWhenMemberAdded(userId, user.getUsername(), user.getResidentNum(), member.getId(), family.getId());
