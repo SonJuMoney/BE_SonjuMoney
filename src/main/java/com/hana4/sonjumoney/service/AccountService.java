@@ -98,7 +98,7 @@ public class AccountService {
 
 		makeTransactionHistory(TransactionHistoryDto.builder()
 			.account(receiver)
-			.afterBalance(sender.getBalance())
+			.afterBalance(receiver.getBalance())
 			.opponentAccountId(sender.getId())
 			.message(allowanceDto.message())
 			.transactionType(TransactionType.DEPOSIT)
