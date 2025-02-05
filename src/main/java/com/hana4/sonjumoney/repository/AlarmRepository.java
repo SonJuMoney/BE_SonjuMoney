@@ -32,4 +32,6 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 	Optional<Alarm> findLatestAlarmByUserIdAndAlarmStatus(@Param("userId") Long userId,
 		@Param("alarmStatus") AlarmStatus alarmStatus);
 
+	@Query("SELECT a FROM Alarm a WHERE a.linkId=:linkId AND (a.alarmType = 'ALLOWANCE' OR a.alarmType = 'CHILD_ALLOWANCE') ")
+	List<Alarm> findByLinkId(Long linkId);
 }

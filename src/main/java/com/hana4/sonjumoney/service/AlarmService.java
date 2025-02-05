@@ -24,7 +24,7 @@ import com.hana4.sonjumoney.dto.response.UpdateAlarmResponse;
 import com.hana4.sonjumoney.exception.CommonException;
 import com.hana4.sonjumoney.exception.ErrorCode;
 import com.hana4.sonjumoney.repository.AlarmRepository;
-import com.hana4.sonjumoney.repository.EventParticipantRepository;
+import com.hana4.sonjumoney.repository.AllowanceRepository;
 import com.hana4.sonjumoney.repository.EventRepository;
 import com.hana4.sonjumoney.repository.FamilyRepository;
 import com.hana4.sonjumoney.repository.MemberRepository;
@@ -46,6 +46,7 @@ public class AlarmService {
 	private final UserRepository userRepository;
 	private final AlarmHandler alarmHandler;
 	private static final int PAGE_SIZE = 30;
+	private final AllowanceRepository allowanceRepository;
 
 	public AlarmResponse getAlarms(Long userId, Integer page) {
 		try {
@@ -66,13 +67,21 @@ public class AlarmService {
 			List<AlarmContentDto> contents = new ArrayList<>();
 			Boolean hasNext = alarmRepository.hasNext(userId, alarms.get(alarms.size() - 1).getId());
 			for (Alarm alarm : alarms) {
+				Long childId = null;
+				if (alarm.getAlarmType() == AlarmType.CHILD_ALLOWANCE) {
+					childId = allowanceRepository.findById(alarm.getLinkId())
+						.orElseThrow(() -> new CommonException(ErrorCode.INTERNAL_SERVER_ERROR))
+						.getReceiver()
+						.getUser().getId();
+				}
 				contents.add(AlarmContentDto.of(
 					alarm.getId(),
 					alarm.getAlarmStatus(),
 					alarm.getAlarmType(),
 					alarm.getMessage(),
 					alarm.getLinkId(),
-					alarm.getCreatedAt()
+					alarm.getCreatedAt(),
+					childId
 				));
 			}
 			AlarmResultDto result = AlarmResultDto.of(
@@ -100,6 +109,17 @@ public class AlarmService {
 		try {
 			alarm.changeStatusToChecked();
 			alarmRepository.save(alarm);
+
+			// 알람이 2개 생기는 용돈 알람에 대한 처리 로직
+			AlarmType alarmType = alarm.getAlarmType();
+			if (alarmType == AlarmType.ALLOWANCE || alarmType == AlarmType.CHILD_ALLOWANCE) {
+				List<Alarm> alarms = alarmRepository.findByLinkId(alarm.getLinkId());
+				for (Alarm childAlarm : alarms) {
+					childAlarm.changeStatusToChecked();
+					alarmRepository.save(childAlarm);
+				}
+			}
+
 		} catch (Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR);
 		}

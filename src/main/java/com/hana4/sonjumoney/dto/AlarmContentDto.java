@@ -14,11 +14,12 @@ public record AlarmContentDto(
 	AlarmType alarm_type,
 	String message,
 	Long link_id,
-	LocalDateTime created_at
+	LocalDateTime created_at,
+	Long child_id
 ) {
 	public static AlarmContentDto of(Long alarm_id, AlarmStatus status, AlarmType alarm_type, String message,
 		Long link_id,
-		LocalDateTime created_at) {
+		LocalDateTime created_at, Long child_id) {
 		return AlarmContentDto.builder()
 			.alarm_id(alarm_id)
 			.status(status)
@@ -26,6 +27,7 @@ public record AlarmContentDto(
 			.message(message)
 			.link_id(link_id)
 			.created_at(created_at)
+			.child_id(child_id)
 			.build();
 	}
 }
