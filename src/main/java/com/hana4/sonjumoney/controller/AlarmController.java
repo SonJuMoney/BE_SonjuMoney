@@ -16,8 +16,10 @@ import com.hana4.sonjumoney.dto.response.UpdateAlarmResponse;
 import com.hana4.sonjumoney.service.AlarmService;
 import com.hana4.sonjumoney.util.AuthenticationUtil;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Alarms", description = "알림 관련 API")
 @RestController
 @RequestMapping("/api/v1/alarms")
 @RequiredArgsConstructor

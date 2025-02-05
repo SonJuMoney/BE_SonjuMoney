@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hana4.sonjumoney.service.VideoService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Videos", description = "비디오 스트리밍 관련 API")
 @RestController
 @RequestMapping("/api/v1/videos")
 @RequiredArgsConstructor

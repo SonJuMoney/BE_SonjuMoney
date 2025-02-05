@@ -20,8 +20,10 @@ import com.hana4.sonjumoney.dto.response.GetFamilyResponse;
 import com.hana4.sonjumoney.service.FamilyService;
 import com.hana4.sonjumoney.util.AuthenticationUtil;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Families", description = "가족 관련 API")
 @RestController
 @RequestMapping("/api/v1/families")
 @RequiredArgsConstructor
