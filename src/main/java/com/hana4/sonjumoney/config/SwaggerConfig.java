@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.filter.ForwardedHeaderFilter;
 
 import com.hana4.sonjumoney.dto.JwtTokenDto;
 import com.hana4.sonjumoney.dto.request.SignInRequest;
@@ -76,9 +75,5 @@ public class SwaggerConfig {
 		) {
 		}
 	}
-
-	@Bean
-	ForwardedHeaderFilter forwardedHeaderFilter() {
-		return new ForwardedHeaderFilter();
-	}
+	
 }
