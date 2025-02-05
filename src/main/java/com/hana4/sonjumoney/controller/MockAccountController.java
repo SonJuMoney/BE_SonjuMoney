@@ -17,8 +17,10 @@ import com.hana4.sonjumoney.dto.response.PinValidResponse;
 import com.hana4.sonjumoney.service.MockAccountService;
 import com.hana4.sonjumoney.util.AuthenticationUtil;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Mock Accounts", description = "목 계좌 관련 API")
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor

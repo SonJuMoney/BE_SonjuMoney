@@ -13,8 +13,10 @@ import com.hana4.sonjumoney.dto.response.CallRecommendationResponse;
 import com.hana4.sonjumoney.service.CallService;
 import com.hana4.sonjumoney.util.AuthenticationUtil;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Calls", description = "화상통하 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/calls")
