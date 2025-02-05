@@ -25,8 +25,10 @@ import com.hana4.sonjumoney.dto.response.PostFeedCommentResponse;
 import com.hana4.sonjumoney.service.FeedService;
 import com.hana4.sonjumoney.util.AuthenticationUtil;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Feeds", description = "피드 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/feeds")

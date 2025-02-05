@@ -27,8 +27,10 @@ import com.hana4.sonjumoney.dto.response.TransferResponse;
 import com.hana4.sonjumoney.service.AccountService;
 import com.hana4.sonjumoney.util.AuthenticationUtil;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Accounts", description = "계좌 관련 API")
 @RestController
 @RequestMapping("/api/v1/accounts")
 @RequiredArgsConstructor

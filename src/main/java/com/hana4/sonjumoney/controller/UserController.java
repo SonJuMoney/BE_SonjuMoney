@@ -17,8 +17,10 @@ import com.hana4.sonjumoney.dto.response.UserInfoResponse;
 import com.hana4.sonjumoney.service.UserService;
 import com.hana4.sonjumoney.util.AuthenticationUtil;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Users", description = "유저 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
